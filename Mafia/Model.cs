@@ -5,13 +5,13 @@ namespace Mafia;
 public class Group
 {
     public required string Name { get; set; }
-    public Role[]? Roles { get; set; }
+    public string[]? Roles { get; set; }
 }
 
 public class RoleAct
 {
-    public Role Role { get; set; }
-    public Act Act {  get; set; }
+    public required string Role { get; set; }
+    public required Act Act {  get; set; }
 }
 
 public class Model
@@ -35,24 +35,24 @@ public class User
 public class Player
 {
     public User User { get; set; }
-    public Role Role { get; set; }
+    public string Role { get; set; }
     public int? Day { get; set; }
 }
 
-public enum Role
-{
-    Civilian,
-    DonMafia,
-    BumMafia,
-    Mafia,
-    Commissar,
-    Sergeant,
-    Doctor,
-    Maniac,
-    Prostitute,
-    Kamikaze,
-    Shahid
-}
+//public enum Role
+//{
+//    Civilian,
+//    DonMafia,
+//    BumMafia,
+//    Mafia,
+//    Commissar,
+//    Sergeant,
+//    Doctor,
+//    Maniac,
+//    Prostitute,
+//    Kamikaze,
+//    Shahid
+//}
 
 public enum SimpleAct
 {
@@ -79,7 +79,7 @@ public enum Act
 public class Evt
 {
     public string? group;
-    public Role? role;
+    public string? role;
     public required SimpleAct act;
 }
 
@@ -91,7 +91,7 @@ public class Evt
 
 public class MaestroMessage
 {
-    public Role[] roles;
+    public string[] roles;
     public Act act;
     public string message;
 }
@@ -141,6 +141,8 @@ public class GameEvent
 public partial class Game
 {
     public Model model;
+
+    public string[] roles => model.Groups.Where(g=>g.Roles != null).SelectMany(g=>g.Roles!).Distinct().ToArray();
 
     public DateTime Time { get; set; }
     public List<Player> Players { get; set; }

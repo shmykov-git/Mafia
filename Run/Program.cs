@@ -3,6 +3,7 @@ using System.Diagnostics;
 using Mafia;
 
 
+
 var nMax = 20;
 var rnd = new Random();
 var players = Enumerable.Range(1, nMax+1).Select(i => new User { Name = $"Player {i}", Nick = i.ToString() }).ToArray();
@@ -19,6 +20,18 @@ var gamePlayers = Enumerable.Range(1, n+1).Select(_ =>
 }).ToArray();
 
 
+var now = DateTime.Now;
+var game = new Game() { Time = now };
+game.LoadModel("mafia.json");
+
+var roles = game.roles;
+
+
+
+
+var stop = 1;
+
+
 //var plan = new[]
 //{
 //    ("Город засыпает", GameEvent.CityFallAsleep),
@@ -31,11 +44,6 @@ var gamePlayers = Enumerable.Range(1, n+1).Select(_ =>
 //};
 
 
-var roles = new Role[] { Role.DonMafia, Role.BumMafia, Role.Commissar, Role.Doctor, Role.Civilian, Role.Civilian, Role.Civilian, Role.Civilian, Role.Civilian, Role.Civilian };
-
-if (roles.Length != n)
-    throw new Exception();
-
 foreach (var _ in Enumerable.Range(0, rnd.Next(17)))
 {
     var i = rnd.Next(roles.Length);
@@ -46,22 +54,11 @@ foreach (var _ in Enumerable.Range(0, rnd.Next(17)))
 var playerRoles = roles.Select((r, i)=> new Player { User = gamePlayers[i], Role = roles[i] }).ToList();
 var lives = playerRoles.ToList();
 
-var now = DateTime.Now;
-var game = new Game() { Time = now, Players = playerRoles/*, Actions = new()*/ };
-game.LoadModel("mafia.json");
 
 
-var stop = 1;
 
-int SomeOne(params Role[] exceptRoles)
-{
-    if (exceptRoles.Length == 0)
-        rnd.Next(lives.Count);
 
-    var list = lives.Where(v=>!exceptRoles.Contains(v.Role)).ToList();
-    var k = rnd.Next(list.Count);
-    return lives.IndexOf(list[k]);
-}
+//int SomeOne() => rnd.Next(lives.Count);
 
 //void Kill(int day, GameEvent evt, int ind)
 //{
