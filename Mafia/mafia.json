@@ -9,7 +9,9 @@
       "roles": [ "Commissar", "Sergeant" ]
     },
     {
-      "name": "City"
+      "name": "City",
+      "act": "Kill",
+      "skippable": "true"
     },
     {
       "name": "Mafia",
@@ -20,7 +22,7 @@
       "roles": [ "Maniac" ]
     }
   ],
-  "roles": [
+  "selectActs": [
     {
       "role": "DonMafia",
       "act": "Kill"
@@ -51,7 +53,8 @@
     },
     {
       "role": "Kamikaze",
-      "act": "Take"
+      "act": "Take",
+      "skippable": "true"
     },
     {
       "role": "Shahid",
@@ -60,146 +63,142 @@
   ],
   "firstDayEvents": [
     {
-      "act": "CityKill",
+      "command": "Select",
       "group": "City"
     },
     {
-      "act": "FallAsleep",
+      "command": "FallAsleep",
       "group": "City"
     },
     {
-      "act": "WakeUp",
+      "command": "WakeUp",
       "role": "Prostitute"
     },
     {
-      "act": "Select",
+      "command": "Select",
       "role": "Prostitute"
     },
     {
-      "act": "FallAsleep",
+      "command": "FallAsleep",
       "role": "Prostitute"
     },
     {
-      "act": "WakeUp",
+      "command": "WakeUp",
       "group": "Mafia"
     },
     {
-      "act": "Select",
+      "command": "Select",
       "group": "Mafia"
     },
     {
-      "act": "FallAsleep",
+      "command": "FallAsleep",
       "group": "Mafia"
     },
     {
-      "act": "WakeUp",
+      "command": "WakeUp",
       "group": "Comissar"
     },
     {
-      "act": "Select",
+      "command": "Select",
       "group": "Comissar"
     },
     {
-      "act": "FallAsleep",
+      "command": "FallAsleep",
       "group": "Comissar"
     },
     {
-      "act": "WakeUp",
+      "command": "WakeUp",
       "role": "Doctor"
     },
     {
-      "act": "Select",
+      "command": "Select",
       "role": "Doctor"
     },
     {
-      "act": "FallAsleep",
+      "command": "FallAsleep",
       "role": "Doctor"
     },
     {
-      "act": "WakeUp",
-      "role": "Doctor"
-    },
-    {
-      "act": "Select",
-      "role": "Doctor"
-    },
-    {
-      "act": "FallAsleep",
-      "role": "Doctor"
-    },
-    {
-      "act": "WakeUp",
+      "command": "WakeUp",
       "role": "Kamikaze"
     },
     {
-      "act": "FallAsleep",
+      "command": "FallAsleep",
       "role": "Kamikaze"
     },
     {
-      "act": "WakeUp",
+      "command": "WakeUp",
       "role": "Shahid"
     },
     {
-      "act": "FallAsleep",
+      "command": "FallAsleep",
       "role": "Shahid"
+    },
+    {
+      "command": "WakeUp",
+      "group": "City"
     }
   ],
   "dayEvents": [
     {
-      "act": "CityKill",
+      "command": "Select",
       "group": "City"
     },
     {
-      "act": "FallAsleep",
+      "command": "FallAsleep",
       "group": "City"
     },
     {
-      "act": "WakeUp",
+      "command": "WakeUp",
       "role": "Prostitute"
     },
     {
-      "act": "Select",
+      "command": "Select",
       "role": "Prostitute"
     },
     {
-      "act": "FallAsleep",
+      "command": "FallAsleep",
       "role": "Prostitute"
     },
     {
-      "act": "WakeUp",
+      "command": "WakeUp",
       "group": "Mafia"
     },
     {
-      "act": "Select",
+      "command": "Select",
       "group": "Mafia"
     },
     {
-      "act": "FallAsleep",
+      "command": "FallAsleep",
       "group": "Mafia"
     },
     {
-      "act": "WakeUp",
+      "command": "WakeUp",
       "group": "Comissar"
     },
     {
-      "act": "Select",
+      "command": "Select",
       "group": "Comissar"
     },
     {
-      "act": "FallAsleep",
+      "command": "FallAsleep",
       "group": "Comissar"
     },
     {
-      "act": "WakeUp",
+      "command": "WakeUp",
       "role": "Doctor"
     },
     {
-      "act": "Select",
+      "command": "Select",
       "role": "Doctor"
     },
     {
-      "act": "FallAsleep",
+      "command": "FallAsleep",
       "role": "Doctor"
+    },
+    {
+      "command": "WakeUp",
+      "group": "City"
     }
   ]
 }
