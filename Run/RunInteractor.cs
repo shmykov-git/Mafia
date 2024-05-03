@@ -9,7 +9,7 @@ public class RunInteractor : IInteractor
     private Game game;
     private Random rnd;
 
-    public RunInteractor(int seed = 0)
+    public RunInteractor(int seed)
     {
         rnd = new Random(seed);
     }
@@ -19,12 +19,11 @@ public class RunInteractor : IInteractor
     public Player[] GetPlayers(Model model)
     {
         var nMax = 20;
-        var rnd = new Random();
         var users = Enumerable.Range(1, nMax + 1).Select(i => new User { Name = $"User {i}", Nick = $"Nick{i}" }).ToArray();
 
         var listP = users.ToList();
 
-        var n = 10;
+        var n = 15;
         var gamePlayers = Enumerable.Range(1, n + 1).Select(_ =>
         {
             var i = rnd.Next(listP.Count);
@@ -33,7 +32,18 @@ public class RunInteractor : IInteractor
             return player;
         }).ToArray();
 
-        var roles = model.Roles;
+        var civilianRole = model.Groups.Single(g => g.IsCivilian).Roles!.Last();
+        var mafiaRole = model.Groups.Single(g => g.IsMafia).Roles!.Last();
+
+        var nn = n - model.Roles.Length;
+        var nMafia = nn / 3;
+        var nCivilian = nn - nMafia;
+
+        var mafias = Enumerable.Range(0, nMafia).Select(_ => mafiaRole);
+        var civilians = Enumerable.Range(0, nCivilian).Select(_ => civilianRole);
+
+        var roles = model.Roles.Concat(mafias).Concat(civilians).ToArray();
+        Act? GetAct(string role) => model.SelectActs.FirstOrDefault(a=>a.Role == role)?.Act;
 
         foreach (var _ in Enumerable.Range(0, rnd.Next(17)))
         {
@@ -42,7 +52,7 @@ public class RunInteractor : IInteractor
             (roles[i], roles[j]) = (roles[j], roles[i]);
         }
 
-        var players = roles.Select((r, i) => new Player { User = gamePlayers[i], Role = roles[i] }).ToArray();
+        var players = roles.Select((r, i) => new Player { User = gamePlayers[i], Role = roles[i], Group = model.GetGroupByRole(roles[i]), Act = GetAct(roles[i]) }).ToArray();
 
         return players;
     }
@@ -54,11 +64,16 @@ public class RunInteractor : IInteractor
         this.game = game;
     }
 
-    private bool NeedSkip(bool skippable) => skippable ? rnd.NextDouble() < 0.1 : false;
-
     public Player[] CitySelect(bool skippable) => NeedSkip(skippable) ? [] : [alivePlayers[rnd.Next(alivePlayers.Count)]];
 
-    public Player[] Select(Player p, bool skippable, Act act) => NeedSkip(skippable) ? [] : [alivePlayers[rnd.Next(alivePlayers.Count)]];
+    public Player[] Select(Player p, bool skippable)
+    {
+        var otherGroupPlayers = p.Group == null 
+            ? alivePlayers.Where(ap => ap != p).ToArray() 
+            : alivePlayers.Where(ap => ap.Group != p.Group).ToArray();
+
+        return NeedSkip(skippable) ? [] : [otherGroupPlayers[rnd.Next(otherGroupPlayers.Length)]];
+    }
 
     public Player[] DoubleSelect(Player p)
     {
@@ -69,8 +84,11 @@ public class RunInteractor : IInteractor
         return [alivePlayers[i], alivePlayers[j]];
     }
 
-    public void TellInformation(string message)
+    public void Tells(string message)
     {
         Debug.WriteLine(message);
     }
+
+    private bool NeedSkip(bool skippable) => skippable ? rnd.NextDouble() < 0.1 : false;
+
 }

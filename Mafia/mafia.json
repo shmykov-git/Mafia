@@ -1,28 +1,36 @@
 ﻿{
   "groups": [
     {
+      "name": "City",
+      "act": "Kill",
+      "isCity": true,
+      "skippable": true
+    },
+    {
+      "name": "Mafia",
+      "roles": [ "DonMafia", "BumMafia", "Mafia" ],
+      "isMafia": true
+    },
+    {
+      "name": "Maniac",
+      "roles": [ "Maniac" ],
+      "isManiac": true
+    },
+    {
       "name": "Civilian",
-      "roles": [ "Commissar", "Sergeant", "Doctor", "Prostitute", "Kamikaze", "Shahid" ]
+      "roles": [ "Commissar", "Sergeant", "Doctor", "Prostitute", "Kamikaze", "Shahid", "Civilian" ],
+      "isCivilian": true
     },
     {
       "name": "Comissar",
       "roles": [ "Commissar", "Sergeant" ]
-    },
-    {
-      "name": "City",
-      "act": "Kill",
-      "skippable": "true"
-    },
-    {
-      "name": "Mafia",
-      "roles": [ "DonMafia", "BumMafia", "Mafia" ]
-    },
-    {
-      "name": "Maniac",
-      "roles": [ "Maniac" ]
     }
   ],
   "selectActs": [
+    {
+      "role": "Prostitute",
+      "act": "Lock"
+    },
     {
       "role": "DonMafia",
       "act": "Kill"
@@ -33,6 +41,10 @@
     },
     {
       "role": "Mafia",
+      "act": "Kill"
+    },
+    {
+      "role": "Maniac",
       "act": "Kill"
     },
     {
@@ -48,13 +60,9 @@
       "act": "Heal"
     },
     {
-      "role": "Prostitute",
-      "act": "Lock"
-    },
-    {
       "role": "Kamikaze",
       "act": "Take",
-      "skippable": "true"
+      "skippable": true
     },
     {
       "role": "Shahid",
@@ -93,6 +101,18 @@
     {
       "command": "FallAsleep",
       "group": "Mafia"
+    },
+    {
+      "command": "WakeUp",
+      "role": "Maniac"
+    },
+    {
+      "command": "Select",
+      "role": "Maniac"
+    },
+    {
+      "command": "FallAsleep",
+      "role": "Maniac"
     },
     {
       "command": "WakeUp",
@@ -171,6 +191,18 @@
     {
       "command": "FallAsleep",
       "group": "Mafia"
+    },
+    {
+      "command": "WakeUp",
+      "role": "Maniac"
+    },
+    {
+      "command": "Select",
+      "role": "Maniac"
+    },
+    {
+      "command": "FallAsleep",
+      "role": "Maniac"
     },
     {
       "command": "WakeUp",

@@ -6,5 +6,11 @@ public class Group
     public string[]? Roles { get; set; }
     public Act? Act { get; set; }
     public bool Skippable { get; set; }
-    public bool IsCity => Roles == null;
+
+    public bool IsCivilian { get; set; }
+    public bool IsMafia { get; set; }
+    public bool IsCity { get; set; }
+    public bool IsManiac { get; set; }
+
+    public bool IsAct => !IsCivilian && !IsCity;
 }

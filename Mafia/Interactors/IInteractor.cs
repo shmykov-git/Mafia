@@ -11,7 +11,7 @@ public interface IInteractor
     string ModelFileName { get; }
 
     Player[] CitySelect(bool skippable);
-    Player[] Select(Player player, bool skippable, Act act);
+    Player[] Select(Player player, bool skippable);
     Player[] DoubleSelect(Player player);
-    void TellInformation(string message);
+    void Tells(string message);
 }

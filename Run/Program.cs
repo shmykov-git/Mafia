@@ -3,7 +3,7 @@ using Mafia.Interactors;
 using Mafia.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-var seed = 0;
+var seed = 1;
 
 var services = new ServiceCollection();
 
