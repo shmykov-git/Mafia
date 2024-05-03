@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel.Design;
 using System.Data;
+using System.Runtime.InteropServices.Marshalling;
 using Mafia.Exceptions;
 using Mafia.Extensions;
 using Mafia.Interactors;
 using Mafia.Models;
 using Mapster;
+using Microsoft.Extensions.Options;
 using Microsoft.VisualBasic;
 
 namespace Mafia.Services;
@@ -15,15 +17,17 @@ public class Game
     public DateTime time;
     public readonly Player[] players;
     private IInteractor interactor;
+    private readonly IOptions<GameOptions> options;
+    private List<Event[]> process = new();
 
     public List<Player> alivePlayers;
-    public List<Event[]> Process = new();
 
-    public Game(IInteractor interactor)
+    public Game(IInteractor interactor, IOptions<GameOptions> options)
     {
         this.interactor = interactor;
+        this.options = options;
         interactor.ApplyGame(this);
-        LoadModel(interactor.ModelFileName);
+        LoadModel(interactor.GameFileName);
         players = interactor.GetPlayers(model!);
         alivePlayers = players.ToList();
     }
@@ -53,7 +57,7 @@ public class Game
         var dayEvents = day == 1 ? model.FirstDayEvents : model.DayEvents;
         var dayProcess = dayEvents.Where(IsMineTimeOfDay).Select(Interact).Where(evt => evt != null).ToArray();
         
-        Process.Add(dayProcess!);
+        process.Add(dayProcess!);
         var kills = GetKills(dayProcess!);
 
         interactor.Tells($"Kills: {kills.SJoin(", ")}");
@@ -142,8 +146,11 @@ public class Game
                 //evt.selections.ForEach(p => alivePlayers.Remove(p));
             }
         }
-        //else
-        //    interactor.Tells($"{who} {act}");
+        else
+        {
+            if (options.Value.TellWakeUp)
+                interactor.Tells($"{who} {act}");
+        }
 
         return evt;
     }
@@ -167,7 +174,7 @@ public class Game
 
         return evt.act switch
         {
-            Act.DoubleKill => interactor.DoubleSelect(evt.mainPlayers![0]),
+            Act.DoubleKillOnDeath => interactor.DoubleKillOnDeath(evt.mainPlayers![0]),
             _ => interactor.Select(evt.mainPlayers![0], evt.skippable)
         };
     }

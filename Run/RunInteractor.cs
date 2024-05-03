@@ -57,7 +57,7 @@ public class RunInteractor : IInteractor
         return players;
     }
 
-    public string ModelFileName => "mafia.json";
+    public string GameFileName => "mafia.json";
 
     public void ApplyGame(Game game)
     {
@@ -75,7 +75,7 @@ public class RunInteractor : IInteractor
         return NeedSkip(skippable) ? [] : [otherGroupPlayers[rnd.Next(otherGroupPlayers.Length)]];
     }
 
-    public Player[] DoubleSelect(Player p)
+    public Player[] DoubleKillOnDeath(Player p)
     {
         var ind = alivePlayers.IndexOf(p);
         var i = (ind - 1 + alivePlayers.Count) % alivePlayers.Count;

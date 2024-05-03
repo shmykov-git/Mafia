@@ -1,15 +1,22 @@
 ﻿using Mafia;
 using Mafia.Interactors;
 using Mafia.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 var seed = 1;
 
+var interactor = new RunInteractor(seed);
+
+var builder = new ConfigurationBuilder();
+builder.AddJsonFile(interactor.GameFileName);
+var configuration = builder.Build();
+
 var services = new ServiceCollection();
 
-services
-    .AddMafia()
-    .AddTransient<IInteractor>(_ => new RunInteractor(seed));
+services        
+    .AddMafia(configuration)
+    .AddTransient<IInteractor>(_ => interactor);
 
 var provider = services.BuildServiceProvider();
 

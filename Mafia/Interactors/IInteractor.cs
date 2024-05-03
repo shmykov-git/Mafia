@@ -8,10 +8,10 @@ public interface IInteractor
     void ApplyGame(Game game);
     Player[] GetPlayers(Model model);
 
-    string ModelFileName { get; }
+    string GameFileName { get; }
 
     Player[] CitySelect(bool skippable);
     Player[] Select(Player player, bool skippable);
-    Player[] DoubleSelect(Player player);
+    Player[] DoubleKillOnDeath(Player player);
     void Tells(string message);
 }

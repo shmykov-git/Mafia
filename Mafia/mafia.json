@@ -1,4 +1,7 @@
 ﻿{
+  "options": {
+    "tellWakeUp": false
+  },
   "groups": [
     {
       "name": "City",
@@ -61,12 +64,31 @@
     },
     {
       "role": "Kamikaze",
-      "act": "Take",
+      "act": "KillOnDeath",
       "skippable": true
     },
     {
       "role": "Shahid",
-      "act": "DoubleTake"
+      "act": "DoubleKillOnDeath"
+    }
+  ],
+  "onDeathEvents": [
+    {
+      "act": "KillOnDeath",
+      "events": [
+        {
+          "command": "WakeUp",
+          "role": "Kamikaze"
+        },
+        {
+          "command": "Select",
+          "role": "Kamikaze"
+        },
+        {
+          "command": "FallAsleep",
+          "role": "Kamikaze"
+        }
+      ]
     }
   ],
   "firstDayEvents": [
