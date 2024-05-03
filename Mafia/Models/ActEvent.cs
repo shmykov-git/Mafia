@@ -2,6 +2,6 @@
 
 public class ActEvent
 {
-    public required Act Act { get; set; }
+    public required string Role { get; set; }
     public required Event[] Events { get; set; }
 }

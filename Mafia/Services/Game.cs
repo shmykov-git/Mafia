@@ -1,13 +1,9 @@
-﻿using System.ComponentModel.Design;
-using System.Data;
-using System.Runtime.InteropServices.Marshalling;
-using Mafia.Exceptions;
+﻿using System.Data;
 using Mafia.Extensions;
 using Mafia.Interactors;
 using Mafia.Models;
 using Mapster;
 using Microsoft.Extensions.Options;
-using Microsoft.VisualBasic;
 
 namespace Mafia.Services;
 
@@ -47,6 +43,31 @@ public class Game
         PlayDay(4, true);
     }
 
+    private Event[] PlayAfterKill(Player[] kills)
+    {
+        var procKills = kills.ToList();
+        List<Event> allKillEvents = new();
+
+        while (procKills.Count > 0)
+        {
+            var killed = procKills[0];
+            procKills.RemoveAt(0);
+
+            var planEvents = model.OnDeathEvents.FirstOrDefault(v => v.Role == killed.Role)?.Events;
+
+            if (planEvents == null)
+                continue;
+
+            var killEvents = planEvents.Select(Interact).Where(evt => evt != null).ToArray();
+            allKillEvents.AddRange(killEvents!);
+
+            var newKills = GetKills(killEvents!);
+            procKills.AddRange(newKills);
+        }
+
+        return allKillEvents.ToArray();
+    }
+
     private void PlayDay(int day, bool night)
     {
         bool IsMineTimeOfDay(Event e) => (e.group == null || !GetGroup(e.group).IsCity) == night;
@@ -54,23 +75,33 @@ public class Game
         var time = night ? "night" : "day";
         interactor.Tells($"======== <{time} {day}> ========");
 
-        var dayEvents = day == 1 ? model.FirstDayEvents : model.DayEvents;
-        var dayProcess = dayEvents.Where(IsMineTimeOfDay).Select(Interact).Where(evt => evt != null).ToArray();
-        
-        process.Add(dayProcess!);
-        var kills = GetKills(dayProcess!);
+        var dayPlanEvents = day == 1 ? model.FirstDayEvents : model.DayEvents;
+        var dayEvents = dayPlanEvents.Where(IsMineTimeOfDay).Select(Interact).Where(evt => evt != null).ToArray();
+
+        var kills = GetKills(dayEvents!);
+        var killEvents = PlayAfterKill(kills);
+
+        if (killEvents.Length > 0)
+        {
+            dayEvents = dayEvents.Concat(killEvents).ToArray();
+            kills = GetKills(dayEvents!);
+        }
+
+        kills.ForEach(p => alivePlayers.Remove(p));
 
         interactor.Tells($"Kills: {kills.SJoin(", ")}");
-        kills.ForEach(p => alivePlayers.Remove(p));
         interactor.Tells($"Alive players: {alivePlayers.OrderBy(p=>p.Group?.Name).ThenBy(p=>p.Role).SJoin(", ")}");
 
         interactor.Tells($"======== </{time} {day}> =======");
+
+        process.Add(dayEvents!);
     }
 
+    private static HashSet<Act> killActs = new[] { Act.Kill, Act.KillOnDeath, Act.DoubleKillOnDeath }.ToHashSet();
     Player[] GetKills(Event[] dayProcess)
     {
         var locks = dayProcess.Where(e => e.info.IsPersonEvent && e.info.act == Act.Lock && e.selections != null).SelectMany(e => e.selections).ToHashSet();
-        var kills = dayProcess.Where(e => e.info.IsPersonEvent && e.info.act == Act.Kill && e.selections != null && e.info.mainPlayers!.Except(locks).Any()).SelectMany(e => e.selections).ToList();
+        var kills = dayProcess.Where(e => e.info.IsPersonEvent && e.info.act.HasValue && killActs.Contains(e.info.act.Value) && e.selections != null && e.info.mainPlayers!.Except(locks).Any()).SelectMany(e => e.selections).ToList();
         var heals = dayProcess.Where(e => e.info.IsPersonEvent && e.info.act == Act.Heal && e.selections != null && e.info.mainPlayers!.Except(locks).Any()).SelectMany(e => e.selections).ToArray();
         heals.ForEach(p => kills.Remove(p));
         locks.ForEach(p => kills.Remove(p));
@@ -129,22 +160,22 @@ public class Game
             return null;
 
         var act = eInfo.act == null ? eInfo.command.ToString() : eInfo.act.ToString();
-        var isKill = eInfo.act == Act.Kill;
 
         if (eInfo.HasSelection)
         {
             evt.selections = GetSelection(eInfo);
 
-            if (evt.selections.Length == 0)
+            var sign = eInfo.act switch
             {
-                interactor.Tells($"{(isKill ? "-> " : "-- ")}{who} {act} nobody"); // todo: mafia.json
-            }
-            else
-            {
-                interactor.Tells($"{(isKill ? "-> " : "-- ")}{who} {act} {evt.selections.SJoin(", ")}");
+                Act.Kill => "-> ",
+                Act.KillOnDeath => "-> ",
+                Act.DoubleKillOnDeath => ">> ",
+                _ => "-- "
+            };
 
-                //evt.selections.ForEach(p => alivePlayers.Remove(p));
-            }
+            var whom = evt.selections.Length == 0 ? "nobody" : evt.selections.SJoin(", ");
+
+            interactor.Tells($"{sign}{who} {act} {whom}");
         }
         else
         {
@@ -172,10 +203,12 @@ public class Game
         if (evt.IsCityEvent)
             return interactor.CitySelect(evt.skippable);
 
+        var player = evt.mainPlayers![0];
+
         return evt.act switch
         {
-            Act.DoubleKillOnDeath => interactor.DoubleKillOnDeath(evt.mainPlayers![0]),
-            _ => interactor.Select(evt.mainPlayers![0], evt.skippable)
+            Act.DoubleKillOnDeath => interactor.DoubleKillOnDeath(player),
+            _ => interactor.Select(player, evt.skippable)
         };
     }
 

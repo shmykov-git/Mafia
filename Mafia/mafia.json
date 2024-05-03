@@ -74,7 +74,7 @@
   ],
   "onDeathEvents": [
     {
-      "act": "KillOnDeath",
+      "role": "Kamikaze",
       "events": [
         {
           "command": "WakeUp",
@@ -87,6 +87,23 @@
         {
           "command": "FallAsleep",
           "role": "Kamikaze"
+        }
+      ]
+    },
+    {
+      "role": "Shahid",
+      "events": [
+        {
+          "command": "WakeUp",
+          "role": "Shahid"
+        },
+        {
+          "command": "Select",
+          "role": "Shahid"
+        },
+        {
+          "command": "FallAsleep",
+          "role": "Shahid"
         }
       ]
     }

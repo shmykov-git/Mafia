@@ -4,7 +4,7 @@ using Mafia.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-var seed = 1;
+var seed = 4;
 
 var interactor = new RunInteractor(seed);
 
