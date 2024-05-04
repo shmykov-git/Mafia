@@ -43,7 +43,7 @@ public class RunInteractor : IInteractor
         var civilians = Enumerable.Range(0, nCivilian).Select(_ => civilianRole);
 
         var roles = model.Roles.Concat(mafias).Concat(civilians).ToArray();
-        Act? GetAct(string role) => model.SelectActs.FirstOrDefault(a=>a.Role == role)?.Act;
+        SelectAct? GetAct(string role) => model.SelectActs.FirstOrDefault(a=>a.Role == role);
 
         foreach (var _ in Enumerable.Range(0, rnd.Next(17)))
         {
@@ -52,7 +52,7 @@ public class RunInteractor : IInteractor
             (roles[i], roles[j]) = (roles[j], roles[i]);
         }
 
-        var players = roles.Select((r, i) => new Player { User = gamePlayers[i], Role = roles[i], Group = model.GetGroupByRole(roles[i]), Act = GetAct(roles[i]) }).ToArray();
+        var players = roles.Select((r, i) => new Player { User = gamePlayers[i], Role = roles[i], Group = model.GetGroupByRole(roles[i]), SelectAct = GetAct(roles[i]) }).ToArray();
 
         return players;
     }
@@ -66,11 +66,16 @@ public class RunInteractor : IInteractor
 
     public Player[] CitySelect(bool skippable) => NeedSkip(skippable) ? [] : [alivePlayers[rnd.Next(alivePlayers.Count)]];
 
-    public Player[] Select(Player p, bool skippable)
+    public Player[] Select(Player p, ICollection<Player> players, bool skippable)
     {
+        if (p.Role == "Doctor" && players.Contains(p))
+        {
+            return [p];
+        }
+
         var otherGroupPlayers = p.Group == null 
-            ? alivePlayers.Where(ap => ap != p).ToArray() 
-            : alivePlayers.Where(ap => ap.Group != p.Group).ToArray();
+            ? players.Where(ap => ap != p).ToArray() 
+            : players.Where(ap => ap.Group != p.Group).ToArray();
 
         return NeedSkip(skippable) ? [] : [otherGroupPlayers[rnd.Next(otherGroupPlayers.Length)]];
     }

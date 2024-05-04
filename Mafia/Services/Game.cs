@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.Design;
-using System.Data;
-using System.Diagnostics;
+﻿using System.Data;
 using Mafia.Extensions;
 using Mafia.Interactors;
 using Mafia.Models;
@@ -35,6 +33,7 @@ public class Game
     public void Start()
     {
         // game end
+        // don't blame doctor
         // players config
         time = DateTime.Now;
         alivePlayers = players.ToList();
@@ -264,10 +263,17 @@ public class Game
 
         var player = evt.mainPlayers![0];
 
+        var needSelfSkip = process.SelectMany(v => v)
+            .Where(e => e.role == player.Role && (player.SelectAct?.SelfOnes ?? false) && e.selections != null)
+            .SelectMany(e => e.selections)
+            .Any(p => p == player);
+
+        var selectablePlayers = needSelfSkip ? alivePlayers.Where(p => p != player).ToList() : alivePlayers;
+
         return evt.act switch
         {
             Act.DoubleKillOnDeath => interactor.DoubleKillOnDeath(player),
-            _ => interactor.Select(player, evt.skippable)
+            _ => interactor.Select(player, selectablePlayers, evt.skippable)
         };
     }
 

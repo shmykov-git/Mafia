@@ -60,7 +60,8 @@
     },
     {
       "role": "Doctor",
-      "act": "Heal"
+      "act": "Heal",
+      "selfOnes": true
     },
     {
       "role": "Kamikaze",
