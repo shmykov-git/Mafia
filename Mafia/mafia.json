@@ -1,6 +1,6 @@
 ﻿{
   "options": {
-    "tellWakeUp": false
+    "tellWakeUp": true
   },
   "groups": [
     {
@@ -108,7 +108,15 @@
       ]
     }
   ],
-  "firstDayEvents": [
+  "firstDayEvents": [    
+    {
+      "command": "WakeUp",
+      "group": "City"
+    },
+    {
+      "command": "GetInfo",
+      "group": "City"
+    },
     {
       "command": "Select",
       "group": "City"
@@ -200,6 +208,14 @@
   ],
   "dayEvents": [
     {
+      "command": "WakeUp",
+      "group": "City"
+    },
+    {
+      "command": "GetInfo",
+      "group": "City"
+    },
+    {
       "command": "Select",
       "group": "City"
     },
@@ -266,10 +282,6 @@
     {
       "command": "FallAsleep",
       "role": "Doctor"
-    },
-    {
-      "command": "WakeUp",
-      "group": "City"
     }
   ]
 }

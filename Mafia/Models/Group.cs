@@ -13,4 +13,5 @@ public class Group
     public bool IsManiac { get; set; }
 
     public bool IsAct => !IsCivilian && !IsCity;
+    public bool HasSingleRole => IsMafia || IsManiac || IsCivilian;
 }

@@ -84,7 +84,17 @@ public class RunInteractor : IInteractor
         return [alivePlayers[i], alivePlayers[j]];
     }
 
+    public void Info(string message)
+    {
+        Debug.WriteLine($"Info| {message}");
+    }
+
     public void Tells(string message)
+    {
+        Debug.WriteLine($"Tell| {message}");
+    }
+
+    public void Log(string message)
     {
         Debug.WriteLine(message);
     }

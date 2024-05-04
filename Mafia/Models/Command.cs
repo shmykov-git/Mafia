@@ -4,5 +4,6 @@ public enum Command
 {
     WakeUp,
     Select,
+    GetInfo,
     FallAsleep
 }

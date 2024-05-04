@@ -13,5 +13,8 @@ public interface IInteractor
     Player[] CitySelect(bool skippable);
     Player[] Select(Player player, bool skippable);
     Player[] DoubleKillOnDeath(Player player);
+    
+    void Info(string message);
     void Tells(string message);
+    void Log(string message);
 }

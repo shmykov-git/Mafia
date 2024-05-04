@@ -1,4 +1,6 @@
-﻿using System.Data;
+﻿using System.ComponentModel.Design;
+using System.Data;
+using System.Diagnostics;
 using Mafia.Extensions;
 using Mafia.Interactors;
 using Mafia.Models;
@@ -14,7 +16,8 @@ public class Game
     public readonly Player[] players;
     private IInteractor interactor;
     private readonly IOptions<GameOptions> options;
-    private List<Event[]> process = new();
+    private List<List<Event>> process = new();
+    private Dictionary<string, int> allRanks;
 
     public List<Player> alivePlayers;
 
@@ -26,10 +29,13 @@ public class Game
         LoadModel(interactor.GameFileName);
         players = interactor.GetPlayers(model!);
         alivePlayers = players.ToList();
+        allRanks = GetRanks(model!.Roles);
     }
 
     public void Start()
     {
+        // game end
+        // players config
         time = DateTime.Now;
         alivePlayers = players.ToList();
         
@@ -73,40 +79,53 @@ public class Game
         bool IsMineTimeOfDay(Event e) => (e.group == null || !GetGroup(e.group).IsCity) == night;
 
         var time = night ? "night" : "day";
-        interactor.Tells($"======== <{time} {day}> ========");
+        interactor.Log($"======== <{time} {day}> ========");
 
         var dayPlanEvents = day == 1 ? model.FirstDayEvents : model.DayEvents;
-        var dayEvents = dayPlanEvents.Where(IsMineTimeOfDay).Select(Interact).Where(evt => evt != null).ToArray();
+        
+        List<Event> dayEvents = new();
+
+        foreach (var planEvent in dayPlanEvents.Where(IsMineTimeOfDay))
+        {
+            var locks = GetLocks(dayEvents);
+            var evt = Interact(planEvent, locks);
+            
+            if (evt == null)
+                continue;
+
+            dayEvents.Add(evt);
+        }
 
         var kills = GetKills(dayEvents!);
         var killEvents = PlayAfterKill(kills);
 
         if (killEvents.Length > 0)
         {
-            dayEvents = dayEvents.Concat(killEvents).ToArray();
+            dayEvents = dayEvents.Concat(killEvents).ToList();
             kills = GetKills(dayEvents!);
         }
 
         kills.ForEach(p => alivePlayers.Remove(p));
 
-        interactor.Tells($"Kills: {kills.SJoin(", ")}");
-        interactor.Tells($"Alive players: {alivePlayers.OrderBy(p=>p.Group?.Name).ThenBy(p=>p.Role).SJoin(", ")}");
-
-        interactor.Tells($"======== </{time} {day}> =======");
+        interactor.Log($"Alive players: {alivePlayers.OrderBy(p => allRanks[p.Role]).SJoin(", ")}");
 
         process.Add(dayEvents!);
+
+        interactor.Log($"======== </{time} {day}> =======");
     }
 
+    HashSet<Player> GetLocks(ICollection<Event> events) => events.Where(e => e.info.IsPersonEvent && e.info.act == Act.Lock && e.selections != null).SelectMany(e => e.selections).ToHashSet();
+
     private static HashSet<Act> killActs = new[] { Act.Kill, Act.KillOnDeath, Act.DoubleKillOnDeath }.ToHashSet();
-    Player[] GetKills(Event[] dayProcess)
+    Player[] GetKills(ICollection<Event> events)
     {
-        var locks = dayProcess.Where(e => e.info.IsPersonEvent && e.info.act == Act.Lock && e.selections != null).SelectMany(e => e.selections).ToHashSet();
-        var kills = dayProcess.Where(e => e.info.IsPersonEvent && e.info.act.HasValue && killActs.Contains(e.info.act.Value) && e.selections != null && e.info.mainPlayers!.Except(locks).Any()).SelectMany(e => e.selections).ToList();
-        var heals = dayProcess.Where(e => e.info.IsPersonEvent && e.info.act == Act.Heal && e.selections != null && e.info.mainPlayers!.Except(locks).Any()).SelectMany(e => e.selections).ToArray();
+        var locks = GetLocks(events);
+        var kills = events.Where(e => e.info.IsPersonEvent && e.info.act.HasValue && killActs.Contains(e.info.act.Value) && e.selections != null && e.info.mainPlayers!.Except(locks).Any()).SelectMany(e => e.selections).ToList();
+        var heals = events.Where(e => e.info.IsPersonEvent && e.info.act == Act.Heal && e.selections != null && e.info.mainPlayers!.Except(locks).Any()).SelectMany(e => e.selections).ToArray();
         heals.ForEach(p => kills.Remove(p));
         locks.ForEach(p => kills.Remove(p));
 
-        var cityKills = dayProcess.Where(e => e.info.IsCityEvent && e.info.act == Act.Kill && e.selections != null).SelectMany(e => e.selections).ToArray();
+        var cityKills = events.Where(e => e.info.IsCityEvent && e.info.act == Act.Kill && e.selections != null).SelectMany(e => e.selections).ToArray();
         kills.AddRange(cityKills);
 
         return kills.ToArray();
@@ -145,21 +164,58 @@ public class Game
         }
     }
 
-    private Event? Interact(Event planEvt)
+    public Dictionary<string, int> GetRanks(string[] roles) => roles.Select((r, i) => (r, i)).ToDictionary(v => v.r, v => v.i);
+
+    private Event? Interact(Event planEvt) => Interact(planEvt, []);
+    private Event? Interact(Event planEvt, HashSet<Player> locks)
     {
+        if (planEvt.command == Command.GetInfo)
+        {
+            if (process.Any())
+            {
+                var kills = GetKills(process[^1]);
+                interactor.Tells($"Kills: {kills.SJoin(", ")}");
+                interactor.Tells($"Alive players: {alivePlayers.OrderBy(p => allRanks[p.Role]).SJoin(", ")}");
+            }
+            // day 1
+
+            return null;
+        }
+
         var evt = planEvt.Adapt<Event>();
         var eInfo = GetEventInfo(evt);
         evt.info = eInfo;
 
         var who = evt.group;
+        var ranks = GetRanks((evt.group == null ? null : GetGroup(evt.group).Roles) ?? model.Roles);
+        var whoLocked = "";
 
         if (eInfo.IsPersonEvent)
-            who = alivePlayers.Where(p => eInfo.roles!.Contains(p.Role)).SJoin(", ");
-
-        if (!who.HasText())
-            return null;
+        {
+            var locked = alivePlayers.Where(p => eInfo.roles!.Contains(p.Role)).OrderBy(p => ranks[p.Role]).FirstOrDefault();
+            who = alivePlayers.Where(p => !locks.Contains(p) && eInfo.roles!.Contains(p.Role)).OrderBy(p => ranks[p.Role]).SJoin(", ");
+            
+            if (locked != null && locks.Contains(locked))
+                whoLocked = locked.ToString();
+        }
 
         var act = eInfo.act == null ? eInfo.command.ToString() : eInfo.act.ToString();
+
+        if (!who.HasText())
+        {
+            if (whoLocked.HasText())
+                if (eInfo.HasSelection)
+                {
+                    interactor.Info($"{whoLocked} is busy and cannot {act}");
+                }
+                else
+                {
+                    if (options.Value.TellWakeUp)
+                        interactor.Tells($"{whoLocked} {act}");
+                }
+
+            return null;
+        }
 
         if (eInfo.HasSelection)
         {
@@ -175,7 +231,10 @@ public class Game
 
             var whom = evt.selections.Length == 0 ? "nobody" : evt.selections.SJoin(", ");
 
-            interactor.Tells($"{sign}{who} {act} {whom}");
+            if (whoLocked.HasText())
+                interactor.Info($"{whoLocked} is busy and cannot {act}");
+
+            interactor.Info($"{sign}{who} {act} {whom}");
         }
         else
         {
@@ -185,7 +244,7 @@ public class Game
 
         return evt;
     }
-
+    
     private Group GetGroup(string name) => model.Groups.Single(g => g.Name == name);
     //public string[] CanSelect(Player p) => players.Select(p => p.User.Id).ToArray();
     //public bool CanAct(Player p) => true;
