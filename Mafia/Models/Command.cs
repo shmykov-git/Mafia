@@ -3,7 +3,10 @@
 public enum Command
 {
     WakeUp,
+    GetMorningInfo,
     Select,
-    GetInfo,
-    FallAsleep
+    GetDayInfo,
+    FallAsleep,
+    ApplyKills,
+    GameEnd
 }

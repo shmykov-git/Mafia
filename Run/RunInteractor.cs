@@ -52,7 +52,7 @@ public class RunInteractor : IInteractor
             (roles[i], roles[j]) = (roles[j], roles[i]);
         }
 
-        var players = roles.Select((r, i) => new Player { User = gamePlayers[i], Role = roles[i], Group = model.GetGroupByRole(roles[i]), SelectAct = GetAct(roles[i]) }).ToArray();
+        var players = roles.Select((r, i) => new Player { User = gamePlayers[i], Role = roles[i], ParticipantGroup = model.GetGroupByRole(roles[i]), SelectAct = GetAct(roles[i]) }).ToArray();
 
         return players;
     }
@@ -73,9 +73,9 @@ public class RunInteractor : IInteractor
             return [p];
         }
 
-        var otherGroupPlayers = p.Group == null 
+        var otherGroupPlayers = p.ParticipantGroup == null 
             ? players.Where(ap => ap != p).ToArray() 
-            : players.Where(ap => ap.Group != p.Group).ToArray();
+            : players.Where(ap => ap.ParticipantGroup != p.ParticipantGroup).ToArray();
 
         return NeedSkip(skippable) ? [] : [otherGroupPlayers[rnd.Next(otherGroupPlayers.Length)]];
     }

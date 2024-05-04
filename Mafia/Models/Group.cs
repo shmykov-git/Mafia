@@ -12,6 +12,7 @@ public class Group
     public bool IsCity { get; set; }
     public bool IsManiac { get; set; }
 
-    public bool IsAct => !IsCivilian && !IsCity;
-    public bool HasSingleRole => IsMafia || IsManiac || IsCivilian;
+
+    public GameEnd End => IsMafia ? GameEnd.Mafia : (IsManiac ? GameEnd.Maniac : GameEnd.Civilian);
+    public bool IsParticipant => IsMafia || IsManiac || IsCivilian;
 }

@@ -109,13 +109,13 @@
       ]
     }
   ],
-  "firstDayEvents": [    
+  "events": [
     {
       "command": "WakeUp",
       "group": "City"
     },
     {
-      "command": "GetInfo",
+      "command": "GetMorningInfo",
       "group": "City"
     },
     {
@@ -123,101 +123,11 @@
       "group": "City"
     },
     {
-      "command": "FallAsleep",
+      "command": "ApplyKills",
       "group": "City"
     },
     {
-      "command": "WakeUp",
-      "role": "Prostitute"
-    },
-    {
-      "command": "Select",
-      "role": "Prostitute"
-    },
-    {
-      "command": "FallAsleep",
-      "role": "Prostitute"
-    },
-    {
-      "command": "WakeUp",
-      "group": "Mafia"
-    },
-    {
-      "command": "Select",
-      "group": "Mafia"
-    },
-    {
-      "command": "FallAsleep",
-      "group": "Mafia"
-    },
-    {
-      "command": "WakeUp",
-      "role": "Maniac"
-    },
-    {
-      "command": "Select",
-      "role": "Maniac"
-    },
-    {
-      "command": "FallAsleep",
-      "role": "Maniac"
-    },
-    {
-      "command": "WakeUp",
-      "group": "Comissar"
-    },
-    {
-      "command": "Select",
-      "group": "Comissar"
-    },
-    {
-      "command": "FallAsleep",
-      "group": "Comissar"
-    },
-    {
-      "command": "WakeUp",
-      "role": "Doctor"
-    },
-    {
-      "command": "Select",
-      "role": "Doctor"
-    },
-    {
-      "command": "FallAsleep",
-      "role": "Doctor"
-    },
-    {
-      "command": "WakeUp",
-      "role": "Kamikaze"
-    },
-    {
-      "command": "FallAsleep",
-      "role": "Kamikaze"
-    },
-    {
-      "command": "WakeUp",
-      "role": "Shahid"
-    },
-    {
-      "command": "FallAsleep",
-      "role": "Shahid"
-    },
-    {
-      "command": "WakeUp",
-      "group": "City"
-    }
-  ],
-  "dayEvents": [
-    {
-      "command": "WakeUp",
-      "group": "City"
-    },
-    {
-      "command": "GetInfo",
-      "group": "City"
-    },
-    {
-      "command": "Select",
+      "command": "GetDayInfo",
       "group": "City"
     },
     {
@@ -283,6 +193,33 @@
     {
       "command": "FallAsleep",
       "role": "Doctor"
+    },
+    {
+      "command": "WakeUp",
+      "role": "Kamikaze",
+      "firstDay": true
+    },
+    {
+      "command": "FallAsleep",
+      "role": "Kamikaze",
+      "firstDay": true
+    },
+    {
+      "command": "WakeUp",
+      "role": "Shahid",
+      "firstDay": true
+    },
+    {
+      "command": "FallAsleep",
+      "role": "Shahid",
+      "firstDay": true
+    },
+    {
+      "command": "ApplyKills"
+    },
+    {
+      "command": "WakeUp",
+      "group": "City"
     }
   ]
 }

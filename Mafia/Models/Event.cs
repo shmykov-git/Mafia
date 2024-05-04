@@ -4,6 +4,7 @@ public class Event
 {
     public string? group;
     public string? role;
+    public bool firstDay;
     public required Command command;
 
 

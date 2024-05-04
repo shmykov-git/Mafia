@@ -37,18 +37,25 @@ public class Game
         // players config
         time = DateTime.Now;
         alivePlayers = players.ToList();
-        
-        PlayDay(1, false);
-        PlayDay(1, true);
-        PlayDay(2, false);
-        PlayDay(2, true);
-        PlayDay(3, false);
-        PlayDay(3, true);
-        PlayDay(4, false);
-        PlayDay(4, true);
+
+        var day = 1;
+        while(true)
+        {
+            Play12(day, false);
+
+            if (process[^1][^1].command == Command.GameEnd)
+                break;
+
+            Play12(day, true);
+
+            if (process[^1][^1].command == Command.GameEnd)
+                break;
+
+            day++;
+        }
     }
 
-    private Event[] PlayAfterKill(Player[] kills)
+    private Event[] PlayAfterKill(Player[] kills, bool night)
     {
         var procKills = kills.ToList();
         List<Event> allKillEvents = new();
@@ -63,7 +70,18 @@ public class Game
             if (planEvents == null)
                 continue;
 
-            var killEvents = planEvents.Select(Interact).Where(evt => evt != null).ToArray();
+            List<Event> killEvents = new();
+
+            foreach (var planEvent in planEvents)
+            {
+                var evt = Interact(planEvent, [], night);
+
+                if (evt == null)
+                    continue;
+
+                killEvents.Add(evt);
+            }
+            
             allKillEvents.AddRange(killEvents!);
 
             var newKills = GetKills(killEvents!);
@@ -73,42 +91,47 @@ public class Game
         return allKillEvents.ToArray();
     }
 
-    private void PlayDay(int day, bool night)
+    private ICollection<Event> ApplyKills(ICollection<Event> events, bool night)
     {
-        bool IsMineTimeOfDay(Event e) => (e.group == null || !GetGroup(e.group).IsCity) == night;
-
-        var time = night ? "night" : "day";
-        interactor.Log($"======== <{time} {day}> ========");
-
-        var dayPlanEvents = day == 1 ? model.FirstDayEvents : model.DayEvents;
-        
-        List<Event> dayEvents = new();
-
-        foreach (var planEvent in dayPlanEvents.Where(IsMineTimeOfDay))
-        {
-            var locks = GetLocks(dayEvents);
-            var evt = Interact(planEvent, locks);
-            
-            if (evt == null)
-                continue;
-
-            dayEvents.Add(evt);
-        }
-
-        var kills = GetKills(dayEvents!);
-        var killEvents = PlayAfterKill(kills);
+        var kills = GetKills(events);
+        var killEvents = PlayAfterKill(kills, night);
 
         if (killEvents.Length > 0)
         {
-            dayEvents = dayEvents.Concat(killEvents).ToList();
-            kills = GetKills(dayEvents!);
+            events = events.Concat(killEvents).ToList();
+            kills = GetKills(events);
         }
 
         kills.ForEach(p => alivePlayers.Remove(p));
 
-        interactor.Log($"Alive players: {alivePlayers.OrderBy(p => allRanks[p.Role]).SJoin(", ")}");
+        return events;
+    }
 
-        process.Add(dayEvents!);
+    private void Play12(int day, bool night)
+    {
+        bool IsMineTimeOfDay(Event e) => (e.group == null || !GetGroup(e.group).IsCity) == night;
+        var isFirstDay = day == 1;
+
+        var time = night ? "night" : "day";
+        interactor.Log($"======== <{time} {day}> ========");
+        
+        List<Event> events = new();
+
+        foreach (var planEvent in model.Events.Where(IsMineTimeOfDay))
+        {
+            if (planEvent.firstDay && !isFirstDay)
+                continue;
+
+            var evt = Interact(planEvent, events, night);
+
+            if (evt == null)
+                continue;
+
+            events.Add(evt);
+
+            if (evt.command == Command.GameEnd)
+                break;
+        }
 
         interactor.Log($"======== </{time} {day}> =======");
     }
@@ -165,18 +188,57 @@ public class Game
 
     public Dictionary<string, int> GetRanks(string[] roles) => roles.Select((r, i) => (r, i)).ToDictionary(v => v.r, v => v.i);
 
-    private Event? Interact(Event planEvt) => Interact(planEvt, []);
-    private Event? Interact(Event planEvt, HashSet<Player> locks)
+    private void TellAlivePlayers()
     {
-        if (planEvt.command == Command.GetInfo)
+        interactor.Tells($"Alive players: {alivePlayers.OrderBy(p => allRanks[p.Role]).SJoin(", ")}");
+    }
+
+    private void TellState(ICollection<Event> events)
+    {
+        var kills = GetKills(events);
+        interactor.Tells($"Kills: {kills.SJoin(", ")}");
+        TellAlivePlayers();
+    }
+
+    private Event? Interact(Event planEvt, ICollection<Event> events, bool night)
+    {
+        if (!night && (planEvt.command == Command.WakeUp || planEvt.command == Command.FallAsleep))
+            return null;
+
+        var locks = GetLocks(events);
+
+        if (planEvt.command == Command.ApplyKills)
         {
-            if (process.Any())
+            events = ApplyKills(events, night);
+            var gameEnd = GetGameEnd();
+
+            Event? endGameEvent = null;
+
+            if (gameEnd != GameEnd.None)
             {
-                var kills = GetKills(process[^1]);
-                interactor.Tells($"Kills: {kills.SJoin(", ")}");
-                interactor.Tells($"Alive players: {alivePlayers.OrderBy(p => allRanks[p.Role]).SJoin(", ")}");
+                endGameEvent = new Event() { command = Command.GameEnd };
+                events.Add(endGameEvent);
+
+                TellAlivePlayers();
+                interactor.Tells($"GameEnd: {gameEnd}");
             }
-            // day 1
+
+            process.Add(events.ToList());
+
+            return endGameEvent;
+        }
+
+        if (planEvt.command == Command.GetMorningInfo)
+        {
+            if (process.Any()) // day 1 ?
+                TellState(process[^1]);
+
+            return null;
+        }
+
+        if (planEvt.command == Command.GetDayInfo)
+        {
+            TellState(events);
 
             return null;
         }
@@ -277,4 +339,31 @@ public class Game
         };
     }
 
+    private GameEnd GetGameEnd()
+    {
+        var counts = alivePlayers.GroupBy(p => p.ParticipantGroup).ToDictionary(gv => gv.Key.End, gv=> gv.Count());
+
+        if (counts.Keys.Count == 1)
+            return counts.Keys.First();
+
+        var mafia = counts.TryGetValue(GameEnd.Mafia, out var countMafia) ? countMafia : 0;
+        var maniac = counts.TryGetValue(GameEnd.Maniac, out var countManiac) ? countManiac : 0;
+        var civilian = counts.TryGetValue(GameEnd.Civilian, out var countCivilian) ? countCivilian : 0;
+
+        if (maniac == 0)
+        {
+            if (mafia >= civilian)
+                return GameEnd.Mafia;
+        }
+        else
+        {
+            if (mafia == 0)
+            {
+                if (civilian <= 1)
+                    return GameEnd.Maniac;
+            }
+        }
+
+        return GameEnd.None;
+    }
 }
