@@ -170,7 +170,7 @@ public class Game
 
             if (group.IsCity)
                 return new EventInfo { roles = null, command = evt.command, act = group.Act!.Value, players = null, skippable = group.Skippable };
-
+            
             var role = group.Roles!.Select(r => model.SelectActs.First(s => s.Role == r)).GroupBy(v => v.Act).Select(v => v.First()).Single();
 
             return new EventInfo { roles = group.Roles, command = evt.command, act = role.Act, players = GetPlayersByRoles(group.Roles!), skippable = role.Skippable };

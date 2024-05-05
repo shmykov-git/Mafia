@@ -4,7 +4,9 @@ using Mafia.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-var seed = 1;
+var seed = 90;
+
+//for (var i = 0; i < 1000; i++)
 
 var interactor = new RunInteractor(seed);
 
@@ -14,7 +16,7 @@ var configuration = builder.Build();
 
 var services = new ServiceCollection();
 
-services        
+services
     .AddMafia(configuration)
     .AddTransient<IInteractor>(_ => interactor);
 

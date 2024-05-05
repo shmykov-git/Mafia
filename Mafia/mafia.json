@@ -11,7 +11,7 @@
     },
     {
       "name": "Mafia",
-      "roles": [ "DonMafia", "BumMafia", "Mafia" ],
+      "roles": [ "DonMafia", "BumMafia", "Mafia" ], 
       "isMafia": true
     },
     {
