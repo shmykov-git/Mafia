@@ -1,4 +1,4 @@
-﻿namespace Mafia.Models;
+﻿namespace tmp.Models;
 
 public class Group
 {
@@ -13,6 +13,6 @@ public class Group
     public bool IsManiac { get; set; }
 
 
-    public GameEnd End => IsMafia ? GameEnd.Mafia : (IsManiac ? GameEnd.Maniac : GameEnd.Civilian);
+    public GameEnd End => IsMafia ? GameEnd.Mafia : IsManiac ? GameEnd.Maniac : GameEnd.Civilian;
     public bool IsParticipant => IsMafia || IsManiac || IsCivilian;
 }

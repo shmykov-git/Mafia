@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
+using Mafia.Model;
 using Mafia.Models;
-using Mafia.Services;
 
-namespace Mafia.Interactors;
+namespace tmp.Interactors;
 
 public class RunInteractor : IInteractor
 {
@@ -43,7 +43,7 @@ public class RunInteractor : IInteractor
         var civilians = Enumerable.Range(0, nCivilian).Select(_ => civilianRole);
 
         var roles = model.Roles.Concat(mafias).Concat(civilians).ToArray();
-        SelectAct? GetAct(string role) => model.SelectActs.FirstOrDefault(a=>a.Role == role);
+        SelectAct? GetAct(string role) => model.SelectActs.FirstOrDefault(a => a.Role == role);
 
         foreach (var _ in Enumerable.Range(0, rnd.Next(17)))
         {
@@ -73,8 +73,8 @@ public class RunInteractor : IInteractor
             return [p];
         }
 
-        var otherGroupPlayers = p.ParticipantGroup == null 
-            ? players.Where(ap => ap != p).ToArray() 
+        var otherGroupPlayers = p.ParticipantGroup == null
+            ? players.Where(ap => ap != p).ToArray()
             : players.Where(ap => ap.ParticipantGroup != p.ParticipantGroup).ToArray();
 
         return NeedSkip(skippable) ? [] : [otherGroupPlayers[rnd.Next(otherGroupPlayers.Length)]];

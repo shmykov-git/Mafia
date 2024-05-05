@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Mafia.Interactors;
-using Mafia.Services;
-using Mafia.Models;
 using Microsoft.Extensions.Configuration;
+using Mafia.Model;
 
 namespace Mafia;
 
@@ -12,10 +10,11 @@ public static class DependencyExtensions
     /// Add Mafia game
     /// Must be implemented: <see cref="IInteractor"/>
     /// </summary>
-    public static IServiceCollection AddMafia(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddMafia(this IServiceCollection services, IConfiguration configuration, City city)
     {
         return services
             .Configure<GameOptions>(configuration.GetSection("options"))
+            .AddTransient(_ => city)
             .AddTransient<Game>();
     }
 }

@@ -1,0 +1,174 @@
+﻿{
+  "options": {
+  },
+  "city": {
+    "groups": [
+      {
+        "name": "Mafia",
+        "roles": [
+          {
+            "name": "DonMafia",
+            "rank": 1,
+            "actions": [
+              {
+                "name": "Kill",
+                "operations": [ "Kill" ],
+                "conditions": [ "SeniorRank" ]
+              }
+            ]
+          },
+          {
+            "name": "BumMafia",
+            "rank": 2,
+            "actions": [
+              {
+                "name": "Kill",
+                "operations": [ "Kill" ],
+                "conditions": [ "SeniorRank" ]
+              }
+            ]
+          },
+          {
+            "name": "Mafia",
+            "rank": 3,
+            "actions": [
+              {
+                "name": "Kill",
+                "operations": [ "Kill" ],
+                "conditions": [ "SeniorRank" ]
+              }
+            ]
+          },
+          {
+            "name": "Prostitute",
+            "rank": 4,
+            "actions": [
+              {
+                "name": "Kill",
+                "operations": [ "RankKill" ],
+                "conditions": [ "SeniorRank", "Single" ]
+              },
+              {
+                "name": "Lock",
+                "operations": [ "Lock" ],
+                "conditions": [ "NotSingle" ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Maniac",
+        "roles": [
+          {
+            "name": "Maniac",
+            "actions": [
+              {
+                "name": "Kill",
+                "operations": [ "Kill" ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Civilian",
+        "roles": [
+          {
+            "name": "Civilian"
+          }
+        ],
+        "groups": [
+          {
+            "name": "Commissar",
+            "roles": [
+              {
+                "name": "Commissar",
+                "rank": 1,
+                "actions": [
+                  {
+                    "name": "Check",
+                    "operations": [ "Check" ],
+                    "conditions": [ "SeniorRank" ]
+                  }
+                ]
+              },
+              {
+                "name": "Sergeant",
+                "rank": 2,
+                "actions": [
+                  {
+                    "name": "Check",
+                    "operations": [ "Check" ],
+                    "conditions": [ "SeniorRank" ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "Doctor",
+            "roles": [
+              {
+                "name": "Doctor",
+                "actions": [
+                  {
+                    "name": "Heal",
+                    "operations": [ "Heal" ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "Kamikaze",
+            "roles": [
+              {
+                "name": "Kamikaze",
+                "actions": [
+                  {
+                    "name": "Hello",
+                    "operations": [ "Hello" ],
+                    "conditions": [ "FirstDay" ]
+                  },
+                  {
+                    "name": "KillOnDeath",
+                    "operations": [ "Kill" ],
+                    "conditions": [ "Killed", "Skippable" ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "Shahid",
+            "roles": [
+              {
+                "name": "Shahid",
+                "actions": [
+                  {
+                    "name": "Hello",
+                    "operations": [ "Hello" ],
+                    "conditions": [ "FirstDay" ]
+                  },
+                  {
+                    "name": "RoundKillOnDeath",
+                    "operations": [ "RoundKill" ],
+                    "conditions": [ "Killed" ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "events": [
+    "Mafia",
+    "Maniac",
+    "Doctor",
+    "Kamikaze",
+    "Shahid"
+  ]
+}

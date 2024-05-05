@@ -1,11 +1,13 @@
 ﻿using System.Data;
 using Mafia.Extensions;
 using Mafia.Interactors;
+using Mafia.Model;
 using Mafia.Models;
 using Mapster;
 using Microsoft.Extensions.Options;
+using tmp.Interactors;
 
-namespace Mafia.Services;
+namespace tmp;
 
 public class Game
 {
@@ -39,7 +41,7 @@ public class Game
         alivePlayers = players.ToList();
 
         var day = 1;
-        while(true)
+        while (true)
         {
             Play12(day, false);
 
@@ -81,7 +83,7 @@ public class Game
 
                 killEvents.Add(evt);
             }
-            
+
             allKillEvents.AddRange(killEvents!);
 
             var newKills = GetKills(killEvents!);
@@ -114,7 +116,7 @@ public class Game
 
         var time = night ? "night" : "day";
         interactor.Log($"======== <{time} {day}> ========");
-        
+
         List<Event> events = new();
 
         foreach (var planEvent in model.Events.Where(IsMineTimeOfDay))
@@ -170,7 +172,7 @@ public class Game
 
             if (group.IsCity)
                 return new EventInfo { roles = null, command = evt.command, act = group.Act!.Value, players = null, skippable = group.Skippable };
-            
+
             var role = group.Roles!.Select(r => model.SelectActs.First(s => s.Role == r)).GroupBy(v => v.Act).Select(v => v.First()).Single();
 
             return new EventInfo { roles = group.Roles, command = evt.command, act = role.Act, players = GetPlayersByRoles(group.Roles!), skippable = role.Skippable };
@@ -255,7 +257,7 @@ public class Game
         {
             var locked = alivePlayers.Where(p => eInfo.roles!.Contains(p.Role)).OrderBy(p => ranks[p.Role]).FirstOrDefault();
             who = alivePlayers.Where(p => !locks.Contains(p) && eInfo.roles!.Contains(p.Role)).OrderBy(p => ranks[p.Role]).SJoin(", ");
-            
+
             if (locked != null && locks.Contains(locked))
                 whoLocked = locked.ToString();
         }
@@ -305,7 +307,7 @@ public class Game
 
         return evt;
     }
-    
+
     private Group GetGroup(string name) => model.Groups.Single(g => g.Name == name);
     //public string[] CanSelect(Player p) => players.Select(p => p.User.Id).ToArray();
     //public bool CanAct(Player p) => true;
@@ -341,7 +343,7 @@ public class Game
 
     private GameEnd GetGameEnd()
     {
-        var counts = alivePlayers.GroupBy(p => p.ParticipantGroup).ToDictionary(gv => gv.Key.End, gv=> gv.Count());
+        var counts = alivePlayers.GroupBy(p => p.ParticipantGroup).ToDictionary(gv => gv.Key.End, gv => gv.Count());
 
         if (counts.Keys.Count == 1)
             return counts.Keys.First();

@@ -1,6 +1,6 @@
 ﻿namespace Mafia.Extensions;
 
-internal static class LinqExtensions
+public static class LinqExtensions
 {
     public static IEnumerable<T> TakeWhileNot<T>(this IEnumerable<T> values, Func<T, bool> condition) => values.TakeWhile(v => !condition(v)).ToList();
     public static IEnumerable<T> SkipWhileNot<T>(this IEnumerable<T> values, Func<T, bool> condition) => values.SkipWhile(v => !condition(v)).ToList();

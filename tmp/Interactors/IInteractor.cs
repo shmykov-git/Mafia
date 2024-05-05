@@ -1,7 +1,7 @@
-﻿using Mafia.Models;
-using Mafia.Services;
+﻿using Mafia.Model;
+using Mafia.Models;
 
-namespace Mafia.Interactors;
+namespace tmp.Interactors;
 
 public interface IInteractor
 {
@@ -13,7 +13,7 @@ public interface IInteractor
     Player[] CitySelect(bool skippable);
     Player[] Select(Player player, ICollection<Player> players, bool skippable);
     Player[] DoubleKillOnDeath(Player player);
-    
+
     void Info(string message);
     void Tells(string message);
     void Log(string message);

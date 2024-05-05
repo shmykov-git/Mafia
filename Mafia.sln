@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34212.112
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Run", "Run\Run.csproj", "{986FB0C8-A0FC-451C-9C26-8E1D4ABB5989}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Run", "Run\Run.csproj", "{986FB0C8-A0FC-451C-9C26-8E1D4ABB5989}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mafia", "Mafia\Mafia.csproj", "{D39BA9C6-1A05-4963-B028-04EE91E6B834}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mafia", "Mafia\Mafia.csproj", "{D39BA9C6-1A05-4963-B028-04EE91E6B834}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tmp", "tmp\tmp.csproj", "{1C667C47-F458-4FB6-959C-1C2EC8F0CFAA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,9 @@ Global
 		{D39BA9C6-1A05-4963-B028-04EE91E6B834}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D39BA9C6-1A05-4963-B028-04EE91E6B834}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D39BA9C6-1A05-4963-B028-04EE91E6B834}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C667C47-F458-4FB6-959C-1C2EC8F0CFAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C667C47-F458-4FB6-959C-1C2EC8F0CFAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C667C47-F458-4FB6-959C-1C2EC8F0CFAA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

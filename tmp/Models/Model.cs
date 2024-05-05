@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Mafia.Models;
+namespace tmp.Models;
 
 public class Model
 {

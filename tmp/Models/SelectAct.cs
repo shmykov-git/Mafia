@@ -1,4 +1,4 @@
-﻿namespace Mafia.Models;
+﻿namespace tmp.Models;
 
 public class SelectAct
 {
