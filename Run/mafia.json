@@ -186,6 +186,24 @@
       "Kamikaze",
       "Shahid"
     ],
-    "currentProcessConditions": [ "Locked", "NotLocked" ]
+    "rules": [
+      {
+        "name": "KillOnDeathNoDoctor",
+        "description": "Смерти от камикадзе и шахида не лечатся доктором",
+        "accepted": true
+      },
+      {
+        "name": "MafiaWin",
+        "description": "Мафия побеждает, если живы только игроки группы Mafia и игроки с перечисленными ролями Civilian и количество мафиози больше или равно количеству мирных",
+        "values": [ "Mafia", "Commissar, Sergeant, Civilian" ],
+        "accepted": true
+      },
+      {
+        "name": "ManiacWin",
+        "description": "Маньяк побеждает, если живы только игроки группы Maniac и игроки с перечисленными ролями Civilian и количество маньяков больше или равно количеству мирных",
+        "values": [ "Maniac", "Commissar, Sergeant, Civilian" ],
+        "accepted": true
+      }
+    ]
   }
 }

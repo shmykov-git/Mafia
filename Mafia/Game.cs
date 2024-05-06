@@ -134,11 +134,33 @@ public class Game
 
         state.LatestNews.Collect(dailyNews);
 
-        // что если доктор лечил человека убитого камикадзе? сейчас чел. умирает от камикадзе, даже если его лечил доктор
-        state.LatestNews.Killed = state.LatestNews.Killed.Concat(dailyNews.GetKills()).ToArray();
+        if (city.GetRule(RuleName.KillOnDeathNoDoctor).Accepted)
+        {
+            state.LatestNews.Killed = state.LatestNews.Killed.Concat(dailyNews.GetKills()).ToArray();
+        }
+        else
+        {
+            KnowNightKills();
+        }
     }
 
-    private bool IsGameEnd() => GetWinnerGroup() != null;
+    private bool IsGameEnd() => GetWinnerGroup() != null || host.IsGameEnd(state);
+
+    private (bool success, Group winner) CheckWinRule(RuleName winRuleName)
+    {
+        var winRule = city.GetRule(winRuleName);
+        if (winRule.Accepted)
+        {
+            var mafia = state.Players.Where(p => p.TopGroup.Name == winRule.Values[0]).Count();
+            var notMafia = state.Players.Where(p => p.TopGroup.Name != winRule.Values[0]).Count();
+            var civilian = state.Players.Where(p => winRule.GetListValues(1).Contains(p.Role.Name)).Count();
+
+            if (notMafia == civilian && mafia >= civilian)
+                return (true, city.GetTopGroup(winRule.Values[0]));
+        }
+
+        return (false, null!);
+    }
 
     /// <summary>
     /// todo: config
@@ -149,6 +171,12 @@ public class Game
 
         if (counts.Keys.Count == 1)
             return counts.Keys.First();
+
+        var (win, group) = CheckWinRule(RuleName.MafiaWin);
+        if (win) return group;
+
+        (win, group) = CheckWinRule(RuleName.ManiacWin);
+        if (win) return group;
 
         return null;
     }
@@ -171,6 +199,7 @@ public class Game
         while (true)
         {
             state.IsDay = true;
+            host.NotifyDayStart(state);
             if (state.DayNumber > 1)
             {
                 KnowNightKills();
@@ -194,6 +223,7 @@ public class Game
                 break;
             }
             state.IsNight = true;
+            host.NotifyNightStart(state);
             PlayNight();
 
             state.DayNumber++;

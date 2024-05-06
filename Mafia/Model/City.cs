@@ -7,8 +7,9 @@ public class City
     public required Group[] Groups { get; set; }
     public required string[] NightEvents { get; set; }
     public required CityAction[] DayActions { get; set; }
-    public required string[] CurrentProcessConditions { get; set; }
+    public required Rule[] Rules { get; set; }
 
+    public Rule GetRule(RuleName name) => Rules.Single(r => r.Name == name);
     public Group GetTopGroup(Role role) => Groups.Single(g => g.AllGroups().Any(gg => gg.AllRoles().Any(r => r == role)));
     public Group GetTopGroup(string name) => Groups.Single(g => g.Name == name);
     public Group GetGroup(string name) => AllGroups().Single(g => g.Name == name);

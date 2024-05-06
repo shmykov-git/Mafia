@@ -22,6 +22,11 @@ public class DebugHost : IHost
         this.options = options.Value;
     }
 
+    public void ChangeSeed(int seed)
+    {
+        rnd = new Random(seed);
+    }
+
     public Player[] GetPlayers()
     {
         var nMax = 20;
@@ -89,15 +94,19 @@ public class DebugHost : IHost
 
     private void TellTheNews(State state)
     {
-        Debug.WriteLine($"Alive players: {state.Players.SJoin(", ")}");
+        if (!state.HasNews)
+        {
+            Debug.WriteLine($"Game players: {state.Players.SJoin(", ")}");
+        }
+        else
+        {
+            Debug.WriteLine($"Where killed: {state.LatestNews.Killed.SJoin(", ")}");
+            Debug.WriteLine($"Alive players: {state.Players.SJoin(", ")}");
+        }
     }
 
     public void NotifyCityAfterNight(State state)
     {
-        if (state.DayNumber > 1)
-            Debug.WriteLine($"===== </night {state.DayNumber}> =====");
-
-        Debug.WriteLine($"===== <day {state.DayNumber}> =====");
         AskCityToWakeUp();
         TellTheNews(state);
 
@@ -110,8 +119,26 @@ public class DebugHost : IHost
         TellTheNews(state);
 
         AskCityToFallAsleep();
+    }
+
+    public void NotifyDayStart(State state)
+    {
+        if (state.DayNumber > 1)
+            Debug.WriteLine($"===== </night {state.DayNumber}> =====");
+
+        Debug.WriteLine($"===== <day {state.DayNumber}> =====");
+    }
+
+    public void NotifyNightStart(State state)
+    {
         Debug.WriteLine($"===== </day {state.DayNumber}> =====");
         Debug.WriteLine($"===== <night {state.DayNumber}> =====");
+    }
+
+    public bool IsGameEnd(State state)
+    {
+        // Ведущий может остановить игру в результате математической победы (2 мафии, 2 мирных)
+        return false;
     }
 
     public void NotifyGameEnd(State state, Group winnerGroup)

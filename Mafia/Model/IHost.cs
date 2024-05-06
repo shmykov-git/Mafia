@@ -3,10 +3,13 @@
 
 public interface IHost
 {
+    void ChangeSeed(int seed);
     Player[] GetPlayers();
 
 
     void NotifyCityAfterNight(State state);
+    void NotifyNightStart(State state);
+    void NotifyDayStart(State state);
     Player AskCityToSelect(State state);
     void NotifyCityAfterDay(State state);
     bool AskCityToSkip(State state);
@@ -16,4 +19,5 @@ public interface IHost
     Player AskToSelectNotSelf(State state, Player player);
     Player[] GetNeighbors(State state, Player player);
     bool AskToSkip(State state, Player player);
+    bool IsGameEnd(State state);
 }

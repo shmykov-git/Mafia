@@ -8,6 +8,7 @@ public class State
     public required City City { get; set; }
     public required List<DailyNews> News { get; set; }
     public DailyNews LatestNews => News[^1];
+    public bool HasNews => News.Count > 0;
 
     public int DayNumber { get; set; }
     public bool IsDay { get; set; }
@@ -21,7 +22,7 @@ public class State
     /// Нужно чтобы в списке действий было хотя бы одно, которое не блокируется условиями текущего процесса
     /// </summary>
     public bool IsCurrentlyAllowed(Player player) => player.Role.AllActions()
-        .Select(a => (a, intersection: a.AllConditions().Intersect(City.CurrentProcessConditions).ToArray()))
+        .Select(a => (a, intersection: a.AllConditions().Intersect(Values.ActiveConditions).ToArray()))
         .Any(v => v.intersection.Length == 0 || v.intersection.All(name => v.a.CheckCondition(name, this, player)));
 
     public bool IsSelfSelected(Player player) => News.Select(ps => ps).Any(ops => ops.Selects?.Any(s => s.Who == player && s.Whom.Contains(player)) ?? false);

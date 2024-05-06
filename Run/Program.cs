@@ -19,12 +19,17 @@ var services = new ServiceCollection();
 services
     .Configure<RunOptions>(configuration.GetSection("options"))
     .AddMafia(model.City)
-    .AddTransient<IHost, DebugHost>();
+    .AddSingleton<IHost, DebugHost>();
 
 var provider = services.BuildServiceProvider();
+var host = provider.GetService<IHost>();
 
-var game = provider.GetService<Game>();
-game.Start();
+for (var k = 0; k<100; k++)
+{
+    var game = provider.GetService<Game>();
+    host.ChangeSeed(k);
+    game.Start();
+}
 
 
 
