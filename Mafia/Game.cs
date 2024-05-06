@@ -1,4 +1,6 @@
-﻿using Mafia.Executions;
+﻿using System.Linq;
+using System.Numerics;
+using Mafia.Executions;
 using Mafia.Extensions;
 using Mafia.Model;
 
@@ -77,9 +79,6 @@ public class Game
     /// </summary>
     private void KnowNightKills()
     {
-        if (state.DayNumber == 1)
-            return;
-
         var locks = state.LatestNews.AllLocks();
         var checks = state.LatestNews.AllChecks();
 
@@ -103,7 +102,7 @@ public class Game
 
     private void KnowDayKills()
     {
-        state.LatestNews.Killed = state.LatestNews.AllKills().SelectMany(l => l.Whom).ToArray();
+        state.LatestNews.Killed = state.LatestNews.GetKills();
     }
 
     private void ApplyKills()
@@ -112,13 +111,31 @@ public class Game
             state.Players.Remove(player);
     }
 
-    private void PlayAfterKills()
+    private void PlayOnDeathKills()
     {
-        var killed = state.LatestNews.Killed;
+        var stack = new Stack<Player>();
+        state.LatestNews.Killed.ForEach(stack.Push);
 
+        var dailyNews = new DailyNews();
 
+        while(stack.TryPop(out var kill))
+        {
+            foreach(var action in kill.Role.AllActions().Where(a=>a.AllConditions().Intersect(Values.OnDeathConditions).Any()))
+            {
+                if (action.CheckConditions(state, kill))
+                {
+                    var actionNews = action.DoOperations(state, kill);
+                    var actionKills = actionNews.GetKills();
+                    actionKills.ForEach(stack.Push);
+                    dailyNews.Collect(actionNews);
+                }
+            }
+        }
 
-        state.LatestNews.Killed = killed;
+        state.LatestNews.Collect(dailyNews);
+
+        // что если доктор лечил человека убитого камикадзе? сейчас чел. умирает от камикадзе, даже если его лечил доктор
+        state.LatestNews.Killed = state.LatestNews.Killed.Concat(dailyNews.GetKills()).ToArray();
     }
 
     private bool IsGameEnd() => GetWinnerGroup() != null;
@@ -154,9 +171,12 @@ public class Game
         while (true)
         {
             state.IsDay = true;
-            KnowNightKills();
-            PlayAfterKills();
-            ApplyKills();
+            if (state.DayNumber > 1)
+            {
+                KnowNightKills();
+                PlayOnDeathKills();
+                ApplyKills();
+            }
             host.NotifyCityAfterNight(state);
             if (IsGameEnd())
             {
@@ -165,7 +185,7 @@ public class Game
             }
             PlayDay();
             KnowDayKills();
-            PlayAfterKills();
+            PlayOnDeathKills();
             ApplyKills();
             host.NotifyCityAfterDay(state);
             if (IsGameEnd())

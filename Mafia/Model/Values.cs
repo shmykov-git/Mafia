@@ -8,4 +8,5 @@ public static class Values
     public static string[] HealOperations = [nameof(Operations.Heal)];
     public static string[] LockOperations = [nameof(Operations.Lock)];
     public static string[] CheckOperations = [nameof(Operations.Check)];
+    public static string[] OnDeathConditions = [nameof(Conditions.Killed)];
 }

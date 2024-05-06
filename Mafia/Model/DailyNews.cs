@@ -27,6 +27,7 @@ public class DailyNews
 
     public IEnumerable<Select> AllSelects() => Selects ?? [];
 
+    public Player[] GetKills() => GetWhom(Values.KillOperations);
 
     public Select[] AllLocks() => GetSelects(Values.LockOperations);
     public Select[] AllKills() => GetSelects(Values.KillOperations);
@@ -34,4 +35,5 @@ public class DailyNews
     public Select[] AllChecks() => GetSelects(Values.CheckOperations);
 
     private Select[] GetSelects(string[] operations) => AllSelects().Where(s => operations.Contains(s.Operation)).ToArray();
+    private Player[] GetWhom(string[] operations) => AllSelects().Where(s => operations.Contains(s.Operation)).SelectMany(s => s.Whom).ToArray();
 }
