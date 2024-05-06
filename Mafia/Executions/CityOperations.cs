@@ -2,14 +2,14 @@
 
 namespace Mafia.Executions;
 
-public delegate OperationResult CityOperation(State state);
+public delegate DailyNews CityOperation(State state);
 
 public static class CityOperations
 {
-    private static OperationResult CitySelect(string name, State state) => new OperationResult
+    private static DailyNews CitySelect(string name, State state) => new DailyNews
     {
         Selects = [new Select { Operation = name, Who = null!, Whom = [state.Host.AskCityToSelect(state)] }]
     };
 
-    public static OperationResult CityKill(State state) => CitySelect(nameof(CityKill), state);
+    public static DailyNews CityKill(State state) => CitySelect(nameof(CityKill), state);
 }

@@ -25,7 +25,7 @@ public class Game
                 .ToDictionary(m => m.Name, m => (CityCondition)((s) => (bool)m.Invoke(null, new object[] { s })));
 
             var operations = cityAction.Operations.Select(name => typeof(CityOperations).GetMethods().First(m => m.Name == name))
-                .ToDictionary(m => m.Name, m => (CityOperation)((s) => (OperationResult)m.Invoke(null, new object[] { s })));
+                .ToDictionary(m => m.Name, m => (CityOperation)((s) => (DailyNews)m.Invoke(null, new object[] { s })));
 
             cityAction.Execution = new CityExecution { Conditions = conditions, Operations = operations };
         });
@@ -36,7 +36,7 @@ public class Game
                 .ToDictionary(m => m.Name, m => (Condition)((s, p) => (bool)m.Invoke(null, new object[] { s, p })));
 
             var operations = action.Operations.Select(name => typeof(Operations).GetMethods().First(m => m.Name == name))
-                .ToDictionary(m => m.Name, m => (Operation)((s, p) => (OperationResult)m.Invoke(null, new object[] { s, p })));
+                .ToDictionary(m => m.Name, m => (Operation)((s, p) => (DailyNews)m.Invoke(null, new object[] { s, p })));
 
             action.Execution = new Execution { Conditions = conditions, Operations = operations };
         });
@@ -44,8 +44,8 @@ public class Game
 
     private void PlayDay()
     {
-        var result = new OperationResult();
-        state.Processes.Add(result);
+        var result = new DailyNews();
+        state.News.Add(result);
 
         foreach (var action in city.DayActions)
         {
@@ -56,8 +56,8 @@ public class Game
 
     private void PlayNight()
     {
-        var result = new OperationResult();
-        state.Processes.Add(result);
+        var result = new DailyNews();
+        state.News.Add(result);
 
         foreach (var group in city.NightEvents.Select(groupName => city.GetGroup(groupName)))
         {
@@ -72,6 +72,45 @@ public class Game
         }
     }
 
+    private void ApplyNightKills()
+    {
+        if (state.DayNumber == 1)
+            return;
+
+        var locks = state.LatestNews.AllLocks();
+
+        var kills = state.LatestNews.AllKills()
+            .Where(s=>!locks.Any(l=>l.Whom.Contains(s.Who)))
+            .SelectMany(k=>k.Whom)
+            .GroupBy(v=>v).Select(gv=>(p: gv.Key, c:gv.Count())).ToArray();
+
+        var heals = state.LatestNews.AllHeals()
+            .Where(s => !locks.Any(l => l.Whom.Contains(s.Who)))
+            .SelectMany(k => k.Whom)
+            .GroupBy(v => v).Select(gv => (p: gv.Key, c: gv.Count())).ToArray();
+
+        var factKills = kills.Where(k => heals.FirstOrDefault(h => h.p == k.p).c < k.c).Select(k => k.p).ToArray();
+
+        state.LatestNews.Locked = locks.SelectMany(l => l.Whom).ToArray();
+        state.LatestNews.Healed = heals.Select(v=>v.p).ToArray();
+        state.LatestNews.Killed = factKills;
+        ApplyKills();
+    }
+
+    private void ApplyDayKills()
+    {
+        state.LatestNews.Killed = state.LatestNews.AllKills().SelectMany(l => l.Whom).ToArray();
+        ApplyKills();
+    }
+
+    private void ApplyKills()
+    {
+        foreach(var player in state.LatestNews.Killed)
+            state.Players.Remove(player);
+    }
+
+    private bool IsGameEnd() => state.DayNumber == 3;
+
     public void Start()
     {
         var players0 = host.GetPlayers();
@@ -84,14 +123,31 @@ public class Game
             Players = players0.ToList(), 
             IsDay = true, 
             DayNumber = 1, 
-            Processes = new() 
+            News = new() 
         };
 
-        state.IsDay = true;
-        host.NotifyCityAfterNight(state);
-        PlayDay();
-        host.NotifyCityAfterDay(state);
-        state.IsDay = false;
-        PlayNight();
+        while (true)
+        {
+            state.IsDay = true;
+            ApplyNightKills();
+            host.NotifyCityAfterNight(state);
+            if (IsGameEnd())
+            {
+                host.NotifyGameEnd(state);
+                break;
+            }
+            PlayDay();
+            ApplyDayKills();
+            host.NotifyCityAfterDay(state);
+            if (IsGameEnd())
+            {
+                host.NotifyGameEnd(state);
+                break;
+            }
+            state.IsNight = true;
+            PlayNight();
+
+            state.DayNumber++;
+        }
     }
 }

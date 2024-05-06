@@ -8,16 +8,16 @@ public class CityAction
     public bool CheckConditions(State state) => Conditions == null || Conditions.All(name => CheckCondition(name, state));
     public bool CheckCondition(string name, State state) => Execution.Conditions[name](state);
 
-    public OperationResult DoOperations(State state)
+    public DailyNews DoOperations(State state)
     {
-        var result = new OperationResult();
+        var result = new DailyNews();
         foreach (var name in Operations)
             result.Collect(DoOperation(name, state));
 
         return result;
     }
 
-    public OperationResult DoOperation(string name, State state) => Execution.Operations[name](state);
+    public DailyNews DoOperation(string name, State state) => Execution.Operations[name](state);
 
 
     public required CityExecution Execution { get; set; }

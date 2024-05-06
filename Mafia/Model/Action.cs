@@ -9,16 +9,16 @@ public class Action
     public bool CheckConditions(State state, Player player) => Conditions == null || Conditions.All(name => CheckCondition(name, state, player));
     public bool CheckCondition(string name, State state, Player player) => Execution.Conditions[name](state, player);
 
-    public OperationResult DoOperations(State state, Player player)
+    public DailyNews DoOperations(State state, Player player)
     {
-        var result = new OperationResult();
+        var result = new DailyNews();
         foreach (var name in Operations)
             result.Collect(DoOperation(name, state, player));
 
         return result;
     }
 
-    public OperationResult DoOperation(string name, State state, Player player) => Execution.Operations[name](state, player);
+    public DailyNews DoOperation(string name, State state, Player player) => Execution.Operations[name](state, player);
 
     public IEnumerable<string> AllConditions() => Conditions ?? new string[0];
     public required Execution Execution { get; set; }

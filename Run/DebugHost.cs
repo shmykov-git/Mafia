@@ -83,6 +83,11 @@ public class DebugHost : IHost
         return selected;
     }
 
+    private void TellTheNews(State state)
+    {
+        Debug.WriteLine($"Alive players: {state.Players.SJoin(", ")}");
+    }
+
     public void NotifyCityAfterNight(State state)
     {
         if (state.DayNumber > 1)
@@ -90,6 +95,7 @@ public class DebugHost : IHost
 
         Debug.WriteLine($"===== <day {state.DayNumber}> =====");
         AskCityToWakeUp();
+        TellTheNews(state);
 
         //check game end
     }
@@ -97,10 +103,17 @@ public class DebugHost : IHost
     public void NotifyCityAfterDay(State state)
     {
         //check game end
+        TellTheNews(state);
 
         AskCityToFallAsleep();
         Debug.WriteLine($"===== </day {state.DayNumber}> =====");
         Debug.WriteLine($"===== <night {state.DayNumber}> =====");
+    }
+
+    public void NotifyGameEnd(State state)
+    {
+        Debug.WriteLine("GameEnd");
+        Debug.WriteLine($"===== </day {state.DayNumber}> =====");
     }
 
     public bool AskCityToSkip(State state)
