@@ -1,6 +1,5 @@
-﻿using System.Diagnostics;
-using System.Numerics;
-using System.Xml.Linq;
+﻿using System.Data;
+using System.Diagnostics;
 using Mafia.Extensions;
 using Mafia.Model;
 using Microsoft.Extensions.Options;
@@ -50,10 +49,15 @@ public class DebugHost : IHost
         var civilians = Enumerable.Range(0, nCivilian).Select(_ => civilianRole);
 
         var gameRoles = city.AllRoles().Concat(mafias).Concat(civilians).ToArray();
-
         gameRoles.Shaffle(17, rnd);
 
-        var players = gameRoles.Select((r, i) => new Player { User = gamePlayers[i], Role = gameRoles[i], Group = city.GetGroup(gameRoles[i]) }).ToArray();
+        var players = gameRoles.Select((r, i) => new Player 
+        { 
+            User = gamePlayers[i], 
+            Role = gameRoles[i], 
+            Group = city.GetGroup(gameRoles[i]),
+            TopGroup = city.GetTopGroup(gameRoles[i]),
+        }).ToArray();
 
         return players;
     }
@@ -110,9 +114,9 @@ public class DebugHost : IHost
         Debug.WriteLine($"===== <night {state.DayNumber}> =====");
     }
 
-    public void NotifyGameEnd(State state)
+    public void NotifyGameEnd(State state, Group winnerGroup)
     {
-        Debug.WriteLine("GameEnd");
+        Debug.WriteLine($"GameEnd, the winner is {winnerGroup.Name}");
         Debug.WriteLine($"===== </day {state.DayNumber}> =====");
     }
 

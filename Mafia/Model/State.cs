@@ -16,8 +16,10 @@ public class State
     public required Player[] Players0 { get; set; }
     public required List<Player> Players { get; set; }
 
-
-    // Нужно чтобы в списке действий было хотя бы одно, которое не блокируется условиями текущего процесса
+    /// <summary>
+    /// todo: config
+    /// Нужно чтобы в списке действий было хотя бы одно, которое не блокируется условиями текущего процесса
+    /// </summary>
     public bool IsCurrentlyAllowed(Player player) => player.Role.AllActions()
         .Select(a => (a, intersection: a.AllConditions().Intersect(City.CurrentProcessConditions).ToArray()))
         .Any(v => v.intersection.Length == 0 || v.intersection.All(name => v.a.CheckCondition(name, this, player)));

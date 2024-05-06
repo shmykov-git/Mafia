@@ -72,12 +72,16 @@ public class Game
         }
     }
 
-    private void ApplyNightKills()
+    /// <summary>
+    /// todo: config
+    /// </summary>
+    private void KnowNightKills()
     {
         if (state.DayNumber == 1)
             return;
 
         var locks = state.LatestNews.AllLocks();
+        var checks = state.LatestNews.AllChecks();
 
         var kills = state.LatestNews.AllKills()
             .Where(s=>!locks.Any(l=>l.Whom.Contains(s.Who)))
@@ -92,15 +96,14 @@ public class Game
         var factKills = kills.Where(k => heals.FirstOrDefault(h => h.p == k.p).c < k.c).Select(k => k.p).ToArray();
 
         state.LatestNews.Locked = locks.SelectMany(l => l.Whom).ToArray();
+        state.LatestNews.Checked = checks.SelectMany(l => l.Whom).ToArray();
         state.LatestNews.Healed = heals.Select(v=>v.p).ToArray();
         state.LatestNews.Killed = factKills;
-        ApplyKills();
     }
 
-    private void ApplyDayKills()
+    private void KnowDayKills()
     {
         state.LatestNews.Killed = state.LatestNews.AllKills().SelectMany(l => l.Whom).ToArray();
-        ApplyKills();
     }
 
     private void ApplyKills()
@@ -109,7 +112,29 @@ public class Game
             state.Players.Remove(player);
     }
 
-    private bool IsGameEnd() => state.DayNumber == 3;
+    private void PlayAfterKills()
+    {
+        var killed = state.LatestNews.Killed;
+
+
+
+        state.LatestNews.Killed = killed;
+    }
+
+    private bool IsGameEnd() => GetWinnerGroup() != null;
+
+    /// <summary>
+    /// todo: config
+    /// </summary>
+    private Group? GetWinnerGroup()
+    {
+        var counts = state.Players.GroupBy(p => p.TopGroup).ToDictionary(gv => gv.Key, gv => gv.Count());
+
+        if (counts.Keys.Count == 1)
+            return counts.Keys.First();
+
+        return null;
+    }
 
     public void Start()
     {
@@ -129,19 +154,23 @@ public class Game
         while (true)
         {
             state.IsDay = true;
-            ApplyNightKills();
+            KnowNightKills();
+            PlayAfterKills();
+            ApplyKills();
             host.NotifyCityAfterNight(state);
             if (IsGameEnd())
             {
-                host.NotifyGameEnd(state);
+                host.NotifyGameEnd(state, GetWinnerGroup()!);
                 break;
             }
             PlayDay();
-            ApplyDayKills();
+            KnowDayKills();
+            PlayAfterKills();
+            ApplyKills();
             host.NotifyCityAfterDay(state);
             if (IsGameEnd())
             {
-                host.NotifyGameEnd(state);
+                host.NotifyGameEnd(state, GetWinnerGroup()!);
                 break;
             }
             state.IsNight = true;

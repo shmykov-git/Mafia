@@ -32,9 +32,10 @@ public static class IteratorExtensions
                 {
                     foreach (var sub in IterateLazyDeepLeftLevel<TItem>(item!, level + 1))
                         yield return sub;
-
-                    yield return (item, level);
                 }
         }
+
+        if (obj is TItem selfItem)
+            yield return (selfItem, level);
     }
 }

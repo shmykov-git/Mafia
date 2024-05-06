@@ -10,7 +10,7 @@ public interface IHost
     Player AskCityToSelect(State state);
     void NotifyCityAfterDay(State state);
     bool AskCityToSkip(State state);
-    void NotifyGameEnd(State state);
+    void NotifyGameEnd(State state, Group group);
 
     Player AskToSelect(State state, Player player);
     Player AskToSelectNotSelf(State state, Player player);
