@@ -6,6 +6,6 @@ public class Role
     public int Rank { get; set; }
     public Action[]? Actions { get; set; }
 
-    public IEnumerable<Action> AllActions() => Actions ?? new Action[0];
+    public IEnumerable<Action> AllActions() => Actions ?? [];
     public override string ToString() => $"{Name}{(Rank == 0 ? "" : Rank.ToString())}";
 }

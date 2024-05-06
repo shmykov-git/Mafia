@@ -1,5 +1,8 @@
 ﻿{
   "options": {
+    "seed": 0,
+    "hostInstructions": false,
+    "citySelections": true
   },
   "city": {
     "groups": [
@@ -13,7 +16,7 @@
               {
                 "name": "Kill",
                 "operations": [ "Kill" ],
-                "conditions": [ "SeniorRank" ]
+                "conditions": [ "SeniorRank", "NotLocked" ]
               }
             ]
           },
@@ -24,7 +27,7 @@
               {
                 "name": "Kill",
                 "operations": [ "Kill" ],
-                "conditions": [ "SeniorRank" ]
+                "conditions": [ "SeniorRank", "NotLocked" ]
               }
             ]
           },
@@ -35,7 +38,7 @@
               {
                 "name": "Kill",
                 "operations": [ "Kill" ],
-                "conditions": [ "SeniorRank" ]
+                "conditions": [ "SeniorRank", "NotLocked" ]
               }
             ]
           },
@@ -45,7 +48,7 @@
             "actions": [
               {
                 "name": "Kill",
-                "operations": [ "RankKill" ],
+                "operations": [ "Kill" ],
                 "conditions": [ "SeniorRank", "Single" ]
               },
               {
@@ -65,7 +68,8 @@
             "actions": [
               {
                 "name": "Kill",
-                "operations": [ "Kill" ]
+                "operations": [ "Kill" ],
+                "conditions": [ "NotLocked" ]
               }
             ]
           }
@@ -89,7 +93,7 @@
                   {
                     "name": "Check",
                     "operations": [ "Check" ],
-                    "conditions": [ "SeniorRank" ]
+                    "conditions": [ "SeniorRank", "NotLocked" ]
                   }
                 ]
               },
@@ -100,7 +104,7 @@
                   {
                     "name": "Check",
                     "operations": [ "Check" ],
-                    "conditions": [ "SeniorRank" ]
+                    "conditions": [ "SeniorRank", "NotLocked" ]
                   }
                 ]
               }
@@ -113,8 +117,14 @@
                 "name": "Doctor",
                 "actions": [
                   {
+                    "name": "HealExceptSelf",
+                    "operations": [ "HealNotSelf" ],
+                    "conditions": [ "SelfSelected", "NotLocked" ]
+                  },
+                  {
                     "name": "Heal",
-                    "operations": [ "Heal" ]
+                    "operations": [ "Heal" ],
+                    "conditions": [ "NotSelfSelected", "NotLocked" ]
                   }
                 ]
               }
@@ -162,13 +172,20 @@
           }
         ]
       }
-    ]
-  },
-  "events": [
-    "Mafia",
-    "Maniac",
-    "Doctor",
-    "Kamikaze",
-    "Shahid"
-  ]
+    ],
+    "dayActions": [
+      {
+        "operations": [ "CityKill" ],
+        "conditions": [ "CitySkippable" ]
+      }
+    ],
+    "nightEvents": [
+      "Mafia",
+      "Maniac",
+      "Doctor",
+      "Kamikaze",
+      "Shahid"
+    ],
+    "currentProcessConditions": [ "Locked", "NotLocked" ]
+  }
 }

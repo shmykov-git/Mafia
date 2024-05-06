@@ -6,40 +6,21 @@ public delegate OperationResult Operation(State state, Player player);
 
 public static class Operations
 {
-    public static OperationResult Kill(State state, Player player)
+    private static OperationResult Select(string name, State state, Player player) => new OperationResult
     {
-        var kill = state.Host.AskToSelect(state, player);
+        Selects = [new Select { Operation = name, Who = player, Whom = [state.Host.AskToSelect(state, player)] }]
+    };
 
-        return new OperationResult { Kills = [kill] };
-    }
-
-    public static OperationResult RankKill(State state, Player player)
+    private static OperationResult SelectNotSelf(string name, State state, Player player) => new OperationResult
     {
-        throw new NotImplementedException();
-    }
+        Selects = [new Select { Operation = name, Who = player, Whom = [state.Host.AskToSelectNotSelf(state, player)] }]
+    };
 
-    public static OperationResult Lock(State state, Player player)
-    {
-        throw new NotImplementedException();
-    }
-
-    public static OperationResult Check(State state, Player player)
-    {
-        throw new NotImplementedException();
-    }
-
-    public static OperationResult Heal(State state, Player player)
-    {
-        throw new NotImplementedException();
-    }
-
-    public static OperationResult Hello(State state, Player player)
-    {
-        throw new NotImplementedException();
-    }
-
-    public static OperationResult RoundKill(State state, Player player)
-    {
-        throw new NotImplementedException();
-    }
+    public static OperationResult Kill(State state, Player player) => Select(nameof(Kill), state, player);
+    public static OperationResult Lock(State state, Player player) => Select(nameof(Lock), state, player);
+    public static OperationResult Check(State state, Player player) => Select(nameof(Check), state, player);
+    public static OperationResult Heal(State state, Player player) => Select(nameof(Heal), state, player);
+    public static OperationResult HealNotSelf(State state, Player player) => SelectNotSelf(nameof(Heal), state, player);
+    public static OperationResult Hello(State state, Player player) => new OperationResult();
+    public static OperationResult RoundKill(State state, Player player) => Select(nameof(RoundKill), state, player);
 }

@@ -6,5 +6,6 @@ public class Player
     public required Role Role { get; set; }
     public required Group Group { get; set; }
 
-    public override string ToString() => $"{User.Nick}-{Role}";
+    public bool Is(string role) => Role.Name == role;
+    public override string ToString() => $"{Group.Name}-{User.Nick}-{Role}";
 }

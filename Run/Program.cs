@@ -5,7 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Run;
 
-var seed = 0;
 var mafiaFileName = "mafia.json";
 
 var builder = new ConfigurationBuilder();
@@ -14,13 +13,13 @@ var configuration = builder.Build();
 
 var json = File.ReadAllText(mafiaFileName);
 var model = json.FromJson<Model>();
-var host = new DebugHost(seed, model.City);
 
 var services = new ServiceCollection();
 
 services
-    .AddMafia(configuration, model.City)
-    .AddTransient<IHost>(_ => host);
+    .Configure<RunOptions>(configuration.GetSection("options"))
+    .AddMafia(model.City)
+    .AddTransient<IHost, DebugHost>();
 
 var provider = services.BuildServiceProvider();
 

@@ -1,6 +1,9 @@
 ﻿using System.Diagnostics;
+using System.Numerics;
+using System.Xml.Linq;
 using Mafia.Extensions;
 using Mafia.Model;
+using Microsoft.Extensions.Options;
 
 namespace Run;
 
@@ -11,11 +14,13 @@ public class DebugHost : IHost
 {
     private Random rnd;
     private readonly City city;
+    private RunOptions options;
 
-    public DebugHost(int seed, City city)
+    public DebugHost(City city, IOptions<RunOptions> options)
     {
-        rnd = new Random(seed);
+        rnd = new Random(options.Value.Seed);
         this.city = city;
+        this.options = options.Value;
     }
 
     public Player[] GetPlayers()
@@ -56,31 +61,130 @@ public class DebugHost : IHost
     public Player AskToSelect(State state, Player player)
     {
         AskToWakeUp(state, player);
-
-        Debug.WriteLine($"Whom would like to select, {player}?");
-
+        if (options.HostInstructions)
+            Debug.WriteLine($"Whom {player} would like to select?");
         AskToFallAsleep(state, player);
 
-        return null;
+        Player selected;
+
+        if (player.Is("Doctor"))
+        {
+            selected = player;
+        }
+        else
+        {
+            var otherTeams = state.GetOtherTeams(player);
+            selected = otherTeams[rnd.Next(otherTeams.Length)];
+        }
+
+        if (options.CitySelections)
+            Debug.WriteLine($"{player} --> {selected}");
+
+        return selected;
+    }
+
+    public void NotifyCityAfterNight(State state)
+    {
+        if (state.DayNumber > 1)
+            Debug.WriteLine($"===== </night {state.DayNumber}> =====");
+
+        Debug.WriteLine($"===== <day {state.DayNumber}> =====");
+        AskCityToWakeUp();
+
+        //check game end
+    }
+
+    public void NotifyCityAfterDay(State state)
+    {
+        //check game end
+
+        AskCityToFallAsleep();
+        Debug.WriteLine($"===== </day {state.DayNumber}> =====");
+        Debug.WriteLine($"===== <night {state.DayNumber}> =====");
+    }
+
+    public bool AskCityToSkip(State state)
+    {
+        var skip = rnd.NextDouble() < 0.1;
+
+        if (skip && options.CitySelections)
+            Debug.WriteLine($"City skip kill");
+
+        return skip;
+    }
+
+    public Player AskCityToSelect(State state)
+    {
+        if (options.HostInstructions)
+            Debug.WriteLine($"City select somebody to kill");
+
+        var selected = state.Players[rnd.Next(state.Players.Count)];
+
+        if (options.CitySelections)
+            Debug.WriteLine($"City --> {selected}");
+
+        return selected;
+    }
+
+    public Player AskToSelectNotSelf(State state, Player player)
+    {
+        AskToWakeUp(state, player);
+        if (options.HostInstructions)
+            Debug.WriteLine($"Whom {player} would like to select except his self?");
+        AskToFallAsleep(state, player);
+
+        var otherTeams = state.GetOtherTeams(player);
+
+        var selected = otherTeams[rnd.Next(otherTeams.Length)];
+
+        if (options.CitySelections)
+            Debug.WriteLine($"{player} --> {selected}");
+
+        return selected;
+    }
+
+    public Player[] GetNeighbors(State state, Player player)
+    {
+        var selected = state.GetNeighborPlayers(player);
+
+        if (options.CitySelections)
+            Debug.WriteLine($"{player} --> {selected.SJoin(", ")}");
+
+        return selected;
     }
 
     public bool AskToSkip(State state, Player player)
     {
-        throw new NotImplementedException();
+        var skip = rnd.NextDouble() < 0.1;
+
+        if (skip && options.CitySelections)
+            Debug.WriteLine($"{player} select nobody");
+
+        return skip;
     }
 
+    private void AskCityToWakeUp()
+    {
+        if (options.HostInstructions)
+            Debug.WriteLine($"City, wake up please");
+    }
 
-
+    private void AskCityToFallAsleep()
+    {
+        if (options.HostInstructions)
+            Debug.WriteLine($"City, fall asleep please");
+    }
 
     private void AskToWakeUp(State state, Player player)
     {
-        if (state.IsNight)
-            Debug.WriteLine($"Wake up please, {player}?");
+        if (state.IsNight && options.HostInstructions)
+            Debug.WriteLine($"{player}, wake up please");
     }
 
     private void AskToFallAsleep(State state, Player player)
     {
-        if (state.IsNight)
-            Debug.WriteLine($"Fall asleep please, {player}?");
+        if (state.IsNight && options.HostInstructions)
+            Debug.WriteLine($"{player}, fall asleep please");
     }
+
 }

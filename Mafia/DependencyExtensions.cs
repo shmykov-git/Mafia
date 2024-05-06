@@ -8,12 +8,11 @@ public static class DependencyExtensions
 {
     /// <summary>
     /// Add Mafia game
-    /// Must be implemented: <see cref="IInteractor"/>
+    /// Must be implemented: <see cref="IHost"/>
     /// </summary>
-    public static IServiceCollection AddMafia(this IServiceCollection services, IConfiguration configuration, City city)
+    public static IServiceCollection AddMafia(this IServiceCollection services, City city)
     {
         return services
-            .Configure<GameOptions>(configuration.GetSection("options"))
             .AddTransient(_ => city)
             .AddTransient<Game>();
     }
