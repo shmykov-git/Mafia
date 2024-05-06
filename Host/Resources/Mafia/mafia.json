@@ -1,0 +1,209 @@
+﻿{
+  "options": {
+    "seed": 0,
+    "hostInstructions": false,
+    "citySelections": true
+  },
+  "city": {
+    "groups": [
+      {
+        "name": "Mafia",
+        "roles": [
+          {
+            "name": "DonMafia",
+            "rank": 1,
+            "actions": [
+              {
+                "name": "Kill",
+                "operations": [ "Kill" ],
+                "conditions": [ "SeniorRank", "NotLocked" ]
+              }
+            ]
+          },
+          {
+            "name": "BumMafia",
+            "rank": 2,
+            "actions": [
+              {
+                "name": "Kill",
+                "operations": [ "Kill" ],
+                "conditions": [ "SeniorRank", "NotLocked" ]
+              }
+            ]
+          },
+          {
+            "name": "Mafia",
+            "rank": 3,
+            "actions": [
+              {
+                "name": "Kill",
+                "operations": [ "Kill" ],
+                "conditions": [ "SeniorRank", "NotLocked" ]
+              }
+            ]
+          },
+          {
+            "name": "Prostitute",
+            "rank": 4,
+            "actions": [
+              {
+                "name": "Kill",
+                "operations": [ "Kill" ],
+                "conditions": [ "SeniorRank", "Single" ]
+              },
+              {
+                "name": "Lock",
+                "operations": [ "Lock" ],
+                "conditions": [ "NotSingle" ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Maniac",
+        "roles": [
+          {
+            "name": "Maniac",
+            "actions": [
+              {
+                "name": "Kill",
+                "operations": [ "Kill" ],
+                "conditions": [ "NotLocked" ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Civilian",
+        "roles": [
+          {
+            "name": "Civilian"
+          }
+        ],
+        "groups": [
+          {
+            "name": "Commissar",
+            "roles": [
+              {
+                "name": "Commissar",
+                "rank": 1,
+                "actions": [
+                  {
+                    "name": "Check",
+                    "operations": [ "Check" ],
+                    "conditions": [ "SeniorRank", "NotLocked" ]
+                  }
+                ]
+              },
+              {
+                "name": "Sergeant",
+                "rank": 2,
+                "actions": [
+                  {
+                    "name": "Check",
+                    "operations": [ "Check" ],
+                    "conditions": [ "SeniorRank", "NotLocked" ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "Doctor",
+            "roles": [
+              {
+                "name": "Doctor",
+                "actions": [
+                  {
+                    "name": "HealExceptSelf",
+                    "operations": [ "HealNotSelf" ],
+                    "conditions": [ "SelfSelected", "NotLocked" ]
+                  },
+                  {
+                    "name": "Heal",
+                    "operations": [ "Heal" ],
+                    "conditions": [ "NotSelfSelected", "NotLocked" ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "Kamikaze",
+            "roles": [
+              {
+                "name": "Kamikaze",
+                "actions": [
+                  {
+                    "name": "Hello",
+                    "operations": [ "Hello" ],
+                    "conditions": [ "FirstDay" ]
+                  },
+                  {
+                    "name": "KillOnDeath",
+                    "operations": [ "Kill" ],
+                    "conditions": [ "Killed", "Skippable" ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "Shahid",
+            "roles": [
+              {
+                "name": "Shahid",
+                "actions": [
+                  {
+                    "name": "Hello",
+                    "operations": [ "Hello" ],
+                    "conditions": [ "FirstDay" ]
+                  },
+                  {
+                    "name": "RoundKillOnDeath",
+                    "operations": [ "RoundKill" ],
+                    "conditions": [ "Killed" ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "dayActions": [
+      {
+        "operations": [ "CityKill" ],
+        "conditions": [ "CitySkippable" ]
+      }
+    ],
+    "nightEvents": [
+      "Mafia",
+      "Maniac",
+      "Doctor",
+      "Kamikaze",
+      "Shahid"
+    ],
+    "rules": [
+      {
+        "name": "KillOnDeathNoDoctor",
+        "description": "Смерти от камикадзе и шахида не лечатся доктором",
+        "accepted": true
+      },
+      {
+        "name": "MafiaWin",
+        "description": "Мафия побеждает, если живы только игроки группы Mafia и игроки с перечисленными ролями Civilian и количество мафиози больше или равно количеству мирных",
+        "values": [ "Mafia", "Commissar, Sergeant, Civilian" ],
+        "accepted": true
+      },
+      {
+        "name": "ManiacWin",
+        "description": "Маньяк побеждает, если живы только игроки группы Maniac и игроки с перечисленными ролями Civilian и количество маньяков больше или равно количеству мирных",
+        "values": [ "Maniac", "Commissar, Sergeant, Civilian" ],
+        "accepted": true
+      }
+    ]
+  }
+}
