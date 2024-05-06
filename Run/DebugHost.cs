@@ -152,7 +152,7 @@ public class DebugHost : IHost
         var skip = rnd.NextDouble() < 0.1;
 
         if (skip && options.CitySelections)
-            Debug.WriteLine($"City skip kill");
+            Debug.WriteLine($"City select nobody");
 
         return skip;
     }

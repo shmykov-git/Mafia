@@ -199,13 +199,13 @@ public class Game
         while (true)
         {
             state.IsDay = true;
-            host.NotifyDayStart(state);
             if (state.DayNumber > 1)
             {
                 KnowNightKills();
                 PlayOnDeathKills();
                 ApplyKills();
             }
+            host.NotifyDayStart(state);
             host.NotifyCityAfterNight(state);
             if (IsGameEnd())
             {
