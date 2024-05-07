@@ -13,6 +13,35 @@
                 HeightRequest="185"
                 Aspect="AspectFit" />
 
+            <Label
+                Text="{Binding PlayerInfo}"
+                Style="{StaticResource Headline}"
+                HorizontalOptions="Start"
+                SemanticProperties.HeadingLevel="Level1" />
+            
+            <ListView ItemsSource="{Binding Roles}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <Grid ColumnDefinitions="0.8*,0.2*">
+                                <Label Grid.Column="0"
+                                   Text="{Binding Role.Name}"
+                                   HorizontalOptions="Start"
+                                   FontAttributes="Bold" />
+
+                                <StackLayout Grid.Column="1" Orientation="Horizontal" HorizontalOptions="End">
+                                    <Editor 
+                                        IsVisible="{Binding IsCounter}"
+                                        IsEnabled="{Binding IsSelected}"
+                                        Text="{Binding Count}" />
+                                    <CheckBox IsChecked="{Binding IsSelected}" />
+                                </StackLayout>
+                            </Grid>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
         </VerticalStackLayout>
     </ScrollView>
 

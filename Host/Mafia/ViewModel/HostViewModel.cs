@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Data;
 using System.Windows.Input;
+using Host.Model;
 using Mafia;
 using Mafia.Extensions;
 using Mafia.Model;
@@ -13,20 +14,51 @@ namespace Host.Mafia.ViewModel;
 /// </summary>
 public class HostViewModel : IHost, INotifyPropertyChanged
 {
-    public event PropertyChangedEventHandler? PropertyChanged;
-    public void Changed(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
     private Random rnd;
     private readonly Game game;
     private readonly City city;
     private HostOptions options;
-    
+
 
     private string _text;
     public string Text { get => _text; set { _text = value; Changed(nameof(Text)); } }
 
+    private string _playerInfo;
+    public string PlayerInfo { get => _playerInfo; set { _playerInfo = value; Changed(nameof(PlayerInfo)); } }
+
+
+    public SelectedRole[] Roles { get; }
+
+    private (string name, int count)[] rolesPreset = [("DonMafia", 1), ("BumMafia", 1), ("Mafia", 1), ("Maniac", 1), ("Commissar", 1), ("Doctor", 1), ("Civilian", 4)];
+
+    public HostViewModel(Game game, City city, IOptions<HostOptions> options)
+    {
+        rnd = new Random();
+        this.game = game;
+        this.city = city;
+        this.options = options.Value;
+
+        Roles = city.AllRoles()
+            .Select(r => (role: r, preset: rolesPreset.FirstOrDefault(rr => rr.name == r.Name)))
+            .Select(v => new SelectedRole(v.role, f => RefreshPlayerInfo()) { IsSelected = v.preset.count > 0, Count = v.preset.count > 0 ? v.preset.count : 1 }).ToArray();
+
+        RefreshPlayerInfo();
+    }
+
+    void RefreshPlayerInfo()
+    {
+        if (Roles == null)
+            return;
+
+        var count = Roles.Where(r => r.IsSelected).Sum(r => r.Count);
+
+        PlayerInfo = $"Players: {count}";
+    }
+
+
     public ICommand ClickMe => new Command(() =>
     {
+        Text = "";
         WriteLine($"\r\n'{city.Name}' game {0}");
         ChangeSeed(0);
         game.Start();
@@ -37,18 +69,7 @@ public class HostViewModel : IHost, INotifyPropertyChanged
         Text += $"{text}\r\n";
     }
 
-    public HostViewModel(Game game, City city, IOptions<HostOptions> options)
-    {
-        rnd = new Random(options.Value.Seed);
-        this.game = game;
-        this.city = city;
-        this.options = options.Value;
-    }
-
-    public void ChangeSeed(int seed)
-    {
-        rnd = new Random(seed);
-    }
+    public void ChangeSeed(int seed) {}
 
     public (User, string)[] GetUserRoles()
     {
@@ -65,17 +86,7 @@ public class HostViewModel : IHost, INotifyPropertyChanged
             return player;
         }).ToArray();
 
-        string[] roles = ["DonMafia", "BumMafia", "Maniac", "Commissar", "Doctor"];
-        string[] multipleRoles = ["Mafia", "Civilian"];
-
-        var nn = n - roles.Length;
-        var nMafia = nn / 3;
-        var nCivilian = nn - nMafia;
-
-        var mafias = Enumerable.Range(0, nMafia).Select(_ => multipleRoles[0]);
-        var civilians = Enumerable.Range(0, nCivilian).Select(_ => multipleRoles[1]);
-
-        var gameRoles = roles.Concat(mafias).Concat(civilians).ToArray();
+        var gameRoles = Roles.Where(r => r.IsSelected).SelectMany(r => Enumerable.Range(0, r.Count).Select(_ => r.Role.Name)).ToArray();
         gameRoles.Shaffle(17, rnd);
 
         return gameRoles.Select((role, i) => (users[i], role)).ToArray();
@@ -244,5 +255,9 @@ public class HostViewModel : IHost, INotifyPropertyChanged
         if (state.IsNight && options.HostInstructions)
             WriteLine($"{player}, fall asleep please");
     }
+
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+    public void Changed(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
 }

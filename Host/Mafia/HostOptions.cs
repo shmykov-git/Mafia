@@ -4,5 +4,4 @@ public class HostOptions
 {
     public bool HostInstructions { get; set; }
     public bool CitySelections { get; set; }
-    public int Seed { get; set; }
 }

@@ -23,7 +23,6 @@
             <Label
                 Text="{Binding Text}"
                 HorizontalOptions="Start" 
-                Style="{StaticResource SubHeadline}"
                 SemanticProperties.HeadingLevel="Level2" />
 
         </VerticalStackLayout>
