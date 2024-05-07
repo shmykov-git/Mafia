@@ -27,13 +27,13 @@ public class DebugHost : IHost
         rnd = new Random(seed);
     }
 
-    private string[] GetGameRoles((string name, int count)[] preset, int n)
+    private string[] GetGameRoles((string name, int count)[] preset, int n, int k)
     {
         string[] roles = preset.Select(r => r.name).ToArray();
         string[] multipleRoles = ["Mafia", "Civilian"];
 
         var nn = n - roles.Length;
-        var nMafia = nn / 3;
+        var nMafia = nn / k;
         var nCivilian = nn - nMafia;
 
         var mafias = Enumerable.Range(0, nMafia).Select(_ => multipleRoles[0]);
@@ -59,7 +59,7 @@ public class DebugHost : IHost
         
         (string name, int count)[] rolesPreset = [("DonMafia", 1), ("BumMafia", 1), ("Mafia", 1), ("Maniac", 1), ("Commissar", 1), ("Doctor", 1), ("Civilian", 4)];
         
-        var gameRoles = GetGameRoles(rolesPreset, n);
+        var gameRoles = GetGameRoles(rolesPreset, n, 4);
         gameRoles.Shaffle(17, rnd);
 
         return gameRoles.Select((role, i) => (users[i], role)).ToArray();
