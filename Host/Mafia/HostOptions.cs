@@ -1,6 +1,6 @@
 ﻿namespace Host.Mafia;
 
-public class RunOptions
+public class HostOptions
 {
     public bool HostInstructions { get; set; }
     public bool CitySelections { get; set; }

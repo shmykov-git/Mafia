@@ -57,6 +57,20 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\Mafia\mafia-drive.json" />
+	  <None Remove="Resources\Mafia\mafia-vicino.json" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiAsset Include="Resources\Mafia\mafia-drive.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </MauiAsset>
+	  <MauiAsset Include="Resources\Mafia\mafia-vicino.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </MauiAsset>
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
@@ -67,7 +81,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="Resources\Mafia\mafia.json">
+	  <None Update="appsettings.json">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>

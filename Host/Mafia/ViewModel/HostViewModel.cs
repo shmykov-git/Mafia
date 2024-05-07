@@ -1,28 +1,47 @@
-﻿using System.Data;
-using System.Diagnostics;
+﻿using System.ComponentModel;
+using System.Data;
+using System.Windows.Input;
+using Mafia;
 using Mafia.Extensions;
 using Mafia.Model;
 using Microsoft.Extensions.Options;
 
-namespace Host.Mafia;
+namespace Host.Mafia.ViewModel;
 
 /// <summary>
 /// todo: view code for host
 /// </summary>
-public class TextHost : IHost
+public class HostViewModel : IHost, INotifyPropertyChanged
 {
-    private Random rnd;
-    private readonly City city;
-    private readonly Func<ITextBuilder> builderFactory;
-    private ITextBuilder _builder;
-    private ITextBuilder builder => (_builder ??= builderFactory());
-    private RunOptions options;
+    public event PropertyChangedEventHandler? PropertyChanged;
+    public void Changed(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-    public TextHost(City city, IOptions<RunOptions> options, Func<ITextBuilder> builderFactory)
+    private Random rnd;
+    private readonly Game game;
+    private readonly City city;
+    private HostOptions options;
+    
+
+    private string _text;
+    public string Text { get => _text; set { _text = value; Changed(nameof(Text)); } }
+
+    public ICommand ClickMe => new Command(() =>
+    {
+        WriteLine($"\r\n'{city.Name}' game {0}");
+        ChangeSeed(0);
+        game.Start();
+    });
+
+    private void WriteLine(string text)
+    {
+        Text += $"{text}\r\n";
+    }
+
+    public HostViewModel(Game game, City city, IOptions<HostOptions> options)
     {
         rnd = new Random(options.Value.Seed);
+        this.game = game;
         this.city = city;
-        this.builderFactory = builderFactory;
         this.options = options.Value;
     }
 
@@ -46,9 +65,6 @@ public class TextHost : IHost
             return player;
         }).ToArray();
 
-        if (city.Name != "Mafia Vicino")
-            throw new NotSupportedException();
-
         string[] roles = ["DonMafia", "BumMafia", "Maniac", "Commissar", "Doctor"];
         string[] multipleRoles = ["Mafia", "Civilian"];
 
@@ -69,7 +85,7 @@ public class TextHost : IHost
     {
         AskToWakeUp(state, player);
         if (options.HostInstructions)
-            builder.WriteLine($"Whom {player} would like to select?");
+            WriteLine($"Whom {player} would like to select?");
         AskToFallAsleep(state, player);
 
         Player selected;
@@ -85,7 +101,7 @@ public class TextHost : IHost
         }
 
         if (options.CitySelections)
-            builder.WriteLine($"{player} --> {selected}");
+            WriteLine($"{player} --> {selected}");
 
         return selected;
     }
@@ -94,12 +110,12 @@ public class TextHost : IHost
     {
         if (!state.HasNews)
         {
-            builder.WriteLine($"Game players: {state.Players.SJoin(", ")}");
+            WriteLine($"Game players: {state.Players.SJoin(", ")}");
         }
         else
         {
-            builder.WriteLine($"Where killed: {state.LatestNews.Killed.SJoin(", ")}");
-            builder.WriteLine($"Alive players: {state.Players.SJoin(", ")}");
+            WriteLine($"Where killed: {state.LatestNews.Killed.SJoin(", ")}");
+            WriteLine($"Alive players: {state.Players.SJoin(", ")}");
         }
     }
 
@@ -122,15 +138,15 @@ public class TextHost : IHost
     public void NotifyDayStart(State state)
     {
         if (state.DayNumber > 1)
-            builder.WriteLine($"===== </night {state.DayNumber}> =====");
+            WriteLine($"===== </night {state.DayNumber}> =====");
 
-        builder.WriteLine($"===== <day {state.DayNumber}> =====");
+        WriteLine($"===== <day {state.DayNumber}> =====");
     }
 
     public void NotifyNightStart(State state)
     {
-        builder.WriteLine($"===== </day {state.DayNumber}> =====");
-        builder.WriteLine($"===== <night {state.DayNumber}> =====");
+        WriteLine($"===== </day {state.DayNumber}> =====");
+        WriteLine($"===== <night {state.DayNumber}> =====");
     }
 
     public bool IsGameEnd(State state)
@@ -141,8 +157,8 @@ public class TextHost : IHost
 
     public void NotifyGameEnd(State state, Group winnerGroup)
     {
-        builder.WriteLine($"GameEnd, the winner is {winnerGroup.Name}");
-        builder.WriteLine($"===== </day {state.DayNumber}> =====");
+        WriteLine($"GameEnd, the winner is {winnerGroup.Name}");
+        WriteLine($"===== </day {state.DayNumber}> =====");
     }
 
     public bool AskCityToSkip(State state)
@@ -150,7 +166,7 @@ public class TextHost : IHost
         var skip = rnd.NextDouble() < 0.1;
 
         if (skip && options.CitySelections)
-            builder.WriteLine($"City select nobody");
+            WriteLine($"City select nobody");
 
         return skip;
     }
@@ -158,12 +174,12 @@ public class TextHost : IHost
     public Player AskCityToSelect(State state)
     {
         if (options.HostInstructions)
-            builder.WriteLine($"City select somebody to kill");
+            WriteLine($"City select somebody to kill");
 
         var selected = state.Players[rnd.Next(state.Players.Count)];
 
         if (options.CitySelections)
-            builder.WriteLine($"City --> {selected}");
+            WriteLine($"City --> {selected}");
 
         return selected;
     }
@@ -172,7 +188,7 @@ public class TextHost : IHost
     {
         AskToWakeUp(state, player);
         if (options.HostInstructions)
-            builder.WriteLine($"Whom {player} would like to select except his self?");
+            WriteLine($"Whom {player} would like to select except his self?");
         AskToFallAsleep(state, player);
 
         var otherTeams = state.GetOtherTeams(player);
@@ -180,7 +196,7 @@ public class TextHost : IHost
         var selected = otherTeams[rnd.Next(otherTeams.Length)];
 
         if (options.CitySelections)
-            builder.WriteLine($"{player} --> {selected}");
+            WriteLine($"{player} --> {selected}");
 
         return selected;
     }
@@ -190,7 +206,7 @@ public class TextHost : IHost
         var selected = state.GetNeighborPlayers(player);
 
         if (options.CitySelections)
-            builder.WriteLine($"{player} --> {selected.SJoin(", ")}");
+            WriteLine($"{player} --> {selected.SJoin(", ")}");
 
         return selected;
     }
@@ -200,7 +216,7 @@ public class TextHost : IHost
         var skip = rnd.NextDouble() < 0.1;
 
         if (skip && options.CitySelections)
-            builder.WriteLine($"{player} select nobody");
+            WriteLine($"{player} select nobody");
 
         return skip;
     }
@@ -208,25 +224,25 @@ public class TextHost : IHost
     private void AskCityToWakeUp()
     {
         if (options.HostInstructions)
-            builder.WriteLine($"City, wake up please");
+            WriteLine($"City, wake up please");
     }
 
     private void AskCityToFallAsleep()
     {
         if (options.HostInstructions)
-            builder.WriteLine($"City, fall asleep please");
+            WriteLine($"City, fall asleep please");
     }
 
     private void AskToWakeUp(State state, Player player)
     {
         if (state.IsNight && options.HostInstructions)
-            builder.WriteLine($"{player}, wake up please");
+            WriteLine($"{player}, wake up please");
     }
 
     private void AskToFallAsleep(State state, Player player)
     {
         if (state.IsNight && options.HostInstructions)
-            builder.WriteLine($"{player}, fall asleep please");
+            WriteLine($"{player}, fall asleep please");
     }
 
 }

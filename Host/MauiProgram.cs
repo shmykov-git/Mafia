@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Host.Mafia;
 using System.IO;
+using Host.Mafia.ViewModel;
 
 namespace Host;
 
@@ -12,7 +13,8 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
-        var mafiaFileName = "Resources/Mafia/mafia.json";
+        var mafiaFileName = "Resources/Mafia/mafia-vicino.json";
+        var appsettingsFileName = "appsettings.json";
 
         using Stream fileStream = FileSystem.Current.OpenAppPackageFileAsync(mafiaFileName).Result;
         using TextReader tr = new StreamReader(fileStream);
@@ -21,14 +23,15 @@ public static class MauiProgram
         var city = json.FromJson<City>();
 
         var builder = MauiApp.CreateBuilder();
-        builder.Configuration.AddJsonFile(mafiaFileName);
+        builder.Configuration.AddJsonFile(appsettingsFileName);
 
         builder.Services
-            .Configure<RunOptions>(builder.Configuration.GetSection("options"))
+            .Configure<HostOptions>(builder.Configuration.GetSection("options"))
             .AddMafia(city)
-            .AddSingleton<MainPage>()
-            .AddTransient<Func<ITextBuilder>>(p=>()=>p.GetRequiredService<MainPage>())
-            .AddSingleton<IHost, TextHost>();
+            .AddSingleton<HostViewModel>()
+            .AddSingleton<IHost, HostViewModel>(p => p.GetRequiredService<HostViewModel>())
+            .AddTransient<MainPage>(p => new MainPage() { BindingContext = p.GetRequiredService<HostViewModel>() })
+            ;
 
         builder
             .UseMauiApp<App>()

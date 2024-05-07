@@ -9,13 +9,17 @@ namespace Mafia;
 public class Game 
 {
     private readonly City city;
-    private readonly IHost host;
+
+    private readonly Func<IHost> hostFactory;
+    private IHost _host;
+    private IHost host => _host ??= hostFactory();
+
     private State state;
 
-    public Game(City city, IHost host)
+    public Game(City city, Func<IHost> hostFactory)
     {
         this.city = city;
-        this.host = host;
+        this.hostFactory = hostFactory;
         InitCity();
     }
 
@@ -61,9 +65,9 @@ public class Game
         var result = new DailyNews();
         state.News.Add(result);
 
-        foreach (var group in city.NightEvents.Select(groupName => city.GetGroup(groupName)))
+        foreach (var group in city.NightEvents.Select(city.GetGroup))
         {
-            foreach (var player in state.GetGroupPlayers(group))
+            foreach (var player in state.GetGroupActivePlayers(group))
             {
                 foreach (var action in player.Role.AllActions())
                 {

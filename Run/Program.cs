@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Run;
 
-var mafiaFileName = "mafia.json";
+var mafiaFileName = "mafia-drive.json";
 var appsettingsFileName = "appsettings.json";
 
 var builder = new ConfigurationBuilder();
@@ -28,12 +28,11 @@ var host = provider.GetService<IHost>();
 
 for (var k = 0; k<1; k++)
 {
-    Debug.WriteLine($"\r\nGame {k}");
+    Debug.WriteLine($"\r\n'{city.Name}' game {k}");
     var game = provider.GetService<Game>();
     host.ChangeSeed(k);
     game.Start();
 }
-
 
 
 var stop = 1;

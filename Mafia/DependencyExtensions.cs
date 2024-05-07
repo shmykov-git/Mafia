@@ -14,6 +14,7 @@ public static class DependencyExtensions
     {
         return services
             .AddTransient(_ => city)
+            .AddTransient<Func<IHost>>(p => () => p.GetRequiredService<IHost>())
             .AddTransient<Game>();
     }
 }

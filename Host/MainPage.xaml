@@ -1,8 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:model="clr-namespace:Host.Mafia.ViewModel"             
              x:Class="Host.MainPage">
-
+   
     <ScrollView>
         <VerticalStackLayout
             Padding="30,0"
@@ -14,8 +15,7 @@
                 SemanticProperties.Description="dot net bot in a race car number eight" />
 
             <Label
-                x:Name="Message"
-                Text="Hello, World!"
+                Text="{Binding Text}"
                 Style="{StaticResource Headline}"
                 SemanticProperties.HeadingLevel="Level1" />
             
@@ -28,7 +28,7 @@
             <Button
                 Text="Click me" 
                 SemanticProperties.Hint="Just click me"
-                Clicked="OnClicked"
+                Command="{Binding ClickMe}"
                 HorizontalOptions="Fill" />
         </VerticalStackLayout>
     </ScrollView>

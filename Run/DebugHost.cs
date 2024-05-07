@@ -42,10 +42,7 @@ public class DebugHost : IHost
             return player;
         }).ToArray();
 
-        if (city.Name != "Mafia Vicino")
-            throw new NotSupportedException();
-
-        string[] roles = ["DonMafia", "BumMafia", "Maniac", "Commissar", "Doctor"];
+        string[] roles = ["Prostitute", "DonMafia", "BumMafia", "Maniac", "Commissar", "Doctor"];
         string[] multipleRoles = ["Mafia", "Civilian"];
 
         var nn = n - roles.Length;
