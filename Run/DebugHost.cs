@@ -27,6 +27,21 @@ public class DebugHost : IHost
         rnd = new Random(seed);
     }
 
+    private string[] GetGameRoles((string name, int count)[] preset, int n)
+    {
+        string[] roles = preset.Select(r => r.name).ToArray();
+        string[] multipleRoles = ["Mafia", "Civilian"];
+
+        var nn = n - roles.Length;
+        var nMafia = nn / 3;
+        var nCivilian = nn - nMafia;
+
+        var mafias = Enumerable.Range(0, nMafia).Select(_ => multipleRoles[0]);
+        var civilians = Enumerable.Range(0, nCivilian).Select(_ => multipleRoles[1]);
+
+        return roles.Concat(mafias).Concat(civilians).ToArray();
+    }
+
     public (User, string)[] GetUserRoles()
     {
         var nMax = 20; // пользователи в базе данных
@@ -41,21 +56,10 @@ public class DebugHost : IHost
             userList.RemoveAt(i);
             return player;
         }).ToArray();
-
-        // todo:
+        
         (string name, int count)[] rolesPreset = [("DonMafia", 1), ("BumMafia", 1), ("Mafia", 1), ("Maniac", 1), ("Commissar", 1), ("Doctor", 1), ("Civilian", 4)];
         
-        string[] roles = ["Prostitute", "DonMafia", "BumMafia", "Maniac", "Commissar", "Doctor"];
-        string[] multipleRoles = ["Mafia", "Civilian"];
-
-        var nn = n - roles.Length;
-        var nMafia = nn / 3;
-        var nCivilian = nn - nMafia;
-
-        var mafias = Enumerable.Range(0, nMafia).Select(_ => multipleRoles[0]);
-        var civilians = Enumerable.Range(0, nCivilian).Select(_ => multipleRoles[1]);
-
-        var gameRoles = roles.Concat(mafias).Concat(civilians).ToArray();
+        var gameRoles = GetGameRoles(rolesPreset, n);
         gameRoles.Shaffle(17, rnd);
 
         return gameRoles.Select((role, i) => (users[i], role)).ToArray();

@@ -37,6 +37,15 @@
               "conditions": [ "SeniorRank", "NotLocked" ]
             }
           ]
+        },
+        {
+          "name": "Putana",
+          "actions": [
+            {
+              "name": "Lock",
+              "operations": [ "Lock" ]
+            }
+          ]
         }
       ]
     },
@@ -64,20 +73,6 @@
         }
       ],
       "groups": [
-        {
-          "name": "Prostitute",
-          "roles": [
-            {
-              "name": "Prostitute",
-              "actions": [
-                {
-                  "name": "Lock",
-                  "operations": [ "Lock" ]
-                }
-              ]
-            }
-          ]
-        },
         {
           "name": "Commissar",
           "roles": [
@@ -170,7 +165,6 @@
     }
   ],
   "nightEvents": [
-    "Prostitute",
     "Mafia",
     "Maniac",
     "Doctor",

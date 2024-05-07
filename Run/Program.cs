@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Run;
 
-var mafiaFileName = "mafia-drive.json";
+var mafiaFileName = "mafia-vicino.json";
 var appsettingsFileName = "appsettings.json";
 
 var builder = new ConfigurationBuilder();
