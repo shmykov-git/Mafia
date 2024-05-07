@@ -96,7 +96,9 @@ public class Game
             .SelectMany(k => k.Whom)
             .GroupBy(v => v).Select(gv => (p: gv.Key, c: gv.Count())).ToArray();
 
-        var factKills = kills.Where(k => heals.FirstOrDefault(h => h.p == k.p).c < k.c).Select(k => k.p).ToArray();
+        var factKills = city.GetRule(RuleName.HealSingleKill).Accepted
+            ? kills.Where(k => heals.FirstOrDefault(h => h.p == k.p).c < k.c).Select(k => k.p).ToArray()
+            : kills.Where(k => heals.FirstOrDefault(h => h.p == k.p).c == 0).Select(k => k.p).ToArray();
 
         state.LatestNews.Locked = locks.SelectMany(l => l.Whom).ToArray();
         state.LatestNews.Checked = checks.SelectMany(l => l.Whom).ToArray();
@@ -138,7 +140,7 @@ public class Game
 
         state.LatestNews.Collect(dailyNews);
 
-        if (city.GetRule(RuleName.KillOnDeathNoDoctor).Accepted)
+        if (city.GetRule(RuleName.KillOnDeathNoHeal).Accepted)
         {
             state.LatestNews.Killed = state.LatestNews.Killed.Concat(dailyNews.GetKills()).ToArray();
         }

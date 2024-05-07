@@ -14,8 +14,7 @@ public interface IHost
     bool AskCityToSkip(State state);
     void NotifyGameEnd(State state, Group group);
 
-    Player AskToSelect(State state, Player player);
-    Player AskToSelectNotSelf(State state, Player player);
+    Player[] AskToSelect(State state, Player player);
     Player[] GetNeighbors(State state, Player player);
     bool AskToSkip(State state, Player player);
     bool IsGameEnd(State state);

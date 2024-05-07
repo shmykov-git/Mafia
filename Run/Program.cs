@@ -26,7 +26,7 @@ services
 var provider = services.BuildServiceProvider();
 var host = provider.GetService<IHost>();
 
-for (var k = 0; k<1; k++)
+for (var k = 0; k<100; k++)
 {
     Debug.WriteLine($"\r\n'{city.Name}' game {k}");
     var game = provider.GetService<Game>();

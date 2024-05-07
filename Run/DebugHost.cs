@@ -61,31 +61,6 @@ public class DebugHost : IHost
         return gameRoles.Select((role, i) => (users[i], role)).ToArray();
     }
 
-    public Player AskToSelect(State state, Player player)
-    {
-        AskToWakeUp(state, player);
-        if (options.HostInstructions)
-            Debug.WriteLine($"Whom {player} would like to select?");
-        AskToFallAsleep(state, player);
-
-        Player selected;
-
-        if (player.Is("Doctor"))
-        {
-            selected = player;
-        }
-        else
-        {
-            var otherTeams = state.GetOtherTeams(player);
-            selected = otherTeams[rnd.Next(otherTeams.Length)];
-        }
-
-        if (options.CitySelections)
-            Debug.WriteLine($"{player} --> {selected}");
-
-        return selected;
-    }
-
     private void TellTheNews(State state)
     {
         if (!state.HasNews)
@@ -164,23 +139,6 @@ public class DebugHost : IHost
         return selected;
     }
 
-    public Player AskToSelectNotSelf(State state, Player player)
-    {
-        AskToWakeUp(state, player);
-        if (options.HostInstructions)
-            Debug.WriteLine($"Whom {player} would like to select except his self?");
-        AskToFallAsleep(state, player);
-
-        var otherTeams = state.GetOtherTeams(player);
-
-        var selected = otherTeams[rnd.Next(otherTeams.Length)];
-
-        if (options.CitySelections)
-            Debug.WriteLine($"{player} --> {selected}");
-
-        return selected;
-    }
-
     public Player[] GetNeighbors(State state, Player player)
     {
         var selected = state.GetNeighborPlayers(player);
@@ -199,6 +157,35 @@ public class DebugHost : IHost
             Debug.WriteLine($"{player} select nobody");
 
         return skip;
+    }
+
+    public Player[] AskToSelect(State state, Player player)
+    {
+        AskToWakeUp(state, player);
+        if (options.HostInstructions)
+            Debug.WriteLine($"Whom {player} would like to select?");
+        AskToFallAsleep(state, player);
+
+        Player[] selected;
+        var except = state.GetExceptPlayers(player);
+
+        if (player.Is("Doctor") && !except.Contains(player))
+        {
+            selected = [player];
+        }
+        else
+        {
+            var otherTeams = state.GetOtherTeams(player).Except(except).ToArray();
+            
+            selected = otherTeams.Length > 0
+                ? [otherTeams[rnd.Next(otherTeams.Length)]]
+                : [];
+        }
+
+        if (options.CitySelections)
+            Debug.WriteLine($"{player} --> {selected}");
+
+        return selected;
     }
 
     private void AskCityToWakeUp()

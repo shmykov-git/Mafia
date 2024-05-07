@@ -18,6 +18,12 @@ public class City
         TopGroup = GetTopGroup(role),
     };
 
+    public bool IsRuleForRoleAccepted(RuleName name, Role role)
+    { 
+        var rule = GetRule(name);
+        return rule.Accepted && rule.GetListValues(0).Contains(role.Name);
+    }
+
     public Rule GetRule(RuleName name) => Rules.Single(r => r.Name == name);
     public Group GetTopGroup(Role role) => Groups.Single(g => g.AllGroups().Any(gg => gg.AllRoles().Any(r => r == role)));
     public Group GetTopGroup(string name) => Groups.Single(g => g.Name == name);

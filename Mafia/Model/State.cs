@@ -7,6 +7,7 @@ public class State
     public required IHost Host { get; set; }
     public required City City { get; set; }
     public required List<DailyNews> News { get; set; }
+    public DailyNews? YesterdayNews => News.Count < 3 ? null : News[^3];
     public DailyNews LatestNews => News[^1];
     public bool HasNews => News.Count > 0;
 
@@ -16,6 +17,8 @@ public class State
 
     public required Player[] Players0 { get; set; }
     public required List<Player> Players { get; set; }
+
+    public IEnumerable<Select> AllSelects() => News.SelectMany(dn=>dn.AllSelects());
 
     /// <summary>
     /// todo: config
@@ -40,5 +43,26 @@ public class State
 
         return [Players[i], Players[j]];
 
+    }
+
+    public Player[] GetExceptPlayers(Player player)
+    {
+        List<Player> except = new();
+
+        if (City.IsRuleForRoleAccepted(RuleName.EvenDoctorDays, player.Role) && YesterdayNews != null)
+        {
+            var select = YesterdayNews.AllSelects().SingleOrDefault(s => s.Who == player);
+            
+            if (select?.Whom.Length > 0)
+                except.AddRange(select.Whom.Intersect(Players));
+        }
+
+        if (City.IsRuleForRoleAccepted(RuleName.DoctorOnceSelfHeal, player.Role))
+        {
+            if (AllSelects().Where(s=>s.Who == player).Any(s => s.Whom.Contains(player)))
+                except.Add(player);
+        }
+
+        return except.ToArray();
     }
 }

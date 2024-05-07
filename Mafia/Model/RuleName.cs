@@ -1,8 +1,11 @@
 ﻿namespace Mafia.Model;
 
 public enum RuleName
-{    
-    KillOnDeathNoDoctor,
+{
+    HealSingleKill,
+    EvenDoctorDays,
+    DoctorOnceSelfHeal,
+    KillOnDeathNoHeal,
     MafiaWin,
     ManiacWin,
 }

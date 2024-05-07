@@ -114,14 +114,9 @@
               "name": "Doctor",
               "actions": [
                 {
-                  "name": "HealExceptSelf",
-                  "operations": [ "HealNotSelf" ],
-                  "conditions": [ "SelfSelected", "NotLocked" ]
-                },
-                {
                   "name": "Heal",
                   "operations": [ "Heal" ],
-                  "conditions": [ "NotSelfSelected", "NotLocked" ]
+                  "conditions": [ "NotLocked" ]
                 }
               ]
             }
@@ -185,18 +180,25 @@
   ],
   "rules": [
     {
-      "name": "DoctorSingleKill",
-      "description": "Если в игрока стреляли два и более раза, то он умирает",
-      "accepted": true
+      "name": "HealSingleKill",
+      "description": "Если в игрока стреляли два и более раза, то он умирает даже если его лечили один раз",
+      "accepted": false
     },
     {
       "name": "EvenDoctorDays",
       "description": "Доктор лечит одного и того же игрока только через раз",
+      "values": [ "Doctor" ],
       "accepted": false
     },
     {
-      "name": "KillOnDeathNoDoctor",
-      "description": "Смерти от камикадзе и шахида не лечатся доктором",
+      "name": "DoctorOnceSelfHeal",
+      "description": "Доктор лечит себя один раз за игру",
+      "values": [ "Doctor" ],
+      "accepted": true
+    },
+    {
+      "name": "KillOnDeathNoHeal",
+      "description": "Смерти от камикадзе и шахида не лечатся",
       "accepted": true
     },
     {

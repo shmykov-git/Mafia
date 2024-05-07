@@ -7,7 +7,6 @@ public delegate bool Condition(State state, Player player);
 public static class Conditions
 {
     public static bool SelfSelected(State state, Player player) => state.IsSelfSelected(player);
-    public static bool NotSelfSelected(State state, Player player) => !SelfSelected(state, player);
     public static bool Single(State state, Player player) => state.GetTeam(player).Count() == 1;
     public static bool NotSingle(State state, Player player) => !Single(state, player);
     public static bool SeniorRank(State state, Player player) => state.GetTeamSeniorRank(player) == player.Role.Rank;
