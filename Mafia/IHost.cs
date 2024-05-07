@@ -4,8 +4,7 @@
 public interface IHost
 {
     void ChangeSeed(int seed);
-    Player[] GetPlayers();
-
+    (User user, string role)[] GetUserRoles();
 
     void NotifyCityAfterNight(State state);
     void NotifyNightStart(State state);

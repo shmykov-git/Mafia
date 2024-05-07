@@ -183,8 +183,8 @@ public class Game
 
     public void Start()
     {
-        var players0 = host.GetPlayers();
-        
+        var players0 = host.GetUserRoles().Select(v => city.CreatePlayer(v.user, city.GetRole(v.role))).ToArray();
+
         state = new State 
         { 
             Host = host, 

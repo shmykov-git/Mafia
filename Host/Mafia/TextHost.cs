@@ -31,44 +31,38 @@ public class TextHost : IHost
         rnd = new Random(seed);
     }
 
-    public Player[] GetPlayers()
+    public (User, string)[] GetUserRoles()
     {
-        var nMax = 20;
-        var users = Enumerable.Range(1, nMax + 1).Select(i => new User { Nick = $"Nick{i}" }).ToArray();
+        var nMax = 20; // пользователи в базе данных
+        var usersDataBase = Enumerable.Range(1, nMax + 1).Select(i => new User { Nick = $"Nick{i}" }).ToArray();
+        var userList = usersDataBase.ToList();
 
-        var listP = users.ToList();
-
-        var n = 15;
-        var gamePlayers = Enumerable.Range(1, n + 1).Select(_ =>
+        var n = 15; // пришло поиграть
+        var users = Enumerable.Range(1, n + 1).Select(_ =>
         {
-            var i = rnd.Next(listP.Count);
-            var player = listP[i];
-            listP.RemoveAt(i);
+            var i = rnd.Next(userList.Count);
+            var player = userList[i];
+            userList.RemoveAt(i);
             return player;
         }).ToArray();
 
-        var civilianRole = city.GetRole("Civilian");
-        var mafiaRole = city.GetRole("Mafia");
+        if (city.Name != "Mafia Vicino")
+            throw new NotSupportedException();
 
-        var nn = n - city.AllRoles().Count();
+        string[] roles = ["DonMafia", "BumMafia", "Maniac", "Commissar", "Doctor"];
+        string[] multipleRoles = ["Mafia", "Civilian"];
+
+        var nn = n - roles.Length;
         var nMafia = nn / 3;
         var nCivilian = nn - nMafia;
 
-        var mafias = Enumerable.Range(0, nMafia).Select(_ => mafiaRole);
-        var civilians = Enumerable.Range(0, nCivilian).Select(_ => civilianRole);
+        var mafias = Enumerable.Range(0, nMafia).Select(_ => multipleRoles[0]);
+        var civilians = Enumerable.Range(0, nCivilian).Select(_ => multipleRoles[1]);
 
-        var gameRoles = city.AllRoles().Concat(mafias).Concat(civilians).ToArray();
+        var gameRoles = roles.Concat(mafias).Concat(civilians).ToArray();
         gameRoles.Shaffle(17, rnd);
 
-        var players = gameRoles.Select((r, i) => new Player
-        {
-            User = gamePlayers[i],
-            Role = gameRoles[i],
-            Group = city.GetGroup(gameRoles[i]),
-            TopGroup = city.GetTopGroup(gameRoles[i]),
-        }).ToArray();
-
-        return players;
+        return gameRoles.Select((role, i) => (users[i], role)).ToArray();
     }
 
     public Player AskToSelect(State state, Player player)

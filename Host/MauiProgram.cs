@@ -18,14 +18,14 @@ public static class MauiProgram
         using TextReader tr = new StreamReader(fileStream);
         var json = tr.ReadToEnd();
 
-        var model = json.FromJson<Model>();
+        var city = json.FromJson<City>();
 
         var builder = MauiApp.CreateBuilder();
         builder.Configuration.AddJsonFile(mafiaFileName);
 
         builder.Services
             .Configure<RunOptions>(builder.Configuration.GetSection("options"))
-            .AddMafia(model.City)
+            .AddMafia(city)
             .AddSingleton<MainPage>()
             .AddTransient<Func<ITextBuilder>>(p=>()=>p.GetRequiredService<MainPage>())
             .AddSingleton<IHost, TextHost>();

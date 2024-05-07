@@ -57,16 +57,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="Resources\Mafia\mafia.json" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <MauiAsset Include="Resources\Mafia\mafia.json">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </MauiAsset>
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
@@ -74,6 +64,12 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Mafia\Mafia.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Resources\Mafia\mafia.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 
 </Project>

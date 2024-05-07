@@ -7,19 +7,20 @@ using Microsoft.Extensions.DependencyInjection;
 using Run;
 
 var mafiaFileName = "mafia.json";
+var appsettingsFileName = "appsettings.json";
 
 var builder = new ConfigurationBuilder();
-builder.AddJsonFile(mafiaFileName);
+builder.AddJsonFile(appsettingsFileName);
 var configuration = builder.Build();
 
 var json = File.ReadAllText(mafiaFileName);
-var model = json.FromJson<Model>();
+var city = json.FromJson<City>();
 
 var services = new ServiceCollection();
 
 services
     .Configure<RunOptions>(configuration.GetSection("options"))
-    .AddMafia(model.City)
+    .AddMafia(city)
     .AddSingleton<IHost, DebugHost>();
 
 var provider = services.BuildServiceProvider();
