@@ -1,4 +1,4 @@
-﻿namespace Host.Mafia;
+﻿namespace Host.Model;
 
 public class HostOptions
 {

@@ -184,6 +184,16 @@
   ],
   "rules": [
     {
+      "name": "DoctorSingleKill",
+      "description": "Если в игрока стреляли два и более раза, то он умирает",
+      "accepted": false
+    },
+    {
+      "name": "EvenDoctorDays",
+      "description": "Доктор лечит одного и того же игрока только через раз",
+      "accepted": true
+    },
+    {
       "name": "KillOnDeathNoDoctor",
       "description": "Смерти от камикадзе и шахида не лечатся доктором",
       "accepted": true

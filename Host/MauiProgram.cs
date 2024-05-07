@@ -3,10 +3,10 @@ using Mafia;
 using Mafia.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Host.Mafia;
 using System.IO;
-using Host.Mafia.ViewModel;
 using Host.Views;
+using Host.ViewModel;
+using Host.Model;
 
 namespace Host;
 

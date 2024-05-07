@@ -7,7 +7,7 @@ using Mafia.Extensions;
 using Mafia.Model;
 using Microsoft.Extensions.Options;
 
-namespace Host.Mafia.ViewModel;
+namespace Host.ViewModel;
 
 /// <summary>
 /// todo: view code for host
@@ -69,7 +69,7 @@ public class HostViewModel : IHost, INotifyPropertyChanged
         Text += $"{text}\r\n";
     }
 
-    public void ChangeSeed(int seed) 
+    public void ChangeSeed(int seed)
     {
         rnd = new Random(seed);
     }
