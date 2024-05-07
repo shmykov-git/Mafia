@@ -3,28 +3,23 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:model="clr-namespace:Host.Mafia.ViewModel"             
              x:Class="Host.Views.GameView">
-   
-    <ScrollView>
-        <VerticalStackLayout
-            Padding="30,0"
-            Spacing="25">
 
-            <Label
-                Text="Click the button below to start the game"
-                Style="{StaticResource Headline}"
-                SemanticProperties.HeadingLevel="Level1" />
-            
+    <ScrollView>
+        <VerticalStackLayout 
+            Padding="30,0"
+            Spacing="25" >
+
             <Button
-                Text="Click Me" 
-                SemanticProperties.Hint="Just click me"
-                Command="{Binding ClickMe}"
-                HorizontalOptions="Fill" />
+                    Text="Start testing game" 
+                    SemanticProperties.Hint="Just click me"
+                    Command="{Binding ClickMe}"
+                    HorizontalOptions="Fill" />
 
             <Label
                 Text="{Binding Text}"
                 HorizontalOptions="Start" 
                 SemanticProperties.HeadingLevel="Level2" />
-
+        
         </VerticalStackLayout>
     </ScrollView>
 

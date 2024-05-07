@@ -8,6 +8,7 @@
         <VerticalStackLayout
             Padding="30,0"
             Spacing="25">
+            
             <Image
                 Source="mafia.jpg"
                 HeightRequest="185"

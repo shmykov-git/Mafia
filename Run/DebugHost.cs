@@ -42,6 +42,9 @@ public class DebugHost : IHost
             return player;
         }).ToArray();
 
+        // todo:
+        (string name, int count)[] rolesPreset = [("DonMafia", 1), ("BumMafia", 1), ("Mafia", 1), ("Maniac", 1), ("Commissar", 1), ("Doctor", 1), ("Civilian", 4)];
+        
         string[] roles = ["Prostitute", "DonMafia", "BumMafia", "Maniac", "Commissar", "Doctor"];
         string[] multipleRoles = ["Mafia", "Civilian"];
 

@@ -11,12 +11,14 @@
                 FlyoutDisplayOptions="AsMultipleItems">
         
         <ShellContent
+            Icon="start.jpg"
             Title="Setup"
             ContentTemplate="{DataTemplate local:StartGameView}"
             Route="StartGameView" />
         
         <ShellContent
-            Title="Game"
+            Icon="game.png"
+            Title="Testing"
             ContentTemplate="{DataTemplate local:GameView}"
             Route="GameView" />
         

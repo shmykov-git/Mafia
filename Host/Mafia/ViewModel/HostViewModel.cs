@@ -26,7 +26,6 @@ public class HostViewModel : IHost, INotifyPropertyChanged
     private string _playerInfo;
     public string PlayerInfo { get => _playerInfo; set { _playerInfo = value; Changed(nameof(PlayerInfo)); } }
 
-
     public SelectedRole[] Roles { get; }
 
     private (string name, int count)[] rolesPreset = [("DonMafia", 1), ("BumMafia", 1), ("Mafia", 1), ("Maniac", 1), ("Commissar", 1), ("Doctor", 1), ("Civilian", 4)];
@@ -58,9 +57,10 @@ public class HostViewModel : IHost, INotifyPropertyChanged
 
     public ICommand ClickMe => new Command(() =>
     {
+        var seed = new Random().Next();
         Text = "";
-        WriteLine($"\r\n'{city.Name}' game {0}");
-        ChangeSeed(0);
+        WriteLine($"\r\n'{city.Name}' game {seed}");
+        ChangeSeed(seed);
         game.Start();
     });
 
@@ -69,7 +69,10 @@ public class HostViewModel : IHost, INotifyPropertyChanged
         Text += $"{text}\r\n";
     }
 
-    public void ChangeSeed(int seed) {}
+    public void ChangeSeed(int seed) 
+    {
+        rnd = new Random(seed);
+    }
 
     public (User, string)[] GetUserRoles()
     {
