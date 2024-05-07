@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Host.Mafia;
 using System.IO;
 using Host.Mafia.ViewModel;
+using Host.Views;
 
 namespace Host;
 
@@ -22,15 +23,18 @@ public static class MauiProgram
 
         var city = json.FromJson<City>();
 
+        using Stream settingsStream = FileSystem.Current.OpenAppPackageFileAsync(appsettingsFileName).Result;
         var builder = MauiApp.CreateBuilder();
-        builder.Configuration.AddJsonFile(appsettingsFileName);
+        builder.Configuration.AddJsonStream(settingsStream);
+        //builder.Configuration.AddJsonFile(appsettingsFileName);
 
         builder.Services
             .Configure<HostOptions>(builder.Configuration.GetSection("options"))
             .AddMafia(city)
             .AddSingleton<HostViewModel>()
             .AddSingleton<IHost, HostViewModel>(p => p.GetRequiredService<HostViewModel>())
-            .AddTransient<MainPage>(p => new MainPage() { BindingContext = p.GetRequiredService<HostViewModel>() })
+            .AddTransient<StartGameView>(p => new StartGameView() { BindingContext = p.GetRequiredService<HostViewModel>() })
+            .AddTransient<GameView>(p => new GameView() { BindingContext = p.GetRequiredService<HostViewModel>() })
             ;
 
         builder
