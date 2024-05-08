@@ -19,8 +19,8 @@
                 Style="{StaticResource Headline}"
                 HorizontalOptions="Start"
                 SemanticProperties.HeadingLevel="Level1" />
-            
-            <ListView ItemsSource="{Binding Roles}">
+
+            <ListView ItemsSource="{Binding ActiveRoles}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
@@ -46,7 +46,7 @@
             <Button
                     Text="Start New Game" 
                     SemanticProperties.Hint="Stop previouse game and start a new one"
-                    Command="{Binding StartNewGame}"
+                    Command="{Binding StartNewGameCommand}"
                     HorizontalOptions="Fill" />
         </VerticalStackLayout>
     </ScrollView>

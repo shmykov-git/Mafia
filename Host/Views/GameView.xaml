@@ -37,7 +37,7 @@
             <Button 
                     Text="Continue" 
                     SemanticProperties.Hint="Ready to continue the game"
-                    Command="{Binding Continue}"
+                    Command="{Binding ContinueCommand}"
                     HorizontalOptions="Fill" />
 
             <Label

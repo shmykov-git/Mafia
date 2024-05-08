@@ -1,11 +1,9 @@
-﻿using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using Mafia.Model;
+﻿using Mafia.Model;
 namespace Host.Model;
 
-public class Player0 : NotifyPropertyChanged
+public class ActiveRole : NotifyPropertyChanged
 {
-    public Player0(Role role, Action<string> onChange)
+    public ActiveRole(Role role, Action<string> onChange)
     {
         Role = role;
         Subscribe(onChange);
