@@ -11,6 +11,12 @@
 
             <Label
                 Text="{Binding HostHint}"
+                Style="{StaticResource Headline}"
+                SemanticProperties.HeadingLevel="Level1" 
+                HorizontalOptions="Start" />
+
+            <Label
+                Text="{Binding Text}"
                 HorizontalOptions="Start" />
 
             <Button
@@ -18,12 +24,6 @@
                     SemanticProperties.Hint="Ready to continue the game"
                     Command="{Binding Continue}"
                     HorizontalOptions="Fill" />
-
-            <Label
-                Text="{Binding Text}"
-                HorizontalOptions="Start" 
-                SemanticProperties.HeadingLevel="Level2" />
-        
         </VerticalStackLayout>
     </ScrollView>
 

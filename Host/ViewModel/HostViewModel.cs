@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
+using System.Numerics;
 using System.Windows.Input;
 using Host.Model;
 using Mafia;
@@ -48,13 +49,15 @@ public class HostViewModel : IHost, INotifyPropertyChanged
         RefreshPlayerInfo();
     }
 
+
+
     public ICommand Continue => new Command(() =>
     {
         awaiter?.SetResult();
     });
 
     TaskCompletionSource? awaiter = null;
-    public async Task DoHostAction(string message)
+    public async Task Interact(string message)
     {
         HostHint = message;
 
@@ -62,6 +65,7 @@ public class HostViewModel : IHost, INotifyPropertyChanged
         await awaiter.Task;
         awaiter = null;
     }
+
 
     void RefreshPlayerInfo()
     {
@@ -72,7 +76,6 @@ public class HostViewModel : IHost, INotifyPropertyChanged
 
         PlayerInfo = $"Players: {count}";
     }
-
 
     public ICommand StartNewGame => new Command(async () =>
     {
@@ -117,16 +120,16 @@ public class HostViewModel : IHost, INotifyPropertyChanged
         return gameRoles.Select((role, i) => (users[i], role)).ToArray();
     }
 
-    private void TellTheNews(State state)
+    private async Task TellTheNews(State state)
     {
         if (!state.HasNews)
         {
-            HostHint = "Hello city";
+            await Interact("Hello city");
             WriteLine($"Game players: {state.Players.SJoin(", ")}");
         }
         else
         {
-            HostHint = $"Where killed: {state.LatestNews.Killed.SJoin(", ")}";
+            await Interact($"Where killed: {state.LatestNews.Killed.SJoin(", ")}");
             WriteLine($"Where killed: {state.LatestNews.Killed.SJoin(", ")}");
             WriteLine($"Alive players: {state.Players.SJoin(", ")}");
         }
@@ -134,15 +137,12 @@ public class HostViewModel : IHost, INotifyPropertyChanged
 
     public async Task NotifyCityAfterNight(State state)
     {
-        TellTheNews(state);
+        await TellTheNews(state);
     }
 
     public async Task NotifyCityAfterDay(State state)
     {
-        //check game end
-        TellTheNews(state);
-
-        AskCityToFallAsleep();
+        await TellTheNews(state);
     }
 
     public async Task NotifyDayStart(State state)
@@ -150,7 +150,7 @@ public class HostViewModel : IHost, INotifyPropertyChanged
         if (state.DayNumber > 1)
         {
             HostHint = "WakeUp City";
-            AskCityToWakeUp();
+            await AskCityToWakeUp();
 
             WriteLine($"===== </night {state.DayNumber}> =====");
         }
@@ -160,6 +160,8 @@ public class HostViewModel : IHost, INotifyPropertyChanged
 
     public async Task NotifyNightStart(State state)
     {
+        await AskCityToFallAsleep();
+
         WriteLine($"===== </day {state.DayNumber}> =====");
         WriteLine($"===== <night {state.DayNumber}> =====");
     }
@@ -211,6 +213,8 @@ public class HostViewModel : IHost, INotifyPropertyChanged
 
     public async Task<bool> AskToSkip(State state, Player player)
     {
+        await Interact($"{player}, do you want to select somebody?");
+
         var skip = rnd.NextDouble() < 0.1;
 
         if (skip && options.CitySelections)
@@ -221,10 +225,14 @@ public class HostViewModel : IHost, INotifyPropertyChanged
 
     public async Task<Player[]> AskToSelect(State state, Player player)
     {
-        AskToWakeUp(state, player);
+        await AskToWakeUp(state, player);
+
+        await Interact($"Whom {player} would like to select?");
+
         if (options.HostInstructions)
-            Debug.WriteLine($"Whom {player} would like to select?");
-        AskToFallAsleep(state, player);
+            WriteLine($"Whom {player} would like to select?");
+
+        await AskToFallAsleep(state, player);
 
         Player[] selected;
         var except = state.GetExceptPlayers(player);
@@ -243,31 +251,39 @@ public class HostViewModel : IHost, INotifyPropertyChanged
         }
 
         if (options.CitySelections)
-            Debug.WriteLine($"{player} --> {(selected is [] ? "nobody" : selected.SJoin(", "))}");
+            WriteLine($"{player} --> {(selected is [] ? "nobody" : selected.SJoin(", "))}");
 
         return selected;
     }
 
-    private void AskCityToWakeUp()
+    private async Task AskCityToWakeUp()
     {
+        await Interact($"City, wake up please");
+
         if (options.HostInstructions)
             WriteLine($"City, wake up please");
     }
 
-    private void AskCityToFallAsleep()
+    private async Task AskCityToFallAsleep()
     {
+        await Interact($"City, fall asleep please");
+
         if (options.HostInstructions)
             WriteLine($"City, fall asleep please");
     }
 
-    private void AskToWakeUp(State state, Player player)
+    private async Task AskToWakeUp(State state, Player player)
     {
+        await Interact($"{player}, wake up please");
+
         if (state.IsNight && options.HostInstructions)
             WriteLine($"{player}, wake up please");
     }
 
-    private void AskToFallAsleep(State state, Player player)
+    private async Task AskToFallAsleep(State state, Player player)
     {
+        await Interact($"{player}, fall asleep please");
+
         if (state.IsNight && options.HostInstructions)
             WriteLine($"{player}, fall asleep please");
     }

@@ -22,12 +22,11 @@ public class State
     public IEnumerable<Select> AllSelects() => News.SelectMany(dn=>dn.AllSelects());
 
     /// <summary>
-    /// todo: config
     /// Нужно чтобы в списке действий было хотя бы одно, которое не блокируется условиями текущего процесса
     /// </summary>
     public bool IsCurrentlyAllowed(Player player) => player.Role.AllActions()
         .Select(a => (a, intersection: a.AllConditions().Intersect(Values.ActiveConditions).ToArray()))
-        .Any(v => v.intersection.Length == 0 || v.intersection.All(name => v.a.CheckCondition(name, this, player).Result));
+        .Any(v => v.intersection.Length == 0 || v.intersection.All(name => v.a.CheckCondition(name, this, player).NoInteractionResult()));
 
     public bool IsSelfSelected(Player player) => News.Select(ps => ps).Any(ops => ops.Selects?.Any(s => s.Who == player && s.Whom.Contains(player)) ?? false);
     public Player[] GetGroupActivePlayers(Group group) => Players.Where(IsCurrentlyAllowed).Where(p => p.Group == group).GroupBy(p=>p.Role).Select(gr=>gr.First()).OrderBy(p=>p.Role.Rank).ToArray();
