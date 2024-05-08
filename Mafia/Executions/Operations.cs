@@ -1,4 +1,5 @@
-﻿using Mafia.Model;
+﻿using System.Xml.Linq;
+using Mafia.Model;
 
 namespace Mafia.Executions;
 
@@ -15,6 +16,10 @@ public static class Operations
     public static Task<DailyNews> Lock(State state, Player player) => Select(nameof(Lock), state, player);
     public static Task<DailyNews> Check(State state, Player player) => Select(nameof(Check), state, player);
     public static Task<DailyNews> Heal(State state, Player player) => Select(nameof(Heal), state, player);
-    public static async Task<DailyNews> Hello(State state, Player player) => new DailyNews();
-    public static Task<DailyNews> RoundKill(State state, Player player) => Select(nameof(RoundKill), state, player);
+    public static DailyNews Hello(State state, Player player) => new DailyNews();
+
+    public static async Task<DailyNews> RoundKill(State state, Player player) => new DailyNews
+    {
+        Selects = [new Select { Operation = nameof(RoundKill), Who = player, Whom = await state.Host.GetNeighbors(state, player) }]
+    };
 }

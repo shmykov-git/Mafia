@@ -187,7 +187,7 @@ public class DebugHost : IHost
         }
 
         if (options.CitySelections)
-            Debug.WriteLine($"{player} --> {selected}");
+            Debug.WriteLine($"{player} --> {(selected is [] ? "nobody" : selected.SJoin(", "))}");
 
         return selected;
     }

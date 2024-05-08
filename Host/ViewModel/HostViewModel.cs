@@ -243,7 +243,7 @@ public class HostViewModel : IHost, INotifyPropertyChanged
         }
 
         if (options.CitySelections)
-            Debug.WriteLine($"{player} --> {selected}");
+            Debug.WriteLine($"{player} --> {(selected is [] ? "nobody" : selected.SJoin(", "))}");
 
         return selected;
     }

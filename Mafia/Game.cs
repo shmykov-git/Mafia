@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Numerics;
+using System.Reflection;
 using Mafia.Executions;
 using Mafia.Extensions;
 using Mafia.Model;
@@ -25,24 +26,40 @@ public class Game
 
     private void InitCity()
     {
+        CityCondition GetCityCondition(MethodInfo m) => m.ReturnParameter.ParameterType.IsTask()
+            ? (s => (Task<bool>)m.Invoke(null, [s])!)
+            : (s => Task.FromResult((bool)m.Invoke(null, [s])!));
+
+        CityOperation GetCityOperation(MethodInfo m) => m.ReturnParameter.ParameterType.IsTask()
+            ? (s => (Task<DailyNews>)m.Invoke(null, [s])!)
+            : (s => Task.FromResult((DailyNews)m.Invoke(null, [s])!));
+
+        Condition GetCondition(MethodInfo m) => m.ReturnParameter.ParameterType.IsTask()
+            ? ((s, p) => (Task<bool>)m.Invoke(null, [s, p])!)
+            : ((s, p) => Task.FromResult((bool)m.Invoke(null, [s, p])!));
+
+        Operation GetOperation(MethodInfo m) => m.ReturnParameter.ParameterType.IsTask()
+            ? ((s, p) => (Task<DailyNews>)m.Invoke(null, [s, p])!)
+            : ((s, p) => Task.FromResult((DailyNews)m.Invoke(null, [s, p])!));
+
         city.DayActions.ForEach(cityAction =>
         {
-            var conditions = cityAction.Conditions?.Select(name => typeof(CityConditions).GetMethods().First(m => m.Name == name))
-                .ToDictionary(m => m.Name, m => (CityCondition)((s) => (Task<bool>)m.Invoke(null, new object[] { s })));
+            var conditions = cityAction.Conditions?.Select(name => typeof(CityConditions).GetMethods().Single(m => m.Name == name))
+                .ToDictionary(m => m.Name, m => GetCityCondition(m));
 
-            var operations = cityAction.Operations.Select(name => typeof(CityOperations).GetMethods().First(m => m.Name == name))
-                .ToDictionary(m => m.Name, m => (CityOperation)((s) => (Task<DailyNews>)m.Invoke(null, new object[] { s })));
+            var operations = cityAction.Operations.Select(name => typeof(CityOperations).GetMethods().Single(m => m.Name == name))
+                .ToDictionary(m => m.Name, m => GetCityOperation(m));
 
             cityAction.Execution = new CityExecution { Conditions = conditions, Operations = operations };
         });
 
         city.AllActions().ForEach(action =>
         {
-            var conditions = action.Conditions?.Select(name => typeof(Conditions).GetMethods().First(m => m.Name == name))
-                .ToDictionary(m => m.Name, m => (Condition)((s, p) => (Task<bool>)m.Invoke(null, new object[] { s, p })));
+            var conditions = action.Conditions?.Select(name => typeof(Conditions).GetMethods().Single(m => m.Name == name))
+                .ToDictionary(m => m.Name, m => GetCondition(m));
 
-            var operations = action.Operations.Select(name => typeof(Operations).GetMethods().First(m => m.Name == name))
-                .ToDictionary(m => m.Name, m => (Operation)((s, p) => (Task<DailyNews>)m.Invoke(null, new object[] { s, p })));
+            var operations = action.Operations.Select(name => typeof(Operations).GetMethods().Single(m => m.Name == name))
+                .ToDictionary(m => m.Name, m => GetOperation(m));
 
             action.Execution = new Execution { Conditions = conditions, Operations = operations };
         });
