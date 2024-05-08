@@ -1,9 +1,29 @@
-﻿using Mafia.Exceptions;
+﻿using System.Diagnostics;
+using Mafia.Exceptions;
 
 namespace Mafia.Extensions;
 
 public static class TaskExtensions
 {
+    /// <summary>
+    /// Start new task execution line
+    /// </summary>
+    public static void NoWait(this Task task) 
+    {
+        // todo: logger
+        Task.Run(async () =>
+        {
+            try
+            {
+                await task;
+            }
+            catch (Exception ex) 
+            {
+                Debug.WriteLine(ex);
+            }
+        });
+    }
+
     public static TResult NoInteractionResult<TResult>(this Task<TResult> task) => task.NoInteractionResult(TimeSpan.FromSeconds(1));
     
     public static TResult NoInteractionResult<TResult>(this Task<TResult> task, TimeSpan timeout)

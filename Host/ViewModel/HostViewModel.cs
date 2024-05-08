@@ -2,6 +2,7 @@
 using System.Data;
 using System.Diagnostics;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Host.Model;
 using Mafia;
@@ -26,10 +27,10 @@ public class HostViewModel : IHost, INotifyPropertyChanged
     public string HostHint { get => _hostHint; set { _hostHint = value; Changed(nameof(HostHint)); } }
 
     private string _text;
-    public string Text { get => _text; set { _text = value; Changed(nameof(Text)); } }
+    public string Text { get => _text; set { _text = value; Changed(); } }
 
     private string _playerInfo;
-    public string PlayerInfo { get => _playerInfo; set { _playerInfo = value; Changed(nameof(PlayerInfo)); } }
+    public string PlayerInfo { get => _playerInfo; set { _playerInfo = value; Changed(); } }
 
     public SelectedRole[] Roles { get; }
 
@@ -50,22 +51,32 @@ public class HostViewModel : IHost, INotifyPropertyChanged
     }
 
 
+    TaskCompletionSource? interactor = null;
+    private void ContinueGame() => interactor?.SetResult();
 
-    public ICommand Continue => new Command(() =>
+    public ICommand Continue => new Command(async () =>
     {
-        awaiter?.SetResult();
-    });
+        await Task.Delay(20);
+        ContinueGame();
+    }, () => game.IsActive);
 
-    TaskCompletionSource? awaiter = null;
     public async Task Interact(string message)
     {
         HostHint = message;
 
-        awaiter = new TaskCompletionSource();
-        await awaiter.Task;
-        awaiter = null;
-    }
+        while (interactor != null)
+        {
+            Debug.WriteLine("warn: async error");
+            await Task.Delay(10);
+        }
+        
+        interactor = new TaskCompletionSource();
+        
+        if (!game.Stopping)
+            await interactor.Task;
 
+        interactor = null;
+    }
 
     void RefreshPlayerInfo()
     {
@@ -79,6 +90,10 @@ public class HostViewModel : IHost, INotifyPropertyChanged
 
     public ICommand StartNewGame => new Command(async () =>
     {
+        var stopTask = game.Stop();
+        ContinueGame();
+        await stopTask;
+
         await Shell.Current.GoToAsync("//pages/GameView");
 
         var seed = new Random().Next();
@@ -86,8 +101,15 @@ public class HostViewModel : IHost, INotifyPropertyChanged
         Text = "";
         WriteLine($"\r\n'{city.Name}' game {seed}");
         ChangeSeed(seed);
-        game.Start();
+
+        game.Start().ContinueWith(_ => RefreshCommands()).NoWait();
+
+        await Task.Delay(50);
+        RefreshCommands();
     });
+
+    private void RefreshCommands() => GetType().GetProperties().Where(p => p.PropertyType == typeof(ICommand)).ForEach(p => Changed(p.Name));
+    
 
     private void WriteLine(string text)
     {
@@ -290,6 +312,6 @@ public class HostViewModel : IHost, INotifyPropertyChanged
 
 
     public event PropertyChangedEventHandler? PropertyChanged;
-    public void Changed(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    public void Changed([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
 }

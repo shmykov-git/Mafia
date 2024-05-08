@@ -15,15 +15,15 @@
                 SemanticProperties.HeadingLevel="Level1" 
                 HorizontalOptions="Start" />
 
-            <Label
-                Text="{Binding Text}"
-                HorizontalOptions="Start" />
-
-            <Button
+            <Button 
                     Text="Continue" 
                     SemanticProperties.Hint="Ready to continue the game"
                     Command="{Binding Continue}"
                     HorizontalOptions="Fill" />
+
+            <Label
+                Text="{Binding Text}"
+                HorizontalOptions="Start" />        
         </VerticalStackLayout>
     </ScrollView>
 

@@ -8,11 +8,13 @@ public class State
     public required IHost Host { get; set; }
     public required City City { get; set; }
     public required List<DailyNews> News { get; set; }
-    public DailyNews? YesterdayNews => News.Count < 3 ? null : News[^3];
-    public DailyNews LatestNews => News[^1];
+    public DailyNews YesterdayNews => News.Count < 3 ? new DailyNews() : News[^3];
+    public DailyNews LatestNews => News.Count < 1 ? new DailyNews() : News[^1];
     public bool HasNews => News.Count > 0;
 
     public int DayNumber { get; set; }
+    public bool IsActive { get; set; }
+    public bool Stopping { get; set; }
     public bool IsDay { get; set; }
     public bool IsNight { get => !IsDay; set => IsDay = !value; }
 
@@ -49,7 +51,7 @@ public class State
     {
         List<Player> except = new();
 
-        if (City.IsRuleForRoleAccepted(RuleName.EvenDoctorDays, player.Role) && YesterdayNews != null)
+        if (City.IsRuleForRoleAccepted(RuleName.EvenDoctorDays, player.Role))
         {
             var select = YesterdayNews.AllSelects().SingleOrDefault(s => s.Who == player);
             

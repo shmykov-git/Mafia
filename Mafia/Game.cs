@@ -16,6 +16,8 @@ public class Game
     private IHost host => _host ??= hostFactory();
 
     private State state;
+    public bool IsActive => state?.IsActive ?? false;
+    public bool Stopping => state == null || state.Stopping;
 
     public Game(City city, Func<IHost> hostFactory)
     {
@@ -218,10 +220,11 @@ public class Game
             Players = players0.ToList(), 
             IsDay = true, 
             DayNumber = 1, 
-            News = new() 
+            News = new(),
+            IsActive = true
         };
 
-        while (true)
+        while (!state.Stopping)
         {
             state.IsDay = true;
             if (state.DayNumber > 1)
@@ -253,5 +256,22 @@ public class Game
 
             state.DayNumber++;
         }
+
+        state.IsActive = false;
+        
+        if (stopping != null)
+            stopping.SetResult();
+    }
+
+    private TaskCompletionSource? stopping = null;
+    public async Task Stop()
+    {
+        if (!IsActive)
+            return;
+
+        stopping = new TaskCompletionSource();
+        state.Stopping = true;
+        await stopping.Task;
+        stopping = null;
     }
 }

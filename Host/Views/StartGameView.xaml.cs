@@ -4,6 +4,6 @@ public partial class StartGameView : ContentPage
 {
     public StartGameView()
     {
-        InitializeComponent();
+        InitializeComponent();        
     }
 }
