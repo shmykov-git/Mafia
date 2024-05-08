@@ -21,6 +21,9 @@ public class HostViewModel : IHost, INotifyPropertyChanged
     private HostOptions options;
 
 
+    private string _hostHint;
+    public string HostHint { get => _hostHint; set { _hostHint = value; Changed(nameof(HostHint)); } }
+
     private string _text;
     public string Text { get => _text; set { _text = value; Changed(nameof(Text)); } }
 
@@ -45,6 +48,21 @@ public class HostViewModel : IHost, INotifyPropertyChanged
         RefreshPlayerInfo();
     }
 
+    public ICommand Continue => new Command(() =>
+    {
+        awaiter?.SetResult();
+    });
+
+    TaskCompletionSource? awaiter = null;
+    public async Task DoHostAction(string message)
+    {
+        HostHint = message;
+
+        awaiter = new TaskCompletionSource();
+        await awaiter.Task;
+        awaiter = null;
+    }
+
     void RefreshPlayerInfo()
     {
         if (Roles == null)
@@ -56,9 +74,12 @@ public class HostViewModel : IHost, INotifyPropertyChanged
     }
 
 
-    public ICommand ClickMe => new Command(() =>
+    public ICommand StartNewGame => new Command(async () =>
     {
+        await Shell.Current.GoToAsync("//pages/GameView");
+
         var seed = new Random().Next();
+
         Text = "";
         WriteLine($"\r\n'{city.Name}' game {seed}");
         ChangeSeed(seed);
@@ -100,24 +121,23 @@ public class HostViewModel : IHost, INotifyPropertyChanged
     {
         if (!state.HasNews)
         {
+            HostHint = "Hello city";
             WriteLine($"Game players: {state.Players.SJoin(", ")}");
         }
         else
         {
+            HostHint = $"Where killed: {state.LatestNews.Killed.SJoin(", ")}";
             WriteLine($"Where killed: {state.LatestNews.Killed.SJoin(", ")}");
             WriteLine($"Alive players: {state.Players.SJoin(", ")}");
         }
     }
 
-    public void NotifyCityAfterNight(State state)
+    public async Task NotifyCityAfterNight(State state)
     {
-        AskCityToWakeUp();
         TellTheNews(state);
-
-        //check game end
     }
 
-    public void NotifyCityAfterDay(State state)
+    public async Task NotifyCityAfterDay(State state)
     {
         //check game end
         TellTheNews(state);
@@ -125,33 +145,38 @@ public class HostViewModel : IHost, INotifyPropertyChanged
         AskCityToFallAsleep();
     }
 
-    public void NotifyDayStart(State state)
+    public async Task NotifyDayStart(State state)
     {
         if (state.DayNumber > 1)
-            WriteLine($"===== </night {state.DayNumber}> =====");
+        {
+            HostHint = "WakeUp City";
+            AskCityToWakeUp();
 
-        WriteLine($"===== <day {state.DayNumber}> =====");
+            WriteLine($"===== </night {state.DayNumber}> =====");
+        }
+
+        WriteLine($"===== <day {state.DayNumber}> =====");        
     }
 
-    public void NotifyNightStart(State state)
+    public async Task NotifyNightStart(State state)
     {
         WriteLine($"===== </day {state.DayNumber}> =====");
         WriteLine($"===== <night {state.DayNumber}> =====");
     }
 
-    public bool IsGameEnd(State state)
+    public async Task<bool> IsGameEnd(State state)
     {
         // Ведущий может остановить игру в результате математической победы (2 мафии, 2 мирных)
         return false;
     }
 
-    public void NotifyGameEnd(State state, Group winnerGroup)
+    public async Task NotifyGameEnd(State state, Group winnerGroup)
     {
         WriteLine($"GameEnd, the winner is {winnerGroup.Name}");
         WriteLine($"===== </day {state.DayNumber}> =====");
     }
 
-    public bool AskCityToSkip(State state)
+    public async Task<bool> AskCityToSkip(State state)
     {
         var skip = rnd.NextDouble() < 0.1;
 
@@ -161,7 +186,7 @@ public class HostViewModel : IHost, INotifyPropertyChanged
         return skip;
     }
 
-    public Player AskCityToSelect(State state)
+    public async Task<Player> AskCityToSelect(State state)
     {
         if (options.HostInstructions)
             WriteLine($"City select somebody to kill");
@@ -174,7 +199,7 @@ public class HostViewModel : IHost, INotifyPropertyChanged
         return selected;
     }
 
-    public Player[] GetNeighbors(State state, Player player)
+    public async Task<Player[]> GetNeighbors(State state, Player player)
     {
         var selected = state.GetNeighborPlayers(player);
 
@@ -184,7 +209,7 @@ public class HostViewModel : IHost, INotifyPropertyChanged
         return selected;
     }
 
-    public bool AskToSkip(State state, Player player)
+    public async Task<bool> AskToSkip(State state, Player player)
     {
         var skip = rnd.NextDouble() < 0.1;
 
@@ -194,7 +219,7 @@ public class HostViewModel : IHost, INotifyPropertyChanged
         return skip;
     }
 
-    public Player[] AskToSelect(State state, Player player)
+    public async Task<Player[]> AskToSelect(State state, Player player)
     {
         AskToWakeUp(state, player);
         if (options.HostInstructions)

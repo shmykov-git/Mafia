@@ -18,7 +18,7 @@
         
         <ShellContent
             Icon="game.png"
-            Title="Testing"
+            Title="Game"
             ContentTemplate="{DataTemplate local:GameView}"
             Route="GameView" />
         

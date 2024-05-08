@@ -9,10 +9,14 @@
             Padding="30,0"
             Spacing="25" >
 
+            <Label
+                Text="{Binding HostHint}"
+                HorizontalOptions="Start" />
+
             <Button
-                    Text="Start testing game" 
-                    SemanticProperties.Hint="Just click me"
-                    Command="{Binding ClickMe}"
+                    Text="Continue" 
+                    SemanticProperties.Hint="Ready to continue the game"
+                    Command="{Binding Continue}"
                     HorizontalOptions="Fill" />
 
             <Label

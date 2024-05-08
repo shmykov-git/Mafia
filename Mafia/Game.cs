@@ -28,10 +28,10 @@ public class Game
         city.DayActions.ForEach(cityAction =>
         {
             var conditions = cityAction.Conditions?.Select(name => typeof(CityConditions).GetMethods().First(m => m.Name == name))
-                .ToDictionary(m => m.Name, m => (CityCondition)((s) => (bool)m.Invoke(null, new object[] { s })));
+                .ToDictionary(m => m.Name, m => (CityCondition)((s) => (Task<bool>)m.Invoke(null, new object[] { s })));
 
             var operations = cityAction.Operations.Select(name => typeof(CityOperations).GetMethods().First(m => m.Name == name))
-                .ToDictionary(m => m.Name, m => (CityOperation)((s) => (DailyNews)m.Invoke(null, new object[] { s })));
+                .ToDictionary(m => m.Name, m => (CityOperation)((s) => (Task<DailyNews>)m.Invoke(null, new object[] { s })));
 
             cityAction.Execution = new CityExecution { Conditions = conditions, Operations = operations };
         });
@@ -39,28 +39,28 @@ public class Game
         city.AllActions().ForEach(action =>
         {
             var conditions = action.Conditions?.Select(name => typeof(Conditions).GetMethods().First(m => m.Name == name))
-                .ToDictionary(m => m.Name, m => (Condition)((s, p) => (bool)m.Invoke(null, new object[] { s, p })));
+                .ToDictionary(m => m.Name, m => (Condition)((s, p) => (Task<bool>)m.Invoke(null, new object[] { s, p })));
 
             var operations = action.Operations.Select(name => typeof(Operations).GetMethods().First(m => m.Name == name))
-                .ToDictionary(m => m.Name, m => (Operation)((s, p) => (DailyNews)m.Invoke(null, new object[] { s, p })));
+                .ToDictionary(m => m.Name, m => (Operation)((s, p) => (Task<DailyNews>)m.Invoke(null, new object[] { s, p })));
 
             action.Execution = new Execution { Conditions = conditions, Operations = operations };
         });
     }
 
-    private void PlayDay()
+    private async Task PlayDay()
     {
         var result = new DailyNews();
         state.News.Add(result);
 
         foreach (var action in city.DayActions)
         {
-            if (action.CheckConditions(state))
-                result.Collect(action.DoOperations(state));
+            if (await action.CheckConditions(state))
+                result.Collect(await action.DoOperations(state));
         }
     }
 
-    private void PlayNight()
+    private async Task PlayNight()
     {
         var result = new DailyNews();
         state.News.Add(result);
@@ -71,8 +71,8 @@ public class Game
             {
                 foreach (var action in player.Role.AllActions())
                 {
-                    if (action.CheckConditions(state, player))
-                        result.Collect(action.DoOperations(state, player));
+                    if (await action.CheckConditions(state, player))
+                        result.Collect(await action.DoOperations(state, player));
                 }
             }
         }
@@ -117,7 +117,7 @@ public class Game
             state.Players.Remove(player);
     }
 
-    private void PlayOnDeathKills()
+    private async Task PlayOnDeathKills()
     {
         var stack = new Stack<Player>();
         state.LatestNews.Killed.ForEach(stack.Push);
@@ -128,9 +128,9 @@ public class Game
         {
             foreach(var action in kill.Role.AllActions().Where(a=>a.AllConditions().Intersect(Values.OnDeathConditions).Any()))
             {
-                if (action.CheckConditions(state, kill))
+                if (await action.CheckConditions(state, kill))
                 {
-                    var actionNews = action.DoOperations(state, kill);
+                    var actionNews = await action.DoOperations(state, kill);
                     var actionKills = actionNews.GetKills();
                     actionKills.ForEach(stack.Push);
                     dailyNews.Collect(actionNews);
@@ -150,7 +150,7 @@ public class Game
         }
     }
 
-    private bool IsGameEnd() => GetWinnerGroup() != null || host.IsGameEnd(state);
+    private async Task<bool> IsGameEnd() => GetWinnerGroup() != null || await host.IsGameEnd(state);
 
     private (bool success, Group winner) CheckWinRule(RuleName winRuleName)
     {
@@ -187,8 +187,10 @@ public class Game
         return null;
     }
 
-    public void Start()
+    public async Task Start()
     {
+        // async await
+
         var players0 = host.GetUserRoles().Select(v => city.CreatePlayer(v.user, city.GetRole(v.role))).ToArray();
 
         state = new State 
@@ -208,29 +210,29 @@ public class Game
             if (state.DayNumber > 1)
             {
                 KnowNightKills();
-                PlayOnDeathKills();
+                await PlayOnDeathKills();
                 ApplyKills();
             }
-            host.NotifyDayStart(state);
-            host.NotifyCityAfterNight(state);
-            if (IsGameEnd())
+            await host.NotifyDayStart(state);
+            await host.NotifyCityAfterNight(state);
+            if (await IsGameEnd())
             {
-                host.NotifyGameEnd(state, GetWinnerGroup()!);
+                await host.NotifyGameEnd(state, GetWinnerGroup()!);
                 break;
             }
-            PlayDay();
+            await PlayDay();
             KnowDayKills();
-            PlayOnDeathKills();
+            await PlayOnDeathKills();
             ApplyKills();
-            host.NotifyCityAfterDay(state);
-            if (IsGameEnd())
+            await host.NotifyCityAfterDay(state);
+            if (await IsGameEnd())
             {
-                host.NotifyGameEnd(state, GetWinnerGroup()!);
+                await host.NotifyGameEnd(state, GetWinnerGroup()!);
                 break;
             }
             state.IsNight = true;
-            host.NotifyNightStart(state);
-            PlayNight();
+            await host.NotifyNightStart(state);
+            await PlayNight();
 
             state.DayNumber++;
         }

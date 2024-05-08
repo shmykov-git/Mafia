@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using Mafia.Extensions;
 
 namespace Mafia.Model;
 
@@ -26,7 +27,7 @@ public class State
     /// </summary>
     public bool IsCurrentlyAllowed(Player player) => player.Role.AllActions()
         .Select(a => (a, intersection: a.AllConditions().Intersect(Values.ActiveConditions).ToArray()))
-        .Any(v => v.intersection.Length == 0 || v.intersection.All(name => v.a.CheckCondition(name, this, player)));
+        .Any(v => v.intersection.Length == 0 || v.intersection.All(name => v.a.CheckCondition(name, this, player).Result));
 
     public bool IsSelfSelected(Player player) => News.Select(ps => ps).Any(ops => ops.Selects?.Any(s => s.Who == player && s.Whom.Contains(player)) ?? false);
     public Player[] GetGroupActivePlayers(Group group) => Players.Where(IsCurrentlyAllowed).Where(p => p.Group == group).GroupBy(p=>p.Role).Select(gr=>gr.First()).OrderBy(p=>p.Role.Rank).ToArray();

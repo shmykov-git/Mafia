@@ -21,4 +21,29 @@ public static class LinqExtensions
         while (en.MoveNext())
             action(en.Current);
     }
+
+    public static async Task<bool> AnyAsync<TSource>(this IEnumerable<TSource> source, Func<TSource, Task<bool>> predicate)
+    {
+        foreach (var item in source)
+            if (await predicate(item))
+                return true;
+
+        return false;
+    }
+
+    public static async Task<bool> AllAsync<TSource>(this IEnumerable<TSource> source, Func<TSource, Task<bool>> predicate)
+    {
+        foreach (var item in source)
+            if (! (await predicate(item)))
+                return false;
+
+        return true;
+    }
+
+    public static async IAsyncEnumerable<TSource> WhereAsync<TSource>(this IEnumerable<TSource> source, Func<TSource, Task<bool>> predicate)
+    {
+        foreach (var item in source)
+            if (await predicate(item))
+                yield return item;
+    }
 }

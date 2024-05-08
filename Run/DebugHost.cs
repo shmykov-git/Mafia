@@ -78,7 +78,7 @@ public class DebugHost : IHost
         }
     }
 
-    public void NotifyCityAfterNight(State state)
+    public async Task NotifyCityAfterNight(State state)
     {
         AskCityToWakeUp();
         TellTheNews(state);
@@ -86,7 +86,7 @@ public class DebugHost : IHost
         //check game end
     }
 
-    public void NotifyCityAfterDay(State state)
+    public async Task NotifyCityAfterDay(State state)
     {
         //check game end
         TellTheNews(state);
@@ -94,7 +94,7 @@ public class DebugHost : IHost
         AskCityToFallAsleep();
     }
 
-    public void NotifyDayStart(State state)
+    public async Task NotifyDayStart(State state)
     {
         if (state.DayNumber > 1)
             Debug.WriteLine($"===== </night {state.DayNumber}> =====");
@@ -102,25 +102,25 @@ public class DebugHost : IHost
         Debug.WriteLine($"===== <day {state.DayNumber}> =====");
     }
 
-    public void NotifyNightStart(State state)
+    public async Task NotifyNightStart(State state)
     {
         Debug.WriteLine($"===== </day {state.DayNumber}> =====");
         Debug.WriteLine($"===== <night {state.DayNumber}> =====");
     }
 
-    public bool IsGameEnd(State state)
+    public async Task<bool> IsGameEnd(State state)
     {
         // Ведущий может остановить игру в результате математической победы (2 мафии, 2 мирных)
         return false;
     }
 
-    public void NotifyGameEnd(State state, Group winnerGroup)
+    public async Task NotifyGameEnd(State state, Group winnerGroup)
     {
         Debug.WriteLine($"GameEnd, the winner is {winnerGroup.Name}");
         Debug.WriteLine($"===== </day {state.DayNumber}> =====");
     }
 
-    public bool AskCityToSkip(State state)
+    public async Task<bool> AskCityToSkip(State state)
     {
         var skip = rnd.NextDouble() < 0.1;
 
@@ -130,7 +130,7 @@ public class DebugHost : IHost
         return skip;
     }
 
-    public Player AskCityToSelect(State state)
+    public async Task<Player> AskCityToSelect(State state)
     {
         if (options.HostInstructions)
             Debug.WriteLine($"City select somebody to kill");
@@ -143,7 +143,7 @@ public class DebugHost : IHost
         return selected;
     }
 
-    public Player[] GetNeighbors(State state, Player player)
+    public async Task<Player[]> GetNeighbors(State state, Player player)
     {
         var selected = state.GetNeighborPlayers(player);
 
@@ -153,7 +153,7 @@ public class DebugHost : IHost
         return selected;
     }
 
-    public bool AskToSkip(State state, Player player)
+    public async Task<bool> AskToSkip(State state, Player player)
     {
         var skip = rnd.NextDouble() < 0.1;
 
@@ -163,7 +163,7 @@ public class DebugHost : IHost
         return skip;
     }
 
-    public Player[] AskToSelect(State state, Player player)
+    public async Task<Player[]> AskToSelect(State state, Player player)
     {
         AskToWakeUp(state, player);
         if (options.HostInstructions)
