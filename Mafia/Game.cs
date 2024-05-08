@@ -3,6 +3,7 @@ using System.Numerics;
 using System.Reflection;
 using Mafia.Executions;
 using Mafia.Extensions;
+using Mafia.Libraries;
 using Mafia.Model;
 
 namespace Mafia;
@@ -223,6 +224,8 @@ public class Game
             News = new(),
             IsActive = true
         };
+
+        host.StartGame(state);
 
         while (!state.Stopping)
         {

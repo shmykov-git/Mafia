@@ -5,6 +5,7 @@ public interface IHost
 {
     void ChangeSeed(int seed);
     (User user, string role)[] GetUserRoles();
+    void StartGame(State state);
 
     Task NotifyCityAfterNight(State state);
     Task NotifyNightStart(State state);

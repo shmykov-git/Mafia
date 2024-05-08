@@ -41,6 +41,7 @@ public class DebugHost : IHost
 
         return roles.Concat(mafias).Concat(civilians).ToArray();
     }
+    public void StartGame(State state) { }
 
     public (User, string)[] GetUserRoles()
     {

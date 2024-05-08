@@ -7,6 +7,7 @@ using System.Windows.Input;
 using Host.Model;
 using Mafia;
 using Mafia.Extensions;
+using Mafia.Libraries;
 using Mafia.Model;
 using Microsoft.Extensions.Options;
 
@@ -15,7 +16,7 @@ namespace Host.ViewModel;
 /// <summary>
 /// todo: view code for host
 /// </summary>
-public class HostViewModel : IHost, INotifyPropertyChanged
+public class HostViewModel : NotifyPropertyChanged, IHost
 {
     private Random rnd;
     private readonly Game game;
@@ -32,9 +33,13 @@ public class HostViewModel : IHost, INotifyPropertyChanged
     private string _playerInfo;
     public string PlayerInfo { get => _playerInfo; set { _playerInfo = value; Changed(); } }
 
-    public SelectedRole[] Roles { get; }
+    public Player0[] Roles { get; private set; }
+    public ActivePlayer[] ActivePlayers { get; private set; }
 
-    private (string name, int count)[] rolesPreset = [("DonMafia", 1), ("BumMafia", 1), ("Mafia", 1), ("Maniac", 1), ("Commissar", 1), ("Doctor", 1), ("Civilian", 4)];
+    private (string name, int count)[] GetRolesPreset(int n)
+    {
+        return RoleValues.GetRolesPreset(["DonMafia", "BumMafia", "Maniac", "Commissar", "Doctor"], "Mafia", "Civilian", n, 3.5);
+    }
 
     public HostViewModel(Game game, City city, IOptions<HostOptions> options)
     {
@@ -43,13 +48,18 @@ public class HostViewModel : IHost, INotifyPropertyChanged
         this.city = city;
         this.options = options.Value;
 
-        Roles = city.AllRoles()
-            .Select(r => (role: r, preset: rolesPreset.FirstOrDefault(rr => rr.name == r.Name)))
-            .Select(v => new SelectedRole(v.role, f => RefreshPlayerInfo()) { IsSelected = v.preset.count > 0, Count = v.preset.count > 0 ? v.preset.count : 1 }).ToArray();
-
-        RefreshPlayerInfo();
+        InitRoles();
     }
 
+
+    private void InitRoles()
+    {
+        Roles = city.AllRoles()
+            .Select(r => (role: r, preset: GetRolesPreset(15).FirstOrDefault(rr => rr.name == r.Name)))
+            .Select(v => new Player0(v.role, f => RefreshPlayersInfo()) { IsSelected = v.preset.count > 0, Count = v.preset.count > 0 ? v.preset.count : 1 }).ToArray();
+
+        RefreshPlayersInfo();
+    }
 
     TaskCompletionSource? interactor = null;
     private void ContinueGame() => interactor?.SetResult();
@@ -78,7 +88,7 @@ public class HostViewModel : IHost, INotifyPropertyChanged
         interactor = null;
     }
 
-    void RefreshPlayerInfo()
+    void RefreshPlayersInfo()
     {
         if (Roles == null)
             return;
@@ -88,16 +98,33 @@ public class HostViewModel : IHost, INotifyPropertyChanged
         PlayerInfo = $"Players: {count}";
     }
 
+    private bool activePlayersSilent = false;
+    void RefreshActivePlayerInfo(string name)
+    {
+        if (!activePlayersSilent)
+        {
+            activePlayersSilent = true;
+
+            if (ActivePlayers.Where(p => p.IsSelected).Any())
+            {
+                ActivePlayers.Where(p => !p.IsSelected).ForEach(p => p.IsEnabled = false);
+            }
+            else
+            {
+                ActivePlayers.ForEach(p => p.IsEnabled = true);
+            }
+
+            activePlayersSilent = false;
+        }
+    }
+
     public ICommand StartNewGame => new Command(async () =>
     {
         var stopTask = game.Stop();
         ContinueGame();
         await stopTask;
 
-        await Shell.Current.GoToAsync("//pages/GameView");
-
         var seed = new Random().Next();
-
         Text = "";
         WriteLine($"\r\n'{city.Name}' game {seed}");
         ChangeSeed(seed);
@@ -106,6 +133,9 @@ public class HostViewModel : IHost, INotifyPropertyChanged
 
         await Task.Delay(50);
         RefreshCommands();
+        RefreshPlayersInfo();
+
+        await Shell.Current.GoToAsync("//pages/GameView");
     });
 
     private void RefreshCommands() => GetType().GetProperties().Where(p => p.PropertyType == typeof(ICommand)).ForEach(p => Changed(p.Name));
@@ -142,6 +172,12 @@ public class HostViewModel : IHost, INotifyPropertyChanged
         return gameRoles.Select((role, i) => (users[i], role)).ToArray();
     }
 
+    public void StartGame(State state) 
+    {
+        ActivePlayers = state.Players.Select(p => new ActivePlayer(p, RefreshActivePlayerInfo)).OrderBy(p=>p.Player.Group.Name).ThenBy(p=>p.Player.Role.Rank).ToArray();
+        Changed(nameof(ActivePlayers));
+    }
+
     private async Task TellTheNews(State state)
     {
         if (!state.HasNews)
@@ -171,7 +207,6 @@ public class HostViewModel : IHost, INotifyPropertyChanged
     {
         if (state.DayNumber > 1)
         {
-            HostHint = "WakeUp City";
             await AskCityToWakeUp();
 
             WriteLine($"===== </night {state.DayNumber}> =====");
@@ -212,6 +247,14 @@ public class HostViewModel : IHost, INotifyPropertyChanged
 
     public async Task<Player> AskCityToSelect(State state)
     {
+        ActivePlayers.ForEach(p =>
+        {
+            p.IsEnabled = true;
+            p.IsSelected = false;
+        });
+
+        await Interact($"City select somebody to kill");
+
         if (options.HostInstructions)
             WriteLine($"City select somebody to kill");
 
@@ -280,6 +323,12 @@ public class HostViewModel : IHost, INotifyPropertyChanged
 
     private async Task AskCityToWakeUp()
     {
+        ActivePlayers.ForEach(p => 
+        { 
+            p.IsEnabled = false; 
+            p.IsSelected = false; 
+        });
+
         await Interact($"City, wake up please");
 
         if (options.HostInstructions)
@@ -288,6 +337,12 @@ public class HostViewModel : IHost, INotifyPropertyChanged
 
     private async Task AskCityToFallAsleep()
     {
+        ActivePlayers.ForEach(p =>
+        {
+            p.IsEnabled = false;
+            p.IsSelected = false;
+        });
+
         await Interact($"City, fall asleep please");
 
         if (options.HostInstructions)
@@ -309,9 +364,4 @@ public class HostViewModel : IHost, INotifyPropertyChanged
         if (state.IsNight && options.HostInstructions)
             WriteLine($"{player}, fall asleep please");
     }
-
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-    public void Changed([CallerMemberName] string propertyName = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
 }

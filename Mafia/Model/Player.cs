@@ -8,5 +8,9 @@ public class Player
     public required Group TopGroup { get; set; }
 
     public bool Is(string role) => Role.Name == role;
-    public override string ToString() => $"{Group.Name}-{User.Nick}-{Role}";
+
+    public override string ToString() => $"{User.Nick}-{Role}";
+    //public override string ToString() => Group.AllRoles().Count() == 1 
+    //    ? $"{User.Nick}-{Role}" 
+    //    : $"{User.Nick}-{Role} ({Group.Name})";
 }

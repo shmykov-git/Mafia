@@ -13,8 +13,27 @@
                 Text="{Binding HostHint}"
                 Style="{StaticResource Headline}"
                 SemanticProperties.HeadingLevel="Level1" 
-                HorizontalOptions="Start" />
+                HorizontalOptions="Center" />
 
+            <ListView ItemsSource="{Binding ActivePlayers}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <Grid ColumnDefinitions="0.8*,0.2*" IsEnabled="{Binding IsEnabled}">
+                                <Label Grid.Column="0"
+                                   Text="{Binding Player}"
+                                   HorizontalOptions="Start"
+                                   FontAttributes="Bold" />
+
+                                <StackLayout Grid.Column="1" Orientation="Horizontal" HorizontalOptions="End">
+                                    <CheckBox IsChecked="{Binding IsSelected}" />
+                                </StackLayout>
+                            </Grid>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>            
+            
             <Button 
                     Text="Continue" 
                     SemanticProperties.Hint="Ready to continue the game"
