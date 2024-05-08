@@ -46,14 +46,21 @@ public partial class HostViewModel
     {
         if (!state.HasNews)
         {
-            await Interact("Hello city");
-            WriteLine($"Game players: {state.Players.SJoin(", ")}");
+            await Interact(new Interaction 
+            { 
+                Message = $"Hello City! Players: {state.Players.SJoin(", ")}", 
+                State = state 
+            });
         }
         else
         {
-            await Interact($"Where killed: {state.LatestNews.Killed.SJoin(", ")}");
-            WriteLine($"Where killed: {state.LatestNews.Killed.SJoin(", ")}");
-            WriteLine($"Alive players: {state.Players.SJoin(", ")}");
+            await Interact(new Interaction 
+            { 
+                Message = $"Killed: {state.LatestNews.Killed.SJoin(", ")}", 
+                State = state 
+            });
+
+            Log($"Alive players: {state.Players.SJoin(", ")}");
         }
     }
 
@@ -71,20 +78,20 @@ public partial class HostViewModel
     {
         if (state.DayNumber > 1)
         {
-            await AskCityToWakeUp();
+            await AskCityToWakeUp(state);
 
-            WriteLine($"===== </night {state.DayNumber}> =====");
+            Log($"===== </night {state.DayNumber}> =====");
         }
 
-        WriteLine($"===== <day {state.DayNumber}> =====");
+        Log($"===== <day {state.DayNumber}> =====");
     }
 
     public async Task NotifyNightStart(State state)
     {
-        await AskCityToFallAsleep();
+        await AskCityToFallAsleep(state);
 
-        WriteLine($"===== </day {state.DayNumber}> =====");
-        WriteLine($"===== <night {state.DayNumber}> =====");
+        Log($"===== </day {state.DayNumber}> =====");
+        Log($"===== <night {state.DayNumber}> =====");
     }
 
     public async Task<bool> IsGameEnd(State state)
@@ -95,138 +102,88 @@ public partial class HostViewModel
 
     public async Task NotifyGameEnd(State state, Group winnerGroup)
     {
-        WriteLine($"GameEnd, the winner is {winnerGroup.Name}");
-        WriteLine($"===== </day {state.DayNumber}> =====");
+        Log($"GameEnd, the winner is {winnerGroup.Name}");
+        Log($"===== </day {state.DayNumber}> =====");
     }
 
     public async Task<bool> AskCityToSkip(State state)
     {
-        var skip = rnd.NextDouble() < 0.1;
+        var result = await Interact(new Interaction
+        {
+            Message = $"City, do you want to skip selection?",
+            AskToSkip = true,
+            State = state
+        });
 
-        if (skip && options.CitySelections)
-            WriteLine($"City select nobody");
-
-        return skip;
+        return result.Skip;
     }
 
     public async Task<Player> AskCityToSelect(State state)
     {
-        ActivePlayers.ForEach(p =>
+        var result = await Interact(new Interaction
         {
-            p.IsEnabled = true;
-            p.IsSelected = false;
+            Message = $"City selects somebody to kill",
+            Selection = (1, 1),
+            State = state
         });
 
-        await Interact($"City select somebody to kill");
-
-        if (options.HostInstructions)
-            WriteLine($"City select somebody to kill");
-
-        var selected = state.Players[rnd.Next(state.Players.Count)];
-
-        if (options.CitySelections)
-            WriteLine($"City --> {selected}");
-
-        return selected;
+        return result.Selected[0];
     }
 
     public async Task<Player[]> GetNeighbors(State state, Player player)
     {
-        var selected = state.GetNeighborPlayers(player);
+        var result = await Interact(new Interaction
+        {
+            Message = $"Select {player} neighbors to kill",
+            Selection = (2, 2),
+            State = state
+        });
 
-        if (options.CitySelections)
-            WriteLine($"{player} --> {selected.SJoin(", ")}");
-
-        return selected;
+        return result.Selected;
     }
 
     public async Task<bool> AskToSkip(State state, Player player)
     {
-        await Interact($"{player}, do you want to select somebody?");
+        var result = await Interact(new Interaction
+        {
+            Message = $"{player}, do you want to skip selection?",
+            AskToSkip = true,
+            Player = player,
+            State = state
+        });
 
-        var skip = rnd.NextDouble() < 0.1;
-
-        if (skip && options.CitySelections)
-            WriteLine($"{player} select nobody");
-
-        return skip;
+        return result.Skip;
     }
 
     public async Task<Player[]> AskToSelect(State state, Player player)
     {
-        await AskToWakeUp(state, player);
-
-        await Interact($"Whom {player} would like to select?");
-
-        if (options.HostInstructions)
-            WriteLine($"Whom {player} would like to select?");
-
-        await AskToFallAsleep(state, player);
-
-        Player[] selected;
-        var except = state.GetExceptPlayers(player);
-
-        if (player.Is("Doctor") && !except.Contains(player))
+        var result = await Interact(new Interaction
         {
-            selected = [player];
-        }
-        else
-        {
-            var otherTeams = state.GetOtherTeams(player).Except(except).ToArray();
-
-            selected = otherTeams.Length > 0
-                ? [otherTeams[rnd.Next(otherTeams.Length)]]
-                : [];
-        }
-
-        if (options.CitySelections)
-            WriteLine($"{player} --> {(selected is [] ? "nobody" : selected.SJoin(", "))}");
-
-        return selected;
-    }
-
-    private async Task AskCityToWakeUp()
-    {
-        ActivePlayers.ForEach(p =>
-        {
-            p.IsEnabled = false;
-            p.IsSelected = false;
+            Message = $"{player}, whom would you like to select?",
+            Selection = (1, 1),
+            Except = state.GetExceptPlayers(player),
+            Player = player,
+            State = state
         });
 
-        await Interact($"City, wake up please");
-
-        if (options.HostInstructions)
-            WriteLine($"City, wake up please");
+        return result.Selected;
     }
 
-    private async Task AskCityToFallAsleep()
+    private async Task AskCityToWakeUp(State state)
     {
-        ActivePlayers.ForEach(p =>
+        await Interact(new Interaction
         {
-            p.IsEnabled = false;
-            p.IsSelected = false;
+            Message = "City, wake up please",
+            State = state
         });
-
-        await Interact($"City, fall asleep please");
-
-        if (options.HostInstructions)
-            WriteLine($"City, fall asleep please");
     }
 
-    private async Task AskToWakeUp(State state, Player player)
+    private async Task AskCityToFallAsleep(State state)
     {
-        await Interact($"{player}, wake up please");
-
-        if (state.IsNight && options.HostInstructions)
-            WriteLine($"{player}, wake up please");
+        await Interact(new Interaction
+        {
+            Message = "City, fall asleep please",
+            State = state
+        });
     }
-
-    private async Task AskToFallAsleep(State state, Player player)
-    {
-        await Interact($"{player}, fall asleep please");
-
-        if (state.IsNight && options.HostInstructions)
-            WriteLine($"{player}, fall asleep please");
-    }
-
 }

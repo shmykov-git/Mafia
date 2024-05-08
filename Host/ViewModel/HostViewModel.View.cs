@@ -2,12 +2,13 @@
 using System.Windows.Input;
 using Host.Model;
 using Mafia.Extensions;
+using Mafia.Model;
 
 namespace Host.ViewModel;
 
 public partial class HostViewModel
 {
-    private TaskCompletionSource? interactor = null;
+    private TaskCompletionSource? hostAwaiter = null;
     private bool onActivePlayerSilent = false;
     private string _hostHint;
     private string _text;
@@ -47,7 +48,7 @@ public partial class HostViewModel
         ChangeSeed(seed);
 
         Text = "";
-        WriteLine($"\r\n'{city.Name}' game {seed}");
+        Log($"\r\n'{city.Name}' game {seed}");
 
         // start new game execution task line
         game.Start().ContinueWith(_ => RefreshCommands()).NoWait();
@@ -58,30 +59,56 @@ public partial class HostViewModel
     }
 
 
-    private async Task Interact(string message)
+    private async Task<InteractionResult> Interact(Interaction interaction)
     {
         if (game.Stopping)
-            return;
+            return new InteractionResult();
 
-        HostHint = message;
+        Log(interaction.Message);
+        HostHint = interaction.Message;
 
-        while (interactor != null)
+        //тут
+
+        ActivePlayers.ForEach(p =>
         {
-            Debug.WriteLine("warn: async many lines error");
+            p.IsEnabled = false;
+            p.IsSelected = false;
+        });
+
+        // warn when game started many times without completion or other async errors
+        while (hostAwaiter != null)
+        {
+            Debug.WriteLine("error: many task lines");
             await Task.Delay(10);
         }
 
-        interactor = new TaskCompletionSource();
-        await interactor.Task;
-        interactor = null;
+        // wait for the host interacts with game team (with real peoples)
+        hostAwaiter = new TaskCompletionSource();
+        await hostAwaiter.Task;
+        hostAwaiter = null;
+
+        // todo:
+        var result = new InteractionResult();
+
+        if (interaction.AskToSkip && result.Skip)
+        {
+            Log($"{(interaction.WithCity ? "City" : interaction.Player)}, skip selection");
+        }
+
+        if (interaction.HasSelection)
+        {
+            Log($"{(interaction.WithCity ? "City" : interaction.Player)} --> {result.Selected.SJoin(", ")}");
+        }
+
+        return result;
     }
 
 
-    private void Continue() => interactor?.SetResult();
+    private void Continue() => hostAwaiter?.SetResult();
     private void RefreshCommands() => GetType().GetProperties().Where(p => p.PropertyType == typeof(ICommand)).ForEach(p => Changed(p.Name));
 
     // todo: temp
-    private void WriteLine(string text)
+    private void Log(string text)
     {
         Text += $"{text}\r\n";
     }
