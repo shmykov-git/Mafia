@@ -14,7 +14,8 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
-        var mafiaFileName = "Resources/Mafia/mafia-drive.json";
+        //var mafiaFileName = "Resources/Mafia/mafia-drive.json";
+        var mafiaFileName = "Resources/Mafia/mafia-vicino-ru.json";
         var appsettingsFileName = "appsettings.json";
 
         using Stream fileStream = FileSystem.Current.OpenAppPackageFileAsync(mafiaFileName).Result;

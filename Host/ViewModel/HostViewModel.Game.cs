@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Windows.Input;
 using Host.Model;
 using Mafia.Extensions;
@@ -82,20 +83,10 @@ public partial class HostViewModel
         Debug.WriteLine(text);
     }
 
-    private void SinchActivePlayers(State state)
-    {
-        ActivePlayers = ActivePlayers.Where(p => state.Players.Contains(p.Player)).ToArray();
-    }
-
     private void PrepareActivePlayers(Interaction interaction)
     {
-        var playerColors = interaction.State.Players0.GroupBy(p => p.Group.Name).OrderBy(gv => gv.Key)
-            .SelectMany((gv, i) => gv.Select(p => (p, i)))
-            .ToDictionary(v => v.p, v => options.GroupColors[v.i % options.GroupColors.Length]);
-
         UpdateActivePlayers(p =>
         {
-            p.TextColor = playerColors[p.Player];
             p.Operation = interaction.Killed.Contains(p.Player) ? "killed" : "";
             p.IsEnabled = !interaction.Except.Contains(p.Player);
             p.IsSelected = false;
@@ -133,8 +124,21 @@ public partial class HostViewModel
         }
     }
 
+    private void SetActivePlayersSilent(IEnumerable<ActivePlayer> activePlayers)
+    {
+        if (!onActivePlayerSilent)
+        {
+            onActivePlayerSilent = true;
+            ActivePlayers = activePlayers.ToArray();
+            onActivePlayerSilent = false;
+        }
+    }
+
     private void OnActivePlayerChange(string? name = null)
     {
+        if (onActivePlayerSilent)
+            return;
+
         if (interaction != null)
             UpdateActivePlayers(interaction);
     }

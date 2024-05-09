@@ -11,7 +11,8 @@ public partial class HostViewModel
 {
     private (string name, int count)[] GetRolesPreset(int n)
     {
-        return RoleValues.GetRolesPreset(["DonMafia", "BumMafia", "Maniac", "Commissar", "Doctor"], "Mafia", "Civilian", n, 3.5);
+        return RoleValues.GetRolesPreset(["Дон", "Бомж", "Маньяк", "Комиссар", "Доктор"], "Мафия", "Мирный", n, 3.5);
+        //return RoleValues.GetRolesPreset(["DonMafia", "BumMafia", "Maniac", "Commissar", "Doctor"], "Mafia", "Civilian", n, 3.5);
     }
 
     public ActiveRole[] ActiveRoles { get; private set; }
@@ -23,6 +24,8 @@ public partial class HostViewModel
             .Select(v => new ActiveRole(v.role, OnActiveRoleChange) { IsSelected = v.preset.count > 0, Count = v.preset.count > 0 ? v.preset.count : 1 }).ToArray();
 
         OnActiveRoleChange();
+
+
     }
 
     private void OnActiveRoleChange(string? name = null)

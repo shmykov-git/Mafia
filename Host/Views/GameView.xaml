@@ -19,26 +19,36 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
-                            <Grid ColumnDefinitions="0.4*,0.4*,0.2*">
+                            <Grid ColumnDefinitions="0.2*,0.2*,0.4*,0.2*">
                                 <Label Grid.Column="0"
-                                   Text="{Binding Player}"
-                                   TextColor="{Binding TextColor}"
-                                   FontAttributes="Bold"
-                                   VerticalOptions="Center"
-                                   VerticalTextAlignment="Center"
-                                   HorizontalOptions="Start" />
+                                       IsEnabled="{Binding IsEnabled}"
+                                       Text="{Binding Player.User.Nick}"
+                                       TextColor="{Binding TextColor}"
+                                       FontAttributes="Bold"
+                                       VerticalOptions="Center"
+                                       VerticalTextAlignment="Center"
+                                       HorizontalOptions="Start" />
 
                                 <Label Grid.Column="1"
-                                   Text="{Binding Operation}"
-                                   TextColor="Red"
-                                   FontAttributes="Bold"
-                                   VerticalOptions="Center"
-                                   VerticalTextAlignment="Center"
-                                   HorizontalOptions="Start" />
+                                       IsEnabled="{Binding IsEnabled}"
+                                       Text="{Binding Player.Role.Name}"
+                                       TextColor="{Binding TextColor}"
+                                       FontAttributes="Bold"
+                                       VerticalOptions="Center"
+                                       VerticalTextAlignment="Center"
+                                       HorizontalOptions="Start" />
+                                
+                                <Label Grid.Column="2"
+                                       Text="{Binding Operation}"
+                                       TextColor="Red"
+                                       FontAttributes="Bold"
+                                       VerticalOptions="Center"
+                                       VerticalTextAlignment="Center"
+                                       HorizontalOptions="Start" />
 
-                                <CheckBox Grid.Column="2"
-                                          IsChecked="{Binding IsSelected}"  
-                                          IsEnabled="{Binding IsEnabled}" 
+                                <CheckBox Grid.Column="3"
+                                          IsEnabled="{Binding IsEnabled}"
+                                          IsChecked="{Binding IsSelected}"                                           
                                           VerticalOptions="Center"
                                           HorizontalOptions="End" />
                             </Grid>

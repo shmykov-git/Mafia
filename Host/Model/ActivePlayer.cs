@@ -2,7 +2,6 @@
 using Microsoft.Maui.Controls;
 
 namespace Host.Model;
-
 public class ActivePlayer : NotifyPropertyChanged
 {
     public ActivePlayer(Player player, Action<string> onChange)

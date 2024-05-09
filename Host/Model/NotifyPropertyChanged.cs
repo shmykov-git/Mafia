@@ -13,6 +13,7 @@ public abstract class NotifyPropertyChanged : INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
     protected void Changed([CallerMemberName] string propertyName = "")
     {
+        //Debug.WriteLine($"PropertyChanged: {propertyName}");
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         subscribers(propertyName);
     }

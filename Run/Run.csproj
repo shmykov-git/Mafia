@@ -18,6 +18,9 @@
     <None Update="mafia-drive.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="mafia-vicino-ru.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="mafia-vicino.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

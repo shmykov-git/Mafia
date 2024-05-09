@@ -37,9 +37,19 @@ public partial class HostViewModel : IHost
         return gameRoles.Select((role, i) => (users[i], role)).ToArray();
     }
 
+    private Color GetPlayerColor(Player p) => 
+        options.GroupColors.FirstOrDefault(gc => gc.Group == p.Group.Name)?.Color ??
+        options.GroupColors.FirstOrDefault(gc => gc.Group == p.TopGroup.Name)?.Color ?? 
+        Colors.Black;
+
     public void StartGame(State state)
     {
-        ActivePlayers = state.Players.Select(p => new ActivePlayer(p, OnActivePlayerChange)).OrderBy(p => p.Player.Group.Name).ThenBy(p => p.Player.Role.Rank).ToArray();
+        //var c = GetPlayerColor(state.Players0.FirstOrDefault(p => p.Role.Name == "Doctor"));
+
+        SetActivePlayersSilent(state.Players.Select(p => new ActivePlayer(p, OnActivePlayerChange)
+        {
+            TextColor = GetPlayerColor(p)
+        }).OrderBy(p => p.Player.Group.Name).ThenBy(p => p.Player.Role.Rank));
     }
 
     private async Task TellTheNews(State state)
@@ -61,7 +71,7 @@ public partial class HostViewModel : IHost
                 State = state 
             });
 
-            SinchActivePlayers(state);
+            SetActivePlayersSilent(ActivePlayers.Where(p => state.Players.Contains(p.Player)).ToArray());
 
             Log($"Alive players: {state.Players.SJoin(", ")}");
         }
@@ -107,6 +117,12 @@ public partial class HostViewModel : IHost
     {
         Log($"GameEnd, the winner is {winnerGroup.Name}");
         Log($"===== </day {state.DayNumber}> =====");
+
+        await Interact(new Interaction
+        {
+            Message = $"GameEnd, the winner is {winnerGroup.Name}",
+            State = state
+        });
     }
 
     public async Task<Player[]> AskCityToSelect(State state, CityAction action)
