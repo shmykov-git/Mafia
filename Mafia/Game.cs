@@ -34,16 +34,16 @@ public class Game
             : (s => Task.FromResult((bool)m.Invoke(null, [s])!));
 
         CityOperation GetCityOperation(MethodInfo m) => m.ReturnParameter.ParameterType.IsTask()
-            ? (s => (Task<DailyNews>)m.Invoke(null, [s])!)
-            : (s => Task.FromResult((DailyNews)m.Invoke(null, [s])!));
+            ? ((s, a) => (Task<DailyNews>)m.Invoke(null, [s, a])!)
+            : ((s, a) => Task.FromResult((DailyNews)m.Invoke(null, [s, a])!));
 
         Condition GetCondition(MethodInfo m) => m.ReturnParameter.ParameterType.IsTask()
             ? ((s, p) => (Task<bool>)m.Invoke(null, [s, p])!)
             : ((s, p) => Task.FromResult((bool)m.Invoke(null, [s, p])!));
 
         Operation GetOperation(MethodInfo m) => m.ReturnParameter.ParameterType.IsTask()
-            ? ((s, p) => (Task<DailyNews>)m.Invoke(null, [s, p])!)
-            : ((s, p) => Task.FromResult((DailyNews)m.Invoke(null, [s, p])!));
+            ? ((s, p, a) => (Task<DailyNews>)m.Invoke(null, [s, p, a])!)
+            : ((s, p, a) => Task.FromResult((DailyNews)m.Invoke(null, [s, p, a])!));
 
         city.DayActions.ForEach(cityAction =>
         {

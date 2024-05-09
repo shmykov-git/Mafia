@@ -15,7 +15,7 @@ namespace Host.ViewModel;
 /// <summary>
 /// todo: view code for host
 /// </summary>
-public partial class HostViewModel : NotifyPropertyChanged, IHost
+public partial class HostViewModel : NotifyPropertyChanged
 {
     private Random rnd;
     private readonly Game game;

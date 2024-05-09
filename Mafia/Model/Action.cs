@@ -1,4 +1,5 @@
 ﻿using Mafia.Extensions;
+using Mafia.Libraries;
 
 namespace Mafia.Model;
 
@@ -20,8 +21,10 @@ public class Action
         return result;
     }
 
-    public Task<DailyNews> DoOperation(string name, State state, Player player) => Execution.Operations[name](state, player);
+    public bool IsSkippable() => AllConditions().Intersect(Values.SkippableConditions).Any();
 
-    public IEnumerable<string> AllConditions() => Conditions ?? new string[0];
+    public Task<DailyNews> DoOperation(string name, State state, Player player) => Execution.Operations[name](state, player, this);
+
+    public IEnumerable<string> AllConditions() => Conditions ?? [];
     public required Execution Execution { get; set; }
 }

@@ -11,4 +11,5 @@ public static class Values
 
     public static string[] OnDeathConditions = [nameof(Conditions.Killed)];
     public static string[] ActiveConditions = [nameof(Conditions.Locked), nameof(Conditions.NotLocked)];
+    public static string[] SkippableConditions = [nameof(CityConditions.CitySkippable), nameof(Conditions.Skippable)];
 }

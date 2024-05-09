@@ -2,10 +2,11 @@
 using Host.Model;
 using Mafia.Extensions;
 using Mafia.Model;
+using Action = Mafia.Model.Action;
 
 namespace Host.ViewModel;
 
-public partial class HostViewModel
+public partial class HostViewModel : IHost
 {
     private int? seed = null;
 
@@ -106,31 +107,19 @@ public partial class HostViewModel
         Log($"===== </day {state.DayNumber}> =====");
     }
 
-    public async Task<bool> AskCityToSkip(State state)
+    public async Task<Player[]> AskCityToSelect(State state, CityAction action)
     {
         var result = await Interact(new Interaction
         {
-            Message = $"City, do you want to skip selection?",
-            AskToSkip = true,
+            Message = $"City selects somebody to kill{(action.IsSkippable() ? " or skip" : "")}",
+            Selection = (action.IsSkippable() ? 0 : 1, 1),
             State = state
         });
 
-        return result.Skip;
+        return result.Selected;
     }
 
-    public async Task<Player> AskCityToSelect(State state)
-    {
-        var result = await Interact(new Interaction
-        {
-            Message = $"City selects somebody to kill",
-            Selection = (1, 1),
-            State = state
-        });
-
-        return result.Selected[0];
-    }
-
-    public async Task<Player[]> GetNeighbors(State state, Player player)
+    public async Task<Player[]> GetNeighbors(State state, Player player, Action action)
     {
         var result = await Interact(new Interaction
         {
@@ -142,25 +131,12 @@ public partial class HostViewModel
         return result.Selected;
     }
 
-    public async Task<bool> AskToSkip(State state, Player player)
+    public async Task<Player[]> AskToSelect(State state, Player player, Action action)
     {
         var result = await Interact(new Interaction
         {
-            Message = $"{player}, do you want to skip selection?",
-            AskToSkip = true,
-            Player = player,
-            State = state
-        });
-
-        return result.Skip;
-    }
-
-    public async Task<Player[]> AskToSelect(State state, Player player)
-    {
-        var result = await Interact(new Interaction
-        {
-            Message = $"{player}, whom would you like to select?",
-            Selection = (1, 1),
+            Message = $"{player}, whom would you like to select{(action.IsSkippable() ? " or skip" : "")}?",
+            Selection = (action.IsSkippable() ? 0 : 1, 1),
             Except = state.GetExceptPlayers(player),
             Player = player,
             State = state

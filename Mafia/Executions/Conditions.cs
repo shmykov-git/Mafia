@@ -12,7 +12,7 @@ public static class Conditions
     public static bool SeniorRank(State state, Player player) => state.GetTeamSeniorRank(player) == player.Role.Rank;
     public static bool Killed(State state, Player player) => state.LatestNews.Killed?.Contains(player) ?? false;
     public static bool FirstDay(State state, Player player) => state.DayNumber == 1;
-    public static async Task<bool> Skippable(State state, Player player) => !(await state.Host.AskToSkip(state, player));
+    public static bool Skippable(State state, Player player) => true;
 
     /// <summary>
     /// No interaction condition (cannot use state.Host here!)

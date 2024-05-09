@@ -3,6 +3,7 @@ using System.Diagnostics;
 using Mafia.Extensions;
 using Mafia.Model;
 using Microsoft.Extensions.Options;
+using Action = Mafia.Model.Action;
 
 namespace Run;
 
@@ -58,7 +59,7 @@ public class DebugHost : IHost
             return player;
         }).ToArray();
         
-        (string name, int count)[] rolesPreset = [("DonMafia", 1), ("BumMafia", 1), ("Mafia", 1), ("Maniac", 1), ("Commissar", 1), ("Doctor", 1), ("Civilian", 4)];
+        (string name, int count)[] rolesPreset = [("DonMafia", 1), ("BumMafia", 1), ("Mafia", 1), ("Maniac", 1), ("Commissar", 1), ("Doctor", 1), ("Kamikaze", 1), ("Civilian", 3)];
         
         var gameRoles = GetGameRoles(rolesPreset, n, 4);
         gameRoles.Shaffle(17, rnd);
@@ -121,30 +122,24 @@ public class DebugHost : IHost
         Debug.WriteLine($"===== </day {state.DayNumber}> =====");
     }
 
-    public async Task<bool> AskCityToSkip(State state)
-    {
-        var skip = rnd.NextDouble() < 0.1;
-
-        if (skip && options.CitySelections)
-            Debug.WriteLine($"City select nobody");
-
-        return skip;
-    }
-
-    public async Task<Player> AskCityToSelect(State state)
+    public async Task<Player[]> AskCityToSelect(State state, CityAction action)
     {
         if (options.HostInstructions)
-            Debug.WriteLine($"City select somebody to kill");
+            Debug.WriteLine($"City select somebody to kill{(action.IsSkippable() ? " or skip" : "")}");
 
-        var selected = state.Players[rnd.Next(state.Players.Count)];
+        var skip = action.IsSkippable() && rnd.NextDouble() < 0.1;
+        
+        Player[] selected = skip 
+            ? []
+            : [state.Players[rnd.Next(state.Players.Count)]];
 
         if (options.CitySelections)
-            Debug.WriteLine($"City --> {selected}");
+            Debug.WriteLine($"City --> {(selected is [] ? "nobody" : selected.SJoin(", "))}");
 
         return selected;
     }
 
-    public async Task<Player[]> GetNeighbors(State state, Player player)
+    public async Task<Player[]> GetNeighbors(State state, Player player, Action action)
     {
         var selected = state.GetNeighborPlayers(player);
 
@@ -154,27 +149,23 @@ public class DebugHost : IHost
         return selected;
     }
 
-    public async Task<bool> AskToSkip(State state, Player player)
-    {
-        var skip = rnd.NextDouble() < 0.1;
-
-        if (skip && options.CitySelections)
-            Debug.WriteLine($"{player} select nobody");
-
-        return skip;
-    }
-
-    public async Task<Player[]> AskToSelect(State state, Player player)
+    public async Task<Player[]> AskToSelect(State state, Player player, Action action)
     {
         AskToWakeUp(state, player);
+
         if (options.HostInstructions)
-            Debug.WriteLine($"Whom {player} would like to select?");
-        AskToFallAsleep(state, player);
+            Debug.WriteLine($"Whom {player} would like to select{(action.IsSkippable() ? " or skip" : "")}?");
 
         Player[] selected;
+
+        var skip = action.IsSkippable() && rnd.NextDouble() < 0.1;
         var except = state.GetExceptPlayers(player);
 
-        if (player.Is("Doctor") && !except.Contains(player))
+        if (skip)
+        {
+            selected = [];
+        }
+        else if (player.Is("Doctor") && !except.Contains(player))
         {
             selected = [player];
         }
@@ -189,6 +180,8 @@ public class DebugHost : IHost
 
         if (options.CitySelections)
             Debug.WriteLine($"{player} --> {(selected is [] ? "nobody" : selected.SJoin(", "))}");
+
+        AskToFallAsleep(state, player);
 
         return selected;
     }

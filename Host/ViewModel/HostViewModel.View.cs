@@ -68,6 +68,7 @@ public partial class HostViewModel
         HostHint = interaction.Message;
 
         //тут
+        // ask skip?
 
         ActivePlayers.ForEach(p =>
         {
