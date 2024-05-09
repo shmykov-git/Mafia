@@ -12,13 +12,13 @@
         
         <ShellContent
             Icon="start.jpg"
-            Title="Setup"
+            Title="{Binding Messages[NewGame]}"
             ContentTemplate="{DataTemplate local:StartGameView}"
             Route="StartGameView" />
         
         <ShellContent
             Icon="game.png"
-            Title="Game"
+            Title="{Binding Messages[Game]}"
             ContentTemplate="{DataTemplate local:GameView}"
             Route="GameView" />
         

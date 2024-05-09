@@ -44,7 +44,7 @@
             </ListView>
             
             <Button
-                    Text="Start New Game" 
+                    Text="{Binding Messages[StartNewGame]}" 
                     SemanticProperties.Hint="Stop previouse game and start a new one"
                     Command="{Binding StartNewGameCommand}"
                     HorizontalOptions="Fill" />

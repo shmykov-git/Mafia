@@ -58,17 +58,18 @@ public partial class HostViewModel : IHost
         {
             await Interact(new Interaction 
             { 
-                Message = $"Hello City!", 
+                Name = "HelloCity",
                 State = state 
             });
         }
         else
         {
-            await Interact(new Interaction 
-            { 
-                Message = $"Killed: {state.LatestNews.Killed.SJoin(", ")}", 
+            await Interact(new Interaction
+            {
+                Name = "Killed",
+                Args = [state.LatestNews.Killed.SJoin(", ")],
                 Killed = state.LatestNews.Killed,
-                State = state 
+                State = state
             });
 
             SetActivePlayersSilent(ActivePlayers.Where(p => state.Players.Contains(p.Player)).ToArray());
@@ -118,9 +119,12 @@ public partial class HostViewModel : IHost
         Log($"GameEnd, the winner is {winnerGroup.Name}");
         Log($"===== </day {state.DayNumber}> =====");
 
+        SetActivePlayersSilent(ActivePlayers.Where(p => state.Players0.Contains(p.Player)).ToArray());
+
         await Interact(new Interaction
         {
-            Message = $"GameEnd, the winner is {winnerGroup.Name}",
+            Name = "GameEnd",
+            Args = [winnerGroup.Name],
             State = state
         });
     }
@@ -129,7 +133,7 @@ public partial class HostViewModel : IHost
     {
         var result = await Interact(new Interaction
         {
-            Message = $"City selects somebody to kill{(action.IsSkippable() ? " or skip" : "")}",
+            Name = action.IsSkippable() ? "CitySelectCanSkip" : "CitySelectNoSkip",
             Selection = (action.IsSkippable() ? 0 : 1, 1),
             State = state
         });
@@ -141,7 +145,8 @@ public partial class HostViewModel : IHost
     {
         var result = await Interact(new Interaction
         {
-            Message = $"Select {player} neighbors to kill",
+            Name = "RoundKilled",
+            Args = [player.ToString()],
             Selection = (2, 2),
             State = state
         });
@@ -153,7 +158,8 @@ public partial class HostViewModel : IHost
     {
         var result = await Interact(new Interaction
         {
-            Message = $"{player}, whom would you like to select{(action.IsSkippable() ? " or skip" : "")}?",
+            Name = action.IsSkippable() ? "PlayerSelectCanSkip" : "PlayerSelectNoSkip",
+            Args = [player.Role.Name],
             Selection = (action.IsSkippable() ? 0 : 1, 1),
             Except = state.GetExceptPlayers(player),
             Player = player,
@@ -167,7 +173,7 @@ public partial class HostViewModel : IHost
     {
         await Interact(new Interaction
         {
-            Message = "City, wake up please",
+            Name = "WakeUpCity",
             State = state
         });
     }
@@ -176,7 +182,7 @@ public partial class HostViewModel : IHost
     {
         await Interact(new Interaction
         {
-            Message = "City, fall asleep please",
+            Name = "FallAsleepCity",
             State = state
         });
     }

@@ -171,18 +171,18 @@
     {
       "name": "HealSingleKill",
       "description": "Если в игрока стреляли два и более раза, то он умирает даже если его лечили один раз",
-      "accepted": false
+      "accepted": true
     },
     {
       "name": "EvenDoctorDays",
       "description": "Доктор лечит одного и того же игрока только через раз",
-      "values": [ "Doctor" ],
+      "values": [ "Доктор" ],
       "accepted": false
     },
     {
       "name": "DoctorOnceSelfHeal",
       "description": "Доктор лечит себя один раз за игру",
-      "values": [ "Doctor" ],
+      "values": [ "Доктор" ],
       "accepted": true
     },
     {
@@ -193,13 +193,13 @@
     {
       "name": "MafiaWin",
       "description": "Мафия побеждает, если живы только игроки группы Mafia и игроки с перечисленными ролями Civilian и количество мафиози больше или равно количеству мирных",
-      "values": [ "Mafia", "Commissar, Sergeant, Civilian" ],
+      "values": [ "Мафия", "Комиссар, Сержант, Мирный" ],
       "accepted": true
     },
     {
       "name": "ManiacWin",
       "description": "Маньяк побеждает, если живы только игроки группы Maniac и игроки с перечисленными ролями Civilian и количество маньяков больше или равно количеству мирных",
-      "values": [ "Maniac", "Commissar, Sergeant, Civilian" ],
+      "values": [ "Маньяк", "Комиссар, Сержант, Мирный" ],
       "accepted": true
     }
   ]

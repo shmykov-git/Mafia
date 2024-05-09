@@ -29,14 +29,15 @@ public partial class HostViewModel
 
     private async Task<InteractionResult> Interact(Interaction interaction)
     {
-        Debug.WriteLine(interaction.Selection);
-
         if (game.Stopping)
             return new InteractionResult();
 
         this.interaction = interaction;
-        Log(interaction.Message);
-        HostHint = interaction.Message;
+
+        var message = string.Format(Messages[interaction.Name], interaction.Args ?? []);
+
+        Log(message);
+        HostHint = message;
 
         PrepareActivePlayers(interaction);
         UpdateActivePlayers(interaction);
@@ -87,7 +88,7 @@ public partial class HostViewModel
     {
         UpdateActivePlayers(p =>
         {
-            p.Operation = interaction.Killed.Contains(p.Player) ? "killed" : "";
+            p.Operation = interaction.Killed.Contains(p.Player) ? Messages["killed"] : "";
             p.IsEnabled = !interaction.Except.Contains(p.Player);
             p.IsSelected = false;
         }, silent:false);

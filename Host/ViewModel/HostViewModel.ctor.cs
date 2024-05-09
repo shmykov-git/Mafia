@@ -22,12 +22,15 @@ public partial class HostViewModel : NotifyPropertyChanged
     private readonly City city;
     private HostOptions options;
 
+    public Dictionary<string, string> Messages { get; }
+
     public HostViewModel(Game game, City city, IOptions<HostOptions> options)
     {
         rnd = new Random();
         this.game = game;
         this.city = city;
         this.options = options.Value;
+        Messages = this.options.Messages.ToDictionary(v => v.Name, v => v.Text);
 
         InitActiveRoles();
     }

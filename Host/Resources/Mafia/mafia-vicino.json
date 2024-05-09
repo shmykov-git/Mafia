@@ -183,7 +183,7 @@
     {
       "name": "HealSingleKill",
       "description": "Если в игрока стреляли два и более раза, то он умирает даже если его лечили один раз",
-      "accepted": false
+      "accepted": true
     },
     {
       "name": "EvenDoctorDays",

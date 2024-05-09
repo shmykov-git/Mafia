@@ -177,11 +177,11 @@ public class Game
         var winRule = city.GetRule(winRuleName);
         if (winRule.Accepted)
         {
-            var mafia = state.Players.Where(p => p.TopGroup.Name == winRule.Values[0]).Count();
-            var notMafia = state.Players.Where(p => p.TopGroup.Name != winRule.Values[0]).Count();
+            var win = state.Players.Where(p => p.TopGroup.Name == winRule.Values[0]).Count();
+            var notWin = state.Players.Where(p => p.TopGroup.Name != winRule.Values[0]).Count();
             var civilian = state.Players.Where(p => winRule.GetListValues(1).Contains(p.Role.Name)).Count();
 
-            if (notMafia == civilian && mafia >= civilian)
+            if (notWin == civilian && win >= civilian)
                 return (true, city.GetTopGroup(winRule.Values[0]));
         }
 

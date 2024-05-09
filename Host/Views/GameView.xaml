@@ -21,7 +21,7 @@
                         <ViewCell>
                             <Grid ColumnDefinitions="0.2*,0.2*,0.4*,0.2*">
                                 <Label Grid.Column="0"
-                                       IsEnabled="{Binding IsEnabled}"
+                                       
                                        Text="{Binding Player.User.Nick}"
                                        TextColor="{Binding TextColor}"
                                        FontAttributes="Bold"
@@ -30,7 +30,7 @@
                                        HorizontalOptions="Start" />
 
                                 <Label Grid.Column="1"
-                                       IsEnabled="{Binding IsEnabled}"
+                                       
                                        Text="{Binding Player.Role.Name}"
                                        TextColor="{Binding TextColor}"
                                        FontAttributes="Bold"
@@ -44,7 +44,7 @@
                                        FontAttributes="Bold"
                                        VerticalOptions="Center"
                                        VerticalTextAlignment="Center"
-                                       HorizontalOptions="Start" />
+                                       HorizontalOptions="Center" />
 
                                 <CheckBox Grid.Column="3"
                                           IsEnabled="{Binding IsEnabled}"
@@ -58,7 +58,7 @@
             </ListView>            
             
             <Button 
-                    Text="Continue" 
+                    Text="{Binding Messages[Continue]}" 
                     SemanticProperties.Hint="Ready to continue the game"
                     Command="{Binding ContinueCommand}"
                     HorizontalOptions="Fill" />

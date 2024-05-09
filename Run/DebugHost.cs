@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Diagnostics;
 using Mafia.Extensions;
+using Mafia.Libraries;
 using Mafia.Model;
 using Microsoft.Extensions.Options;
 using Action = Mafia.Model.Action;
@@ -28,21 +29,28 @@ public class DebugHost : IHost
         rnd = new Random(seed);
     }
 
-    private string[] GetGameRoles((string name, int count)[] preset, int n, int k)
-    {
-        string[] roles = preset.Select(r => r.name).ToArray();
-        string[] multipleRoles = ["Mafia", "Civilian"];
+    //private string[] GetGameRoles((string name, int count)[] preset, int n, double k)
+    //{
+    //    string[] roles = preset.Select(r => r.name).ToArray();
+    //    string[] multipleRoles = ["Mafia", "Civilian"];
 
-        var nn = n - roles.Length;
-        var nMafia = nn / k;
-        var nCivilian = nn - nMafia;
+    //    var nn = n - roles.Length;
+    //    var nMafia = (int)(nn / k);
+    //    var nCivilian = nn - nMafia;
 
-        var mafias = Enumerable.Range(0, nMafia).Select(_ => multipleRoles[0]);
-        var civilians = Enumerable.Range(0, nCivilian).Select(_ => multipleRoles[1]);
+    //    var mafias = Enumerable.Range(0, nMafia).Select(_ => multipleRoles[0]);
+    //    var civilians = Enumerable.Range(0, nCivilian).Select(_ => multipleRoles[1]);
 
-        return roles.Concat(mafias).Concat(civilians).ToArray();
-    }
+    //    return roles.Concat(mafias).Concat(civilians).ToArray();
+    //}
+
     public void StartGame(State state) { }
+    
+    private (string name, int count)[] GetRolesPreset(int n)
+    {
+        return RoleValues.GetRolesPreset(["Дон", "Бомж", "Маньяк", "Комиссар", "Доктор"], "Мафия", "Мирный", n, 3.5);
+        //return RoleValues.GetRolesPreset(["DonMafia", "BumMafia", "Maniac", "Commissar", "Doctor"], "Mafia", "Civilian", n, 3.5);
+    }
 
     public (User, string)[] GetUserRoles()
     {
@@ -58,10 +66,10 @@ public class DebugHost : IHost
             userList.RemoveAt(i);
             return player;
         }).ToArray();
-        
-        (string name, int count)[] rolesPreset = [("DonMafia", 1), ("BumMafia", 1), ("Mafia", 1), ("Maniac", 1), ("Commissar", 1), ("Doctor", 1), ("Kamikaze", 1), ("Civilian", 3)];
-        
-        var gameRoles = GetGameRoles(rolesPreset, n, 4);
+
+        (string name, int count)[] rolesPreset = GetRolesPreset(n);
+
+        var gameRoles = rolesPreset.SelectMany(v => Enumerable.Range(0, v.count).Select(_ => v.name)).ToArray();
         gameRoles.Shaffle(17, rnd);
 
         return gameRoles.Select((role, i) => (users[i], role)).ToArray();

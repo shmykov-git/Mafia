@@ -8,8 +8,5 @@ public static class StringExtensions
 
     public static string SJoin<T>(this IEnumerable<T> values, string del) => string.Join(del, values);
 
-    public static (string, string?) ToPair(this IEnumerable<string> values)
-    {
-        return (values.First(), values.Skip(1).FirstOrDefault());
-    }
+    public static string With(this string value, params object[] args) => string.Format(value, args);
 }

@@ -34,7 +34,7 @@ public static class MauiProgram
             .AddMafia(city)
             .AddSingleton<HostViewModel>()
             .AddSingleton<IHost, HostViewModel>(p => p.GetRequiredService<HostViewModel>())
-            .AddTransient<AppShell>()
+            .AddTransient<AppShell>(p => new AppShell() { BindingContext = p.GetRequiredService<HostViewModel>() })
             .AddTransient<StartGameView>(p => new StartGameView() { BindingContext = p.GetRequiredService<HostViewModel>() })
             .AddTransient<GameView>(p => new GameView() { BindingContext = p.GetRequiredService<HostViewModel>() })
             ;

@@ -4,7 +4,8 @@ namespace Host.Model;
 
 public class Interaction
 {
-    public required string Message { get; set; }
+    public required string Name { get; set; }
+    public string[]? Args { get; set; }
     public required State State { get; set; }
     public Player? Player { get; set; }
     public Player[] Except { get; set; } = [];

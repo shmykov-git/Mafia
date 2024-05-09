@@ -6,4 +6,5 @@ public class HostOptions
     public bool AdjustWindow {  get; set; }
     public Rect WindowRect { get; set; }
     public required GroupColor[] GroupColors { get; set; }
+    public required Message[] Messages { get; set; }
 }

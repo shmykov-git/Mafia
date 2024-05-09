@@ -34,7 +34,7 @@ public partial class HostViewModel
             return;
 
         var count = ActiveRoles.Where(r => r.IsSelected).Sum(r => r.Count);
-        PlayerInfo = $"Players: {count}";
+        PlayerInfo = Messages["PlayerCountInfo"].With(count);
     }
 
     public ICommand StartNewGameCommand => new Command(async () =>
