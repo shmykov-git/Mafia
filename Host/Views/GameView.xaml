@@ -19,15 +19,28 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
-                            <Grid ColumnDefinitions="0.8*,0.2*" IsEnabled="{Binding IsEnabled}">
+                            <Grid ColumnDefinitions="0.4*,0.4*,0.2*">
                                 <Label Grid.Column="0"
                                    Text="{Binding Player}"
-                                   HorizontalOptions="Start"
-                                   FontAttributes="Bold" />
+                                   TextColor="{Binding TextColor}"
+                                   FontAttributes="Bold"
+                                   VerticalOptions="Center"
+                                   VerticalTextAlignment="Center"
+                                   HorizontalOptions="Start" />
 
-                                <StackLayout Grid.Column="1" Orientation="Horizontal" HorizontalOptions="End">
-                                    <CheckBox IsChecked="{Binding IsSelected}" />
-                                </StackLayout>
+                                <Label Grid.Column="1"
+                                   Text="{Binding Operation}"
+                                   TextColor="Red"
+                                   FontAttributes="Bold"
+                                   VerticalOptions="Center"
+                                   VerticalTextAlignment="Center"
+                                   HorizontalOptions="Start" />
+
+                                <CheckBox Grid.Column="2"
+                                          IsChecked="{Binding IsSelected}"  
+                                          IsEnabled="{Binding IsEnabled}" 
+                                          VerticalOptions="Center"
+                                          HorizontalOptions="End" />
                             </Grid>
                         </ViewCell>
                     </DataTemplate>
@@ -39,10 +52,6 @@
                     SemanticProperties.Hint="Ready to continue the game"
                     Command="{Binding ContinueCommand}"
                     HorizontalOptions="Fill" />
-
-            <Label
-                Text="{Binding Text}"
-                HorizontalOptions="Start" />        
         </VerticalStackLayout>
     </ScrollView>
 

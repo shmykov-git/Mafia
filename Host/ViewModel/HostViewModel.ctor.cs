@@ -32,19 +32,5 @@ public partial class HostViewModel : NotifyPropertyChanged
         InitActiveRoles();
     }
 
-    private (string name, int count)[] GetRolesPreset(int n)
-    {
-        return RoleValues.GetRolesPreset(["DonMafia", "BumMafia", "Maniac", "Commissar", "Doctor"], "Mafia", "Civilian", n, 3.5);
-    }
-
-    private void InitActiveRoles()
-    {
-        ActiveRoles = city.AllRoles()
-            .Select(r => (role: r, preset: GetRolesPreset(15).FirstOrDefault(rr => rr.name == r.Name)))
-            .Select(v => new ActiveRole(v.role, OnActiveRoleChange) { IsSelected = v.preset.count > 0, Count = v.preset.count > 0 ? v.preset.count : 1 }).ToArray();
-
-        OnActiveRoleChange();
-    }
-
-
+    private void RefreshCommands() => GetType().GetProperties().Where(p => p.PropertyType == typeof(ICommand)).ForEach(p => Changed(p.Name));
 }

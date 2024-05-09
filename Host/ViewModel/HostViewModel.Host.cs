@@ -40,7 +40,6 @@ public partial class HostViewModel : IHost
     public void StartGame(State state)
     {
         ActivePlayers = state.Players.Select(p => new ActivePlayer(p, OnActivePlayerChange)).OrderBy(p => p.Player.Group.Name).ThenBy(p => p.Player.Role.Rank).ToArray();
-        Changed(nameof(ActivePlayers));
     }
 
     private async Task TellTheNews(State state)
@@ -49,7 +48,7 @@ public partial class HostViewModel : IHost
         {
             await Interact(new Interaction 
             { 
-                Message = $"Hello City! Players: {state.Players.SJoin(", ")}", 
+                Message = $"Hello City!", 
                 State = state 
             });
         }
@@ -58,8 +57,11 @@ public partial class HostViewModel : IHost
             await Interact(new Interaction 
             { 
                 Message = $"Killed: {state.LatestNews.Killed.SJoin(", ")}", 
+                Killed = state.LatestNews.Killed,
                 State = state 
             });
+
+            SinchActivePlayers(state);
 
             Log($"Alive players: {state.Players.SJoin(", ")}");
         }
