@@ -21,20 +21,31 @@ public partial class HostViewModel
 
     private void InitActiveRoles()
     {
-        ActiveRoles = city.AllRoles()
-            .Select(r => (role: r, preset: GetRolesPreset(15).FirstOrDefault(rr => rr.name == r.Name)))
-            .Select(v => new ActiveRole(v.role, OnActiveRoleChange) { IsSelected = v.preset.count > 0, Count = v.preset.count > 0 ? v.preset.count : 1 }).ToArray();
+        var n = ActiveUsers.Count(u => u.IsSelected);
 
-        OnActiveRoleChange();
+        ActiveRoles = city.AllRoles()
+            .Select(r => (role: r, preset: GetRolesPreset(n).FirstOrDefault(rr => rr.name == r.Name)))
+            .Select(v => new ActiveRole(v.role, OnActiveRoleChange, nameof(ActiveRoles)) { IsSelectedSilent = v.preset.count > 0, CountSilent = v.preset.count > 0 ? v.preset.count : 1 }).ToArray();
     }
 
-    private void OnActiveRoleChange(string? name = null)
+    private void OnActiveRoleChange(string name, ActiveRole activeRole)
     {
-        if (IsSilent(nameof(ActiveRoles)) || ActiveRoles == null)
+        var n = ActiveUsers.Count(u => u.IsSelected);
+        var k = ActiveRoles.Where(r => r.IsSelected).Sum(r => r.Count);
+
+        if (n == k)
             return;
-        
-        var count = ActiveRoles.Where(r => r.IsSelected).Sum(r => r.Count);
-        PlayerInfo = Messages["PlayerCountInfo"].With(count);
+
+        switch (name)
+        {
+            case nameof(ActiveRole.IsSelected):
+                ActiveRoles.Where(a => a.IsCounter).MaxBy(a => a.Count).Count += n - k;
+                break;
+
+            case nameof(ActiveRole.Count):
+                ActiveRoles.Where(a => a != activeRole).Where(a => a.IsCounter).MaxBy(a => a.Count).Count += n - k;
+                break;                
+        }
     }
 
     public ICommand StartNewGameCommand => new Command(async () =>

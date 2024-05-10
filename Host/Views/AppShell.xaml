@@ -14,16 +14,18 @@
             Icon="appicon.svg"
             Title="{Binding Messages[Players]}"
             ContentTemplate="{DataTemplate local:UserView}"
-            Route="StartGameView" />
+            Route="UserView" />
 
         <ShellContent
             Icon="start.jpg"
+            IsEnabled="{Binding AreUsersSelected}"
             Title="{Binding Messages[NewGame]}"
             ContentTemplate="{DataTemplate local:StartGameView}"
             Route="StartGameView" />
 
         <ShellContent
             Icon="game.png"
+            IsEnabled="{Binding AreUsersSelected}"
             Title="{Binding Messages[Game]}"
             ContentTemplate="{DataTemplate local:GameView}"
             Route="GameView" />

@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Windows.Input;
 using Host.Model;
+using Mafia;
 using Mafia.Extensions;
 using Mafia.Model;
 using Newtonsoft.Json;
@@ -9,6 +10,7 @@ using Newtonsoft.Json;
 namespace Host.ViewModel;
 public partial class HostViewModel
 {
+    private readonly Game game;
     private TaskCompletionSource? hostWaiter = null;
     private string _hostHint;
     private string _playerInfo;
@@ -113,7 +115,7 @@ public partial class HostViewModel
 
     private void OnActivePlayerChange(string? name = null)
     {
-        if (IsSilent(nameof(ActivePlayers)) || interaction == null)
+        if (interaction == null)
             return;
 
         UpdateActivePlayers(interaction);

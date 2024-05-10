@@ -40,7 +40,7 @@ public class DebugHost : IHost
     public (User, string)[] GetUserRoles()
     {
         var nMax = 20; // пользователи в базе данных
-        var usersDataBase = Enumerable.Range(1, nMax + 1).Select(i => new User { Nick = $"Nick{i}" }).ToArray();
+        var usersDataBase = Enumerable.Range(1, nMax + 1).Select(i => new User { Nick = $"Nick{i}", LastPlay = DateTime.Now }).ToArray();
         var userList = usersDataBase.ToList();
 
         var n = 15; // пришло поиграть

@@ -19,23 +19,19 @@
                 HorizontalOptions="Start"
                 SemanticProperties.HeadingLevel="Level1" />
 
-            <ListView ItemsSource="{Binding ActiveRoles}">
+            <ListView ItemsSource="{Binding ActiveUsers}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
                             <Grid ColumnDefinitions="0.8*,0.2*">
-                                <Label Grid.Column="0"
-                                   Text="{Binding Role.Name}"
-                                   HorizontalOptions="Start"
-                                   FontAttributes="Bold" />
+                                <Label Grid.Column="0"                                        
+                                       Text="{Binding Nick}"                                            
+                                       HorizontalOptions="Start"                                            
+                                       FontAttributes="Bold" />
 
-                                <StackLayout Grid.Column="1" Orientation="Horizontal" HorizontalOptions="End">
-                                    <Editor 
-                                        IsVisible="{Binding IsCounter}"
-                                        IsEnabled="{Binding IsSelected}"
-                                        Text="{Binding Count}" />
-                                    <CheckBox IsChecked="{Binding IsSelected}" />
-                                </StackLayout>
+                                <CheckBox Grid.Column="1"
+                                          IsChecked="{Binding IsSelected}"                                           
+                                          HorizontalOptions="End" />
                             </Grid>
                         </ViewCell>
                     </DataTemplate>
@@ -43,9 +39,8 @@
             </ListView>
             
             <Button
-                    Text="{Binding Messages[StartNewGame]}" 
-                    SemanticProperties.Hint="Stop previouse game and start a new one"
-                    Command="{Binding StartNewGameCommand}"
+                    Text="{Binding Messages[SelectRoles]}" 
+                    Command="{Binding SelectRolesCommand}"
                     HorizontalOptions="Fill" />
         </VerticalStackLayout>
     </ScrollView>

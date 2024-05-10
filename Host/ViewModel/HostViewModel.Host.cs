@@ -18,19 +18,6 @@ public partial class HostViewModel : IHost
 
     public (User, string)[] GetUserRoles()
     {
-        var nMax = 20; // пользователи в базе данных
-        var usersDataBase = Enumerable.Range(1, nMax + 1).Select(i => new User { Nick = $"Nick{i}" }).ToArray();
-        var userList = usersDataBase.ToList();
-
-        var n = 15; // пришло поиграть
-        var users = Enumerable.Range(1, n + 1).Select(_ =>
-        {
-            var i = rnd.Next(userList.Count);
-            var player = userList[i];
-            userList.RemoveAt(i);
-            return player;
-        }).ToArray();
-
         var gameRoles = ActiveRoles.Where(r => r.IsSelected).SelectMany(r => Enumerable.Range(0, r.Count).Select(_ => r.Role.Name)).ToArray();
         gameRoles.Shaffle(17, rnd);
 
@@ -46,7 +33,7 @@ public partial class HostViewModel : IHost
     {
         ActivePlayers = [];
         await Task.Delay(100); // skip list replace animations
-        ActivePlayers = state.Players.Select(p => new ActivePlayer(p, OnActivePlayerChange)
+        ActivePlayers = state.Players.Select(p => new ActivePlayer(p, OnActivePlayerChange, nameof(ActivePlayers))
         {
             TextColor = GetPlayerColor(p)
         }).OrderBy(p => p.Player.Group.Name).ThenBy(p => p.Player.Role.Rank).ToArray();
