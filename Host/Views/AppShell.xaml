@@ -9,13 +9,19 @@
 
     <FlyoutItem Route="pages"
                 FlyoutDisplayOptions="AsMultipleItems">
-        
+
+        <ShellContent
+            Icon="appicon.svg"
+            Title="{Binding Messages[Players]}"
+            ContentTemplate="{DataTemplate local:UserView}"
+            Route="StartGameView" />
+
         <ShellContent
             Icon="start.jpg"
             Title="{Binding Messages[NewGame]}"
             ContentTemplate="{DataTemplate local:StartGameView}"
             Route="StartGameView" />
-        
+
         <ShellContent
             Icon="game.png"
             Title="{Binding Messages[Game]}"
@@ -23,7 +29,7 @@
             Route="GameView" />
         
     </FlyoutItem>
-    
-    <ShellContent Route="StartGameView" />
+
+    <ShellContent Route="UserView" />
 
 </Shell>

@@ -225,7 +225,7 @@ public class Game
             IsActive = true
         };
 
-        host.StartGame(state);
+        await host.StartGame(state);
 
         while (!state.Stopping)
         {

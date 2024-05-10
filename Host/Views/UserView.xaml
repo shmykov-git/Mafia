@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Host.Views.UserView">
+   
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="30,0"
+            Spacing="25">
+            
+            <Image
+                Source="mafia.jpg"
+                HeightRequest="185"
+                Aspect="AspectFit" />
+
+            <Label
+                Text="{Binding PlayerInfo}"
+                Style="{StaticResource Headline}"
+                HorizontalOptions="Start"
+                SemanticProperties.HeadingLevel="Level1" />
+
+            <ListView ItemsSource="{Binding ActiveRoles}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <Grid ColumnDefinitions="0.8*,0.2*">
+                                <Label Grid.Column="0"
+                                   Text="{Binding Role.Name}"
+                                   HorizontalOptions="Start"
+                                   FontAttributes="Bold" />
+
+                                <StackLayout Grid.Column="1" Orientation="Horizontal" HorizontalOptions="End">
+                                    <Editor 
+                                        IsVisible="{Binding IsCounter}"
+                                        IsEnabled="{Binding IsSelected}"
+                                        Text="{Binding Count}" />
+                                    <CheckBox IsChecked="{Binding IsSelected}" />
+                                </StackLayout>
+                            </Grid>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            
+            <Button
+                    Text="{Binding Messages[StartNewGame]}" 
+                    SemanticProperties.Hint="Stop previouse game and start a new one"
+                    Command="{Binding StartNewGameCommand}"
+                    HorizontalOptions="Fill" />
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

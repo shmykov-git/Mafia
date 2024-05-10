@@ -28,23 +28,8 @@ public class DebugHost : IHost
     {
         rnd = new Random(seed);
     }
-
-    //private string[] GetGameRoles((string name, int count)[] preset, int n, double k)
-    //{
-    //    string[] roles = preset.Select(r => r.name).ToArray();
-    //    string[] multipleRoles = ["Mafia", "Civilian"];
-
-    //    var nn = n - roles.Length;
-    //    var nMafia = (int)(nn / k);
-    //    var nCivilian = nn - nMafia;
-
-    //    var mafias = Enumerable.Range(0, nMafia).Select(_ => multipleRoles[0]);
-    //    var civilians = Enumerable.Range(0, nCivilian).Select(_ => multipleRoles[1]);
-
-    //    return roles.Concat(mafias).Concat(civilians).ToArray();
-    //}
-
-    public void StartGame(State state) { }
+    
+    public async Task StartGame(State state) { }
     
     private (string name, int count)[] GetRolesPreset(int n)
     {

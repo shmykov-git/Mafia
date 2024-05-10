@@ -9,13 +9,15 @@ namespace Host.ViewModel;
 
 public partial class HostViewModel
 {
+
     private (string name, int count)[] GetRolesPreset(int n)
     {
         return RoleValues.GetRolesPreset(["Дон", "Бомж", "Маньяк", "Комиссар", "Доктор"], "Мафия", "Мирный", n, 3.5);
         //return RoleValues.GetRolesPreset(["DonMafia", "BumMafia", "Maniac", "Commissar", "Doctor"], "Mafia", "Civilian", n, 3.5);
     }
 
-    public ActiveRole[] ActiveRoles { get; private set; }
+    public ActiveRole[] ActiveRolesSilent;
+    public ActiveRole[] ActiveRoles { get => ActiveRolesSilent; set { ActiveRolesSilent = value; ChangedSilently(); } }
 
     private void InitActiveRoles()
     {
@@ -24,15 +26,13 @@ public partial class HostViewModel
             .Select(v => new ActiveRole(v.role, OnActiveRoleChange) { IsSelected = v.preset.count > 0, Count = v.preset.count > 0 ? v.preset.count : 1 }).ToArray();
 
         OnActiveRoleChange();
-
-
     }
 
     private void OnActiveRoleChange(string? name = null)
     {
-        if (ActiveRoles == null)
+        if (IsSilent(nameof(ActiveRoles)) || ActiveRoles == null)
             return;
-
+        
         var count = ActiveRoles.Where(r => r.IsSelected).Sum(r => r.Count);
         PlayerInfo = Messages["PlayerCountInfo"].With(count);
     }

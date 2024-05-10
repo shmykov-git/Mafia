@@ -42,14 +42,14 @@ public partial class HostViewModel : IHost
         options.GroupColors.FirstOrDefault(gc => gc.Group == p.TopGroup.Name)?.Color ?? 
         Colors.Black;
 
-    public void StartGame(State state)
+    public async Task StartGame(State state)
     {
-        //var c = GetPlayerColor(state.Players0.FirstOrDefault(p => p.Role.Name == "Doctor"));
-
-        SetActivePlayersSilent(state.Players.Select(p => new ActivePlayer(p, OnActivePlayerChange)
+        ActivePlayers = [];
+        await Task.Delay(100); // skip list replace animations
+        ActivePlayers = state.Players.Select(p => new ActivePlayer(p, OnActivePlayerChange)
         {
             TextColor = GetPlayerColor(p)
-        }).OrderBy(p => p.Player.Group.Name).ThenBy(p => p.Player.Role.Rank));
+        }).OrderBy(p => p.Player.Group.Name).ThenBy(p => p.Player.Role.Rank).ToArray();
     }
 
     private async Task TellTheNews(State state)
@@ -72,7 +72,7 @@ public partial class HostViewModel : IHost
                 State = state
             });
 
-            SetActivePlayersSilent(ActivePlayers.Where(p => state.Players.Contains(p.Player)).ToArray());
+            ActivePlayers = ActivePlayers.Where(p => state.Players.Contains(p.Player)).ToArray();
 
             Log($"Alive players: {state.Players.SJoin(", ")}");
         }
@@ -119,7 +119,7 @@ public partial class HostViewModel : IHost
         Log($"GameEnd, the winner is {winnerGroup.Name}");
         Log($"===== </day {state.DayNumber}> =====");
 
-        SetActivePlayersSilent(ActivePlayers.Where(p => state.Players0.Contains(p.Player)).ToArray());
+        ActivePlayers = ActivePlayers.Where(p => state.Players0.Contains(p.Player)).ToArray();
 
         await Interact(new Interaction
         {

@@ -16,27 +16,27 @@ public static class MauiProgram
     {
         //var mafiaFileName = "Resources/Mafia/mafia-drive.json";
         var mafiaFileName = "Resources/Mafia/mafia-vicino-ru.json";
-        var appsettingsFileName = "appsettings.json";
+        var settingsFileName = "appsettings.json";
 
-        using Stream fileStream = FileSystem.Current.OpenAppPackageFileAsync(mafiaFileName).Result;
-        using TextReader tr = new StreamReader(fileStream);
-        var json = tr.ReadToEnd();
+        using Stream mafiaStream = FileSystem.Current.OpenAppPackageFileAsync(mafiaFileName).Result;
+        using Stream settingsStream = FileSystem.Current.OpenAppPackageFileAsync(settingsFileName).Result;
 
+        using TextReader textReader = new StreamReader(mafiaStream);
+        var json = textReader.ReadToEnd();
         var city = json.FromJson<City>();
 
-        using Stream settingsStream = FileSystem.Current.OpenAppPackageFileAsync(appsettingsFileName).Result;
         var builder = MauiApp.CreateBuilder();
         builder.Configuration.AddJsonStream(settingsStream);
-        //builder.Configuration.AddJsonFile(appsettingsFileName);
 
         builder.Services
             .Configure<HostOptions>(builder.Configuration.GetSection("options"))
             .AddMafia(city)
             .AddSingleton<HostViewModel>()
             .AddSingleton<IHost, HostViewModel>(p => p.GetRequiredService<HostViewModel>())
-            .AddTransient<AppShell>(p => new AppShell() { BindingContext = p.GetRequiredService<HostViewModel>() })
-            .AddTransient<StartGameView>(p => new StartGameView() { BindingContext = p.GetRequiredService<HostViewModel>() })
-            .AddTransient<GameView>(p => new GameView() { BindingContext = p.GetRequiredService<HostViewModel>() })
+            .AddTransient(p => new AppShell() { BindingContext = p.GetRequiredService<HostViewModel>() })
+            .AddTransient(p => new UserView() { BindingContext = p.GetRequiredService<HostViewModel>() })
+            .AddTransient(p => new StartGameView() { BindingContext = p.GetRequiredService<HostViewModel>() })
+            .AddTransient(p => new GameView() { BindingContext = p.GetRequiredService<HostViewModel>() })
             ;
 
         builder

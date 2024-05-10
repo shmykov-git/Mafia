@@ -12,9 +12,7 @@ using Mafia.Model;
 using Microsoft.Extensions.Options;
 
 namespace Host.ViewModel;
-/// <summary>
-/// todo: view code for host
-/// </summary>
+
 public partial class HostViewModel : NotifyPropertyChanged
 {
     private Random rnd;
@@ -36,4 +34,9 @@ public partial class HostViewModel : NotifyPropertyChanged
     }
 
     private void RefreshCommands() => GetType().GetProperties().Where(p => p.PropertyType == typeof(ICommand)).ForEach(p => Changed(p.Name));
+
+    private void Log(string text)
+    {
+        Debug.WriteLine(text);
+    }
 }

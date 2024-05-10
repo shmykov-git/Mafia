@@ -10,15 +10,14 @@ namespace Host.ViewModel;
 public partial class HostViewModel
 {
     private TaskCompletionSource? hostWaiter = null;
-    private bool onActivePlayerSilent = false;
     private string _hostHint;
     private string _playerInfo;
     private ActivePlayer[] _activePlayers;
     private Interaction? interaction = null;
 
-    public string HostHint { get => _hostHint; set { _hostHint = value; Changed(nameof(HostHint)); } }
+    public string HostHint { get => _hostHint; set { _hostHint = value; Changed(); } }
     public string PlayerInfo { get => _playerInfo; set { _playerInfo = value; Changed(); } }
-    public ActivePlayer[] ActivePlayers { get => _activePlayers; set { _activePlayers = value; Changed(); } }
+    public ActivePlayer[] ActivePlayers { get => _activePlayers; set { _activePlayers = value; ChangedSilently(); } }
 
     public ICommand ContinueCommand => new Command(async () =>
     {
@@ -78,12 +77,6 @@ public partial class HostViewModel
 
     private void Continue() => hostWaiter?.SetResult();
 
-    // todo: temp
-    private void Log(string text)
-    {
-        Debug.WriteLine(text);
-    }
-
     private void PrepareActivePlayers(Interaction interaction)
     {
         UpdateActivePlayers(p =>
@@ -91,7 +84,7 @@ public partial class HostViewModel
             p.Operation = interaction.Killed.Contains(p.Player) ? Messages["killed"] : "";
             p.IsEnabled = !interaction.Except.Contains(p.Player);
             p.IsSelected = false;
-        }, silent:false);
+        });
     }
 
     private void UpdateActivePlayers(Interaction interaction)
@@ -101,46 +94,28 @@ public partial class HostViewModel
         UpdateActivePlayers(p =>
         {
             p.IsEnabled = isEnabled && !interaction.Except.Contains(p.Player);
-        }, p => !p.IsSelected, false);
+        }, p => !p.IsSelected);
 
         Changed(nameof(ContinueCommand));
     }
 
-    private void UpdateActivePlayers(Action<ActivePlayer> action, Func<ActivePlayer, bool>? predicate = null, bool silent = true)
+    private void UpdateActivePlayers(Action<ActivePlayer> action, Func<ActivePlayer, bool>? predicate = null)
     {
-        if (!onActivePlayerSilent)
+        DoSilent(nameof(ActivePlayers), () =>
         {
-            onActivePlayerSilent = true;
-
             foreach (var activePlayer in ActivePlayers)
             {
                 if (predicate?.Invoke(activePlayer) ?? true)
                     action(activePlayer);
             }
-
-            if (silent)
-                ActivePlayers = ActivePlayers.ToArray();
-
-            onActivePlayerSilent = false;
-        }
-    }
-
-    private void SetActivePlayersSilent(IEnumerable<ActivePlayer> activePlayers)
-    {
-        if (!onActivePlayerSilent)
-        {
-            onActivePlayerSilent = true;
-            ActivePlayers = activePlayers.ToArray();
-            onActivePlayerSilent = false;
-        }
+        });
     }
 
     private void OnActivePlayerChange(string? name = null)
     {
-        if (onActivePlayerSilent)
+        if (IsSilent(nameof(ActivePlayers)) || interaction == null)
             return;
 
-        if (interaction != null)
-            UpdateActivePlayers(interaction);
+        UpdateActivePlayers(interaction);
     }
 }

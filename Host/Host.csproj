@@ -80,6 +80,9 @@
 	  <Compile Update="Views\GameView.xaml.cs">
 	    <DependentUpon>GameView.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Views\UserView.xaml.cs">
+	    <DependentUpon>UserView.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\StartGameView.xaml.cs">
 	    <DependentUpon>StartGameView.xaml</DependentUpon>
 	  </Compile>
@@ -87,6 +90,9 @@
 
 	<ItemGroup>
 	  <MauiXaml Update="Views\GameView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\UserView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>
