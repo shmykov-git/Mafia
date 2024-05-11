@@ -104,7 +104,7 @@ public partial class HostViewModel
         activePlayer.RoleColor = activePlayer.NickColor = GetRoleColor(activePlayer.RoleName);
     }
 
-    private async Task SetupPlayerRoles(Interaction interaction, ActivePlayer[] activePlayers, Role[] roles)
+    private async Task AttachPlayerRoles(Interaction interaction, ActivePlayer[] activePlayers, Role[] roles)
     {
         var roleList = roles.ToList();
 
@@ -163,7 +163,7 @@ public partial class HostViewModel
             activePlayerSelectionMode = "interaction";
 
             var wakeUpPlayers = ActivePlayers.Where(p => p.IsSelected).ToArray();
-            await SetupPlayerRoles(interaction, wakeUpPlayers, wakeupRoles.ToArray());
+            await AttachPlayerRoles(interaction, wakeUpPlayers, wakeupRoles.ToArray());
 
             var lastRoles = GetSelectedRoles().Except(ActivePlayers.Where(p => p.Player != null).Select(p => p.Player.Role)).ToArray();
             
@@ -185,7 +185,7 @@ public partial class HostViewModel
         
         // todo: rule show card
         if (interaction.State.IsDay)
-            await SetupPlayerRoles(interaction, result.Selected, GetSelectedRoles());
+            await AttachPlayerRoles(interaction, result.Selected, GetSelectedRoles());
 
         CleanUpInteraction();
 
