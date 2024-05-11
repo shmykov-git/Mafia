@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Numerics;
 using System.Reflection;
+using Mafia.Exceptions;
 using Mafia.Executions;
 using Mafia.Extensions;
 using Mafia.Libraries;
@@ -78,6 +79,8 @@ public class Game
             if (await action.CheckConditions(state))
                 result.Collect(await action.DoOperations(state));
         }
+
+        DoKnowWhomSelect();
     }
 
     private async Task PlayNight()
@@ -95,6 +98,19 @@ public class Game
                         result.Collect(await action.DoOperations(state, player));
                 }
             }
+        }
+
+        DoKnowWhomSelect();
+    }
+
+    private void DoKnowWhomSelect()
+    {
+        if (state.Players0.Any(p => p.User == null))
+            throw new UnknownUsersException();
+
+        foreach (var select in state.LatestNews.AllSelects().Where(s => s.IsWhomUnknown))
+        {
+            select.Whom = select.UserWhom.Select(u=>state.Players0.Single(p=>p.User == u)).ToArray();
         }
     }
 

@@ -107,7 +107,7 @@ public class DebugHost : IHost
         Debug.WriteLine($"===== </day {state.DayNumber}> =====");
     }
 
-    public async Task<Player[]> AskCityToSelect(State state, CityAction action)
+    public async Task<User[]> AskCityToSelect(State state, CityAction action)
     {
         if (options.HostInstructions)
             Debug.WriteLine($"City select somebody to kill{(action.IsSkippable() ? " or skip" : "")}");
@@ -121,20 +121,20 @@ public class DebugHost : IHost
         if (options.CitySelections)
             Debug.WriteLine($"City --> {(selected is [] ? "nobody" : selected.SJoin(", "))}");
 
-        return selected;
+        return selected.Select(p=>p.User).ToArray();
     }
 
-    public async Task<Player[]> GetNeighbors(State state, Player player, Action action)
+    public async Task<User[]> GetNeighbors(State state, Player player, Action action)
     {
         var selected = state.GetNeighborPlayers(player);
 
         if (options.CitySelections)
             Debug.WriteLine($"{player} --> {selected.SJoin(", ")}");
 
-        return selected;
+        return selected.Select(p => p.User).ToArray();
     }
 
-    public async Task<Player[]> AskToSelect(State state, Player player, Action action)
+    public async Task<User[]> AskToSelect(State state, Player player, Action action)
     {
         AskToWakeUp(state, player);
 
@@ -168,7 +168,7 @@ public class DebugHost : IHost
 
         AskToFallAsleep(state, player);
 
-        return selected;
+        return selected.Select(p => p.User).ToArray();
     }
 
     private void AskCityToWakeUp()

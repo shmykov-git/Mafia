@@ -124,7 +124,7 @@ public partial class HostViewModel : IHost
         });
     }
 
-    public async Task<Player[]> AskCityToSelect(State state, CityAction action)
+    public async Task<User[]> AskCityToSelect(State state, CityAction action)
     {
         var result = await Interact(new Interaction
         {
@@ -133,10 +133,10 @@ public partial class HostViewModel : IHost
             State = state
         });
 
-        return result.SelectedPlayers;
+        return result.SelectedUsers;
     }
 
-    public async Task<Player[]> GetNeighbors(State state, Player player, Action action)
+    public async Task<User[]> GetNeighbors(State state, Player player, Action action)
     {
         var result = await Interact(new Interaction
         {
@@ -146,10 +146,10 @@ public partial class HostViewModel : IHost
             State = state
         });
 
-        return result.SelectedPlayers;
+        return result.SelectedUsers;
     }
 
-    public async Task<Player[]> AskToSelect(State state, Player player, Action action)
+    public async Task<User[]> AskToSelect(State state, Player player, Action action)
     {
         var result = await Interact(new Interaction
         {
@@ -161,7 +161,7 @@ public partial class HostViewModel : IHost
             State = state
         });
 
-        return result.SelectedPlayers;
+        return result.SelectedUsers;
     }
 
     private async Task AskCityToWakeUp(State state)

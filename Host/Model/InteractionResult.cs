@@ -6,6 +6,7 @@ namespace Host.Model;
 public class InteractionResult
 {
     public ActivePlayer[] Selected { get; set; } = [];
+    public User[] SelectedUsers => Selected.Select(p => p.User).ToArray();
     public Player[] SelectedPlayers
     {
         get

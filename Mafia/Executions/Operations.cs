@@ -9,7 +9,7 @@ public static class Operations
 {
     private static async Task<DailyNews> Select(string name, State state, Player player, Action action) => new DailyNews
     {
-        Selects = [new Select { Operation = name, Who = player, Whom = await state.Host.AskToSelect(state, player, action) }]
+        Selects = [new Select { Operation = name, Who = player, UserWhom = await state.Host.AskToSelect(state, player, action) }]
     };
 
     public static Task<DailyNews> Kill(State state, Player player, Action action) => Select(nameof(Kill), state, player, action);
@@ -20,6 +20,6 @@ public static class Operations
 
     public static async Task<DailyNews> RoundKill(State state, Player player, Action action) => new DailyNews
     {
-        Selects = [new Select { Operation = nameof(RoundKill), Who = player, Whom = await state.Host.GetNeighbors(state, player, action) }]
+        Selects = [new Select { Operation = nameof(RoundKill), Who = player, UserWhom = await state.Host.GetNeighbors(state, player, action) }]
     };
 }
