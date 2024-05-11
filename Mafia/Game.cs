@@ -101,7 +101,7 @@ public class Game
     /// <summary>
     /// todo: config
     /// </summary>
-    private void KnowNightKills()
+    private void CalcNightKills()
     {
         var locks = state.LatestNews.AllLocks();
         var checks = state.LatestNews.AllChecks();
@@ -126,7 +126,7 @@ public class Game
         state.LatestNews.Killed = factKills;
     }
 
-    private void KnowDayKills()
+    private void CalcDayKills()
     {
         state.LatestNews.Killed = state.LatestNews.GetKills();
     }
@@ -141,7 +141,7 @@ public class Game
     {
         var stack = new Stack<Player>();
         state.LatestNews.Killed.ForEach(stack.Push);
-
+        // нужно определить роль убитого
         var dailyNews = new DailyNews();
 
         while(stack.TryPop(out var kill))
@@ -166,7 +166,7 @@ public class Game
         }
         else
         {
-            KnowNightKills();
+            CalcNightKills();
         }
     }
 
@@ -209,9 +209,7 @@ public class Game
 
     public async Task Start()
     {
-        // async await
-
-        var players0 = host.GetUserRoles().Select(v => city.CreatePlayer(v.user, city.GetRole(v.role))).ToArray();
+        var players0 = host.GetGameRoles().Select((role, i) => city.CreatePlayer(city.GetRole(role), $"P{i + 1}")).ToArray();
 
         state = new State 
         { 
@@ -232,7 +230,7 @@ public class Game
             state.IsDay = true;
             if (state.DayNumber > 1)
             {
-                KnowNightKills();
+                CalcNightKills();
                 await PlayOnDeathKills();
                 ApplyKills();
             }
@@ -244,7 +242,7 @@ public class Game
                 break;
             }
             await PlayDay();
-            KnowDayKills();
+            CalcDayKills();
             await PlayOnDeathKills();
             ApplyKills();
             await host.NotifyCityAfterDay(state);

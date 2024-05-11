@@ -16,27 +16,33 @@ public partial class HostViewModel : IHost
         rnd = new Random(seed);
     }
 
-    public (User, string)[] GetUserRoles()
+    public string[] GetGameRoles()
     {
-        var gameRoles = ActiveRoles.Where(r => r.IsSelected).SelectMany(r => Enumerable.Range(0, r.Count).Select(_ => r.Role.Name)).ToArray();
-        gameRoles.Shaffle(17, rnd);
-
-        return gameRoles.Select((role, i) => (users[i], role)).ToArray();
+        return ActiveRoles.Where(r => r.IsSelected).SelectMany(r => Enumerable.Range(0, r.Count).Select(_ => r.Role.Name)).ToArray();
     }
 
-    private Color GetPlayerColor(Player p) => 
-        options.GroupColors.FirstOrDefault(gc => gc.Group == p.Group.Name)?.Color ??
-        options.GroupColors.FirstOrDefault(gc => gc.Group == p.TopGroup.Name)?.Color ?? 
-        Colors.Black;
+    private Color GetRoleColor(string roleName) => 
+        GetGroupColor(city.GetGroupByRoleName(roleName)) ?? 
+        GetGroupColor(city.GetTopGroupByRoleName(roleName)) ?? 
+        options.CityColor;
+
+    private Color? GetGroupColor(Group group) => options.GroupColors.FirstOrDefault(gc => gc.Group == group.Name)?.Color;
+    private Color GetPlayerRoleColor(Player p) => GetGroupColor(p.Group) ?? GetGroupColor(p.TopGroup) ?? options.CityColor;
+
+    private Color GetUserColor(Player p) => p.User == null 
+        ? options.CityColor
+        : GetPlayerRoleColor(p);
 
     public async Task StartGame(State state)
     {
         ActivePlayers = [];
         await Task.Delay(100); // skip list replace animations
-        ActivePlayers = state.Players.Select(p => new ActivePlayer(p, OnActivePlayerChange, nameof(ActivePlayers))
+        ActivePlayers = ActiveUsers.Where(u => u.IsSelected).Select(u => new ActivePlayer(Messages, u.User, OnActivePlayerChange, nameof(ActivePlayers))
         {
-            TextColor = GetPlayerColor(p)
-        }).OrderBy(p => p.Player.Group.Name).ThenBy(p => p.Player.Role.Rank).ToArray();
+            NickColor = options.CityColor,
+            RoleColor = options.CityColor
+        }).OrderBy(p => p.Nick).ToArray();
+            //.OrderBy(p => p.Player.Group.Name).ThenBy(p => p.Player.Role.Rank).ToArray();
     }
 
     private async Task TellTheNews(State state)
@@ -51,10 +57,12 @@ public partial class HostViewModel : IHost
         }
         else
         {
+            var kills = state.LatestNews.Killed.Select(p => ActivePlayers.Single(a => a.Player == p)).Select(p => p.Nick).SJoin(", ");
+
             await Interact(new Interaction
             {
-                Name = "Killed",
-                Args = [state.LatestNews.Killed.SJoin(", ")],
+                Name = state.LatestNews.Killed.Any() ? "KillsInTheCity" : "NoKillsInTheCity",
+                Args = [kills],
                 Killed = state.LatestNews.Killed,
                 State = state
             });
@@ -125,7 +133,7 @@ public partial class HostViewModel : IHost
             State = state
         });
 
-        return result.Selected;
+        return result.SelectedPlayers;
     }
 
     public async Task<Player[]> GetNeighbors(State state, Player player, Action action)
@@ -138,7 +146,7 @@ public partial class HostViewModel : IHost
             State = state
         });
 
-        return result.Selected;
+        return result.SelectedPlayers;
     }
 
     public async Task<Player[]> AskToSelect(State state, Player player, Action action)
@@ -153,7 +161,7 @@ public partial class HostViewModel : IHost
             State = state
         });
 
-        return result.Selected;
+        return result.SelectedPlayers;
     }
 
     private async Task AskCityToWakeUp(State state)

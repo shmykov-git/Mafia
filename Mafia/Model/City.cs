@@ -10,9 +10,9 @@ public class City
     public required CityAction[] DayActions { get; set; }
     public required Rule[] Rules { get; set; }
 
-    public Player CreatePlayer(User user, Role role) => new Player
+    public Player CreatePlayer(Role role, string id) => new Player
     {
-        User = user,
+        Id = id,
         Role = role,
         Group = GetGroup(role),
         TopGroup = GetTopGroup(role),
@@ -24,6 +24,8 @@ public class City
         return rule.Accepted && rule.GetListValues(0).Contains(role.Name);
     }
 
+    public Group GetTopGroupByRoleName(string roleName) => Groups.Single(g => g.AllGroups().Any(g => g.AllRoles().Any(r => r.Name == roleName)));
+    public Group GetGroupByRoleName(string roleName) => AllGroups().Single(g => g.AllRoles().Any(r => r.Name == roleName));
     public Rule GetRule(RuleName name) => Rules.Single(r => r.Name == name);
     public Group GetTopGroup(Role role) => Groups.Single(g => g.AllGroups().Any(gg => gg.AllRoles().Any(r => r == role)));
     public Group GetTopGroup(string name) => Groups.Single(g => g.Name == name);

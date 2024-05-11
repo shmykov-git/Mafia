@@ -42,6 +42,7 @@ public partial class HostViewModel
 
     private ActiveUser GetActiveUser(User user, int i) => new ActiveUser(user, onActiveUserChange, nameof(ActiveUsers)) 
     {
+        NickColorSilent = options.CityColor,
         IsSelectedSilent = i < options.PresetPlayerSelectedCount
     };
 

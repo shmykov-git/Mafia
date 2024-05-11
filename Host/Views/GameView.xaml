@@ -7,55 +7,94 @@
         <VerticalStackLayout 
             Padding="30,0"
             Spacing="25" >
-
-            <Label
-                Text="{Binding HostHint}"
-                Style="{StaticResource Headline}"
-                SemanticProperties.HeadingLevel="Level1" 
-                HorizontalOptions="Center" />
-
-            <ListView ItemsSource="{Binding ActivePlayers}">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <ViewCell>
-                            <Grid ColumnDefinitions="0.2*,0.2*,0.4*,0.2*">
-                                <Label Grid.Column="0"
-                                       
-                                       Text="{Binding Player.User.Nick}"
-                                       TextColor="{Binding TextColor}"
-                                       FontAttributes="Bold"
-                                       VerticalOptions="Center"
-                                       VerticalTextAlignment="Center"
-                                       HorizontalOptions="Start" />
-
-                                <Label Grid.Column="1"
-                                       
-                                       Text="{Binding Player.Role.Name}"
-                                       TextColor="{Binding TextColor}"
-                                       FontAttributes="Bold"
-                                       VerticalOptions="Center"
-                                       VerticalTextAlignment="Center"
-                                       HorizontalOptions="Start" />
-                                
-                                <Label Grid.Column="2"
-                                       Text="{Binding Operation}"
-                                       TextColor="Red"
-                                       FontAttributes="Bold"
-                                       VerticalOptions="Center"
-                                       VerticalTextAlignment="Center"
-                                       HorizontalOptions="Center" />
-
-                                <CheckBox Grid.Column="3"
-                                          IsEnabled="{Binding IsEnabled}"
-                                          IsChecked="{Binding IsSelected}"                                           
-                                          VerticalOptions="Center"
-                                          HorizontalOptions="End" />
-                            </Grid>
-                        </ViewCell>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>            
             
+            <Label
+                TextColor="{Binding HintColor}"
+                IsVisible="{Binding IsVisibleHostWakeUpHint}"
+                Text="{Binding HostWakeUpHint}"
+                Style="{StaticResource WakeUpline}"
+                HorizontalOptions="Start" />
+            
+            <Label
+                TextColor="{Binding HintColor}"
+                Text="{Binding HostHint}"
+                Style="{StaticResource HostHintline}"
+                HorizontalOptions="Start" />
+
+            <Grid>
+                <ListView ItemsSource="{Binding ActivePlayers}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                                <Grid ColumnDefinitions="0.2*,0.2*,0.4*,0.2*">
+                                    <Label Grid.Column="0"
+                                       
+                                            Text="{Binding Nick}"
+                                            TextColor="{Binding NickColor}"
+                                            FontAttributes="Bold"
+                                            VerticalOptions="Center"
+                                            VerticalTextAlignment="Center"
+                                            HorizontalOptions="Start" />
+
+                                    <Label Grid.Column="1"
+                                       
+                                            Text="{Binding Role}"
+                                            TextColor="{Binding RoleColor}"
+                                            FontAttributes="Bold"
+                                            VerticalOptions="Center"
+                                            VerticalTextAlignment="Center"
+                                            HorizontalOptions="Start" />
+
+                                    <Label Grid.Column="2"
+                                            Text="{Binding Operation}"
+                                            TextColor="Red"
+                                            FontAttributes="Bold"
+                                            VerticalOptions="Center"
+                                            VerticalTextAlignment="Center"
+                                            HorizontalOptions="Center" />
+
+                                    <CheckBox Grid.Column="3"
+                                                IsEnabled="{Binding IsEnabled}"
+                                                IsChecked="{Binding IsSelected}"                                           
+                                                VerticalOptions="Center"
+                                                HorizontalOptions="End" />
+                                </Grid>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <VerticalStackLayout                     
+                    Padding="30,20"
+                    Spacing="25" 
+                    BackgroundColor="White"
+                    IsVisible="{Binding IsActivePlayerRoleVisible}" >
+                    
+                    <ListView ItemsSource="{Binding ActivePlayerRoles}" >
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <ViewCell>
+                                    <Grid ColumnDefinitions="0.8*,0.2*" >
+                                        <Label Grid.Column="0"
+                                       
+                                                Text="{Binding Role}"
+                                                TextColor="{Binding RoleColor}"
+                                                FontAttributes="Bold"
+                                                VerticalOptions="Center"
+                                                VerticalTextAlignment="Center"
+                                                HorizontalOptions="Start" />
+
+                                        <CheckBox Grid.Column="1"
+                                                    IsEnabled="{Binding IsEnabled}"
+                                                    IsChecked="{Binding IsSelected}"                                           
+                                                    VerticalOptions="Center"
+                                                    HorizontalOptions="End" />
+                                    </Grid>
+                                </ViewCell>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </VerticalStackLayout>
+            </Grid>
             <Button 
                     Text="{Binding Messages[Continue]}" 
                     SemanticProperties.Hint="Ready to continue the game"

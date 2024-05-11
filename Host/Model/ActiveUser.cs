@@ -10,6 +10,9 @@ public class ActiveUser : NotifyPropertyChanged
         Subscribe(onChange, propertyName);
     }
 
+    public Color NickColorSilent { get; set; } = Colors.Black;
+    public Color NickColor { get => NickColorSilent; set { NickColorSilent = value; Changed(); } }
+
     public User User { get; }
 
     public string Nick { get => User.Nick; set { User.Nick = value; Changed(); } }

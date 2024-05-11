@@ -1,4 +1,5 @@
-﻿namespace Mafia.Extensions;
+﻿using System.Linq;
+namespace Mafia.Extensions;
 
 public static class LinqExtensions
 {

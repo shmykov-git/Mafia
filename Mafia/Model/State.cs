@@ -2,6 +2,7 @@
 using Mafia.Extensions;
 using Mafia.Libraries;
 
+
 namespace Mafia.Model;
 
 public class State
@@ -10,6 +11,7 @@ public class State
     public required City City { get; set; }
     public required List<DailyNews> News { get; set; }
     public DailyNews YesterdayNews => News.Count < 3 ? new DailyNews() : News[^3];
+    public DailyNews LatestDayNews => IsDay ? LatestNews : (News.Count < 2 ? new DailyNews() : News[^2]);
     public DailyNews LatestNews => News.Count < 1 ? new DailyNews() : News[^1];
     public bool HasNews => News.Count > 0;
 
@@ -30,6 +32,9 @@ public class State
     public bool IsCurrentlyAllowed(Player player) => player.Role.AllActions()
         .Select(a => (a, intersection: a.AllConditions().Intersect(Values.ActiveConditions).ToArray()))
         .Any(v => v.intersection.Length == 0 || v.intersection.All(name => v.a.CheckCondition(name, this, player).NoInteractionResult()));
+
+    public bool IsAlive(Player player) => Players.Contains(player);
+    public bool IsAliveRole(Role role) => Players.Any(p => p.Role == role);
 
     public bool IsSelfSelected(Player player) => News.Select(ps => ps).Any(ops => ops.Selects?.Any(s => s.Who == player && s.Whom.Contains(player)) ?? false);
     public Player[] GetGroupActivePlayers(Group group) => Players.Where(IsCurrentlyAllowed).Where(p => p.Group == group).GroupBy(p=>p.Role).Select(gr=>gr.First()).OrderBy(p=>p.Role.Rank).ToArray();

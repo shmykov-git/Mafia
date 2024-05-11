@@ -25,6 +25,7 @@
                         <ViewCell>
                             <Grid ColumnDefinitions="0.8*,0.2*">
                                 <Label Grid.Column="0"
+                                   TextColor="{Binding RoleColor}"
                                    Text="{Binding Role.Name}"
                                    HorizontalOptions="Start"
                                    FontAttributes="Bold" />

@@ -13,13 +13,29 @@ public abstract class NotifyPropertyChanged : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    protected void Subscribe(Action<string, NotifyPropertyChanged> onChange, string propertyName) { objectSubscribers += (name, obj) => DoSilent(propertyName, () => onChange(name, obj)); }
-    protected void Subscribe(Action<string> onChange, string propertyName) { subscribers += name => DoSilent(propertyName, () => onChange(name)); }
+    protected void SubscribeNoSilent(Action<string> onChange) 
+    { 
+        subscribers += onChange; 
+    }
+    
+    protected void Subscribe(Action<string> onChange, string silentPropertyName) 
+    { 
+        subscribers += name => OnChangeSilent(silentPropertyName, () => onChange(name)); 
+    }
 
-    //protected void Subscribe(Action<string> onChange) { subscribers += onChange; }
-    //protected bool IsSilent(string propertyName) => silents.TryGetValue(propertyName, out bool silent) ? silent : false;
+    protected void Subscribe(Action<string, NotifyPropertyChanged> onChange, string silentPropertyName) 
+    { 
+        objectSubscribers += (name, value) => OnChangeSilent(silentPropertyName, () => onChange(name, value)); 
+    }
 
-    protected void DoSilent(string propertyName, Action onChange)
+    public void DoSilent(string propertyName, Action doAction)
+    {
+        silents[propertyName] = true;
+        doAction();
+        silents[propertyName] = false;
+    }
+
+    private void OnChangeSilent(string propertyName, Action onChange)
     {
         if (silents.TryGetValue(propertyName, out var value) ? value : false)
             return;

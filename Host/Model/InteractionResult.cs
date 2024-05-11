@@ -1,9 +1,24 @@
-﻿using Mafia.Model;
+﻿using Mafia.Extensions;
+using Mafia.Model;
 
 namespace Host.Model;
 
 public class InteractionResult
 {
-    public Player[] Selected { get; set; } = [];
+    public ActivePlayer[] Selected { get; set; } = [];
+    public Player[] SelectedPlayers
+    {
+        get
+        {
+            Selected.ForEach(p =>
+            {
+                if (p.Player == null)
+                    throw new ArgumentNullException(nameof(p.Player));
+            });
+
+            return Selected.Select(p => p.Player!).ToArray();
+        }
+    }
+
     public bool IsSkipped => Selected.Length == 0;
 }

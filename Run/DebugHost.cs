@@ -29,35 +29,29 @@ public class DebugHost : IHost
         rnd = new Random(seed);
     }
     
-    public async Task StartGame(State state) { }
-    
+    public async Task StartGame(State state) 
+    {
+        var n = state.Players0.Length;
+        var users = Enumerable.Range(1, n + 1).Select(i => new User { Nick = $"U{i}", LastPlay = DateTime.Now }).ToArray();
+        users.Shaffle(n + 7, rnd);
+
+        state.Players0.ForEach((p, i) => p.User = users[i]);
+    }
+
     private (string name, int count)[] GetRolesPreset(int n)
     {
         return RoleValues.GetRolesPreset(["Дон", "Бомж", "Маньяк", "Комиссар", "Доктор"], "Мафия", "Мирный", n, 3.5);
         //return RoleValues.GetRolesPreset(["DonMafia", "BumMafia", "Maniac", "Commissar", "Doctor"], "Mafia", "Civilian", n, 3.5);
     }
 
-    public (User, string)[] GetUserRoles()
+    public string[] GetGameRoles()
     {
-        var nMax = 20; // пользователи в базе данных
-        var usersDataBase = Enumerable.Range(1, nMax + 1).Select(i => new User { Nick = $"Nick{i}", LastPlay = DateTime.Now }).ToArray();
-        var userList = usersDataBase.ToList();
-
         var n = 15; // пришло поиграть
-        var users = Enumerable.Range(1, n + 1).Select(_ =>
-        {
-            var i = rnd.Next(userList.Count);
-            var player = userList[i];
-            userList.RemoveAt(i);
-            return player;
-        }).ToArray();
-
         (string name, int count)[] rolesPreset = GetRolesPreset(n);
 
         var gameRoles = rolesPreset.SelectMany(v => Enumerable.Range(0, v.count).Select(_ => v.name)).ToArray();
-        gameRoles.Shaffle(17, rnd);
 
-        return gameRoles.Select((role, i) => (users[i], role)).ToArray();
+        return gameRoles;
     }
 
     private void TellTheNews(State state)
@@ -77,8 +71,6 @@ public class DebugHost : IHost
     {
         AskCityToWakeUp();
         TellTheNews(state);
-
-        //check game end
     }
 
     public async Task NotifyCityAfterDay(State state)

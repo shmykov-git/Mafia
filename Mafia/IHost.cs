@@ -6,7 +6,7 @@ namespace Mafia.Model;
 public interface IHost
 {
     void ChangeSeed(int seed);
-    (User user, string role)[] GetUserRoles();
+    string[] GetGameRoles();
     Task StartGame(State state);
 
     Task NotifyCityAfterNight(State state);

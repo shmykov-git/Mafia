@@ -25,7 +25,12 @@ public partial class HostViewModel
 
         ActiveRoles = city.AllRoles()
             .Select(r => (role: r, preset: GetRolesPreset(n).FirstOrDefault(rr => rr.name == r.Name)))
-            .Select(v => new ActiveRole(v.role, OnActiveRoleChange, nameof(ActiveRoles)) { IsSelectedSilent = v.preset.count > 0, CountSilent = v.preset.count > 0 ? v.preset.count : 1 }).ToArray();
+            .Select(v => new ActiveRole(v.role, OnActiveRoleChange, nameof(ActiveRoles)) 
+            { 
+                RoleColorSilent = GetRoleColor(v.role.Name),
+                IsSelectedSilent = v.preset.count > 0, 
+                CountSilent = v.preset.count > 0 ? v.preset.count : 1 
+            }).ToArray();
     }
 
     private void OnActiveRoleChange(string name, ActiveRole activeRole)
