@@ -13,6 +13,8 @@ public class ActiveRole : NotifyPropertyChanged
     public Color RoleColor { get => RoleColorSilent; set { RoleColorSilent = value; Changed(); } }
 
     public Role Role { get; }
+    public string RoleName => Role.Name;
+
     public bool IsCounter => Role.IsMultiple;
     public bool IsCheckbox => !Role.IsMultiple;
 

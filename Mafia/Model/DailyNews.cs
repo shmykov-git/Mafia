@@ -10,10 +10,12 @@ public class DailyNews
 {
     public List<Select>? Selects { get; set; }
 
-    public Player[] Locked { get; set; }
-    public Player[] Healed { get; set; }
-    public Player[] Killed { get; set; }
-    public Player[] Checked { get; set; }
+    // <calculated>
+    public Player[] Locked { get; set; } = [];
+    public Player[] Healed { get; set; } = [];
+    public Player[] Killed { get; set; } = [];
+    public Player[] Checked { get; set; } = [];
+    // </calculated>
 
     public void Collect(DailyNews other)
     {

@@ -21,10 +21,11 @@ public class ActivePlayer : NotifyPropertyChanged
     }
 
     public User User { get; }
-    public Player? Player { get; set; }
+    public Player? PlayerSilent { get; set; }
+    public Player? Player { get => PlayerSilent; set { PlayerSilent = value; Changed(); Changed(nameof(RoleName)); } }
 
-    public string Nick => User.Nick;// ?? messages["Unknown"];
-    public string Role => Player?.Role.Name ?? messages["Unknown"];
+    public string Nick => User.Nick;
+    public string RoleName => Player?.Role.Name ?? messages["Unknown"];
 
     public Color NickColorSilent { get; set; } = Colors.Black;
     public Color NickColor { get => NickColorSilent; set { NickColorSilent = value; Changed(); } }
@@ -34,6 +35,9 @@ public class ActivePlayer : NotifyPropertyChanged
 
     public string OperationSilent { get; set; } = string.Empty;
     public string Operation { get => OperationSilent; set { OperationSilent = value; Changed(); } }
+    
+    public Color OperationColorSilent { get; set; } = Colors.Red;
+    public Color OperationColor { get => OperationColorSilent; set { OperationColorSilent = value; Changed(); } }
 
     public bool IsSelectedSilent { get; set; }
     public bool IsSelected { get => IsSelectedSilent; set { IsSelectedSilent = value; Changed(); } }

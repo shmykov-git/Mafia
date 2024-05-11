@@ -19,6 +19,9 @@ public partial class HostViewModel
     public ActiveRole[] ActiveRolesSilent;
     public ActiveRole[] ActiveRoles { get => ActiveRolesSilent; set { ActiveRolesSilent = value; ChangedSilently(); } }
 
+    private Role[] GetSelectedMultipliedRoles() => ActiveRoles.Where(r => r.IsSelected).SelectMany(r => Enumerable.Range(0, r.Count).Select(_ => r.Role)).ToArray();
+    private Role[] GetSelectedRoles() => ActiveRoles.Where(r => r.IsSelected).Select(r => r.Role).ToArray();
+
     private void InitActiveRoles()
     {
         var n = ActiveUsers.Count(u => u.IsSelected);

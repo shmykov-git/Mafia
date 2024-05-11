@@ -38,7 +38,7 @@
 
                                     <Label Grid.Column="1"
                                        
-                                            Text="{Binding Role}"
+                                            Text="{Binding RoleName}"
                                             TextColor="{Binding RoleColor}"
                                             FontAttributes="Bold"
                                             VerticalOptions="Center"
@@ -47,57 +47,75 @@
 
                                     <Label Grid.Column="2"
                                             Text="{Binding Operation}"
-                                            TextColor="Red"
+                                            TextColor="{Binding OperationColor}"
                                             FontAttributes="Bold"
                                             VerticalOptions="Center"
                                             VerticalTextAlignment="Center"
                                             HorizontalOptions="Center" />
 
                                     <CheckBox Grid.Column="3"
-                                                IsEnabled="{Binding IsEnabled}"
-                                                IsChecked="{Binding IsSelected}"                                           
-                                                VerticalOptions="Center"
-                                                HorizontalOptions="End" />
+                                              IsEnabled="{Binding IsEnabled}"                                               
+                                              IsChecked="{Binding IsSelected}"                                           
+                                              VerticalOptions="Center"
+                                              HorizontalOptions="End" />
                                 </Grid>
                             </ViewCell>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
-                <VerticalStackLayout                     
-                    Padding="30,20"
-                    Spacing="25" 
-                    BackgroundColor="White"
-                    IsVisible="{Binding IsActivePlayerRoleVisible}" >
-                    
-                    <ListView ItemsSource="{Binding ActivePlayerRoles}" >
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <ViewCell>
-                                    <Grid ColumnDefinitions="0.8*,0.2*" >
-                                        <Label Grid.Column="0"
-                                       
-                                                Text="{Binding Role}"
+                <Border 
+                    IsVisible="{Binding IsActivePlayerRoleVisible}"
+                    StrokeThickness="4"
+                    StrokeShape="RoundRectangle 40,0,0,40"
+                    Background="White"                    
+                    Padding="30,25"                    
+                    HorizontalOptions="Center">
+                    <Border.Stroke>
+                        <LinearGradientBrush EndPoint="0,1">
+                            <GradientStop Color="Orange"
+                            Offset="0.1" />
+                            <GradientStop Color="Brown"
+                            Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Border.Stroke>
+
+                    <VerticalStackLayout Spacing="25" >
+                        <Label                                             
+                            Text="{Binding SelectedPlayerRoleMessage}"
+                            TextColor="{Binding SelectedPlayerRoleMessageColor}"
+                            FontAttributes="Bold"
+                            VerticalOptions="Center"
+                            VerticalTextAlignment="Center"
+                            HorizontalOptions="Start" />
+
+                        <ListView ItemsSource="{Binding ActivePlayerRoles}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <ViewCell>
+                                        <Grid ColumnDefinitions="0.8*,0.2*" >
+                                            <Label Grid.Column="0"                                       
+                                                Text="{Binding RoleName}"
                                                 TextColor="{Binding RoleColor}"
                                                 FontAttributes="Bold"
                                                 VerticalOptions="Center"
                                                 VerticalTextAlignment="Center"
                                                 HorizontalOptions="Start" />
 
-                                        <CheckBox Grid.Column="1"
+                                            <CheckBox Grid.Column="1"
                                                     IsEnabled="{Binding IsEnabled}"
                                                     IsChecked="{Binding IsSelected}"                                           
                                                     VerticalOptions="Center"
                                                     HorizontalOptions="End" />
-                                    </Grid>
-                                </ViewCell>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
-                </VerticalStackLayout>
+                                        </Grid>
+                                    </ViewCell>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </VerticalStackLayout>
+                </Border>
             </Grid>
             <Button 
                     Text="{Binding Messages[Continue]}" 
-                    SemanticProperties.Hint="Ready to continue the game"
                     Command="{Binding ContinueCommand}"
                     HorizontalOptions="Fill" />
         </VerticalStackLayout>

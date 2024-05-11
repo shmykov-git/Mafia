@@ -10,11 +10,11 @@ public class InteractionResult
     {
         get
         {
-            Selected.ForEach(p =>
-            {
-                if (p.Player == null)
-                    throw new ArgumentNullException(nameof(p.Player));
-            });
+            //Selected.ForEach(p =>
+            //{
+            //    if (p.Player == null)
+            //        throw new ArgumentNullException(nameof(p.Player));
+            //});
 
             return Selected.Select(p => p.Player!).ToArray();
         }

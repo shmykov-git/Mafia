@@ -12,6 +12,7 @@ public class Interaction
     public Player[] Killed { get; set; } = [];
     public (int from, int to) Selection { get; set; } = (0, 0);
     
+    public bool NeedSelection => Selection != (0, 0);
     public bool IsSkippable => Selection.from == 0;
     public bool WithCity => Player == null;
     public bool WithPlayer => Player != null;

@@ -30,6 +30,7 @@ public partial class HostViewModel : NotifyPropertyChanged
         this.city = city;
         this.options = options.Value;
         HintColor = this.options.CityColor;
+        SelectedPlayerRoleMessageColor = this.options.CityColor;
         Messages = this.options.Messages.ToDictionary(v => v.Name, v => v.Text);
 
         Task.Run(InitDatabaseUsers).Wait();

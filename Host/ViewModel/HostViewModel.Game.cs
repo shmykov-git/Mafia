@@ -16,12 +16,15 @@ public partial class HostViewModel
     private string _hostWakeUpHint;
     private bool _isVisibleHostWakeUpHint;
     private bool _isActivePlayerRoleVisible;
+    private string _selectedPlayerRoleMessage;
     private string _playerInfo;
+    private Color _hintColor;
+    private Color _selectedPlayerRoleMessageColor;
     private ActiveRole[] _activePlayerRoles;
     private ActivePlayer[] _activePlayers;
     private Interaction? prevInteraction = null;
     private Interaction? interaction = null;
-    private Color _hintColor;
+    private string activePlayerSelectionMode = "interaction";
 
     public Color HintColor { get => _hintColor; set { _hintColor = value; Changed(); } }
     public bool IsVisibleHostWakeUpHint { get => _isVisibleHostWakeUpHint; set { _isVisibleHostWakeUpHint = value; Changed(); } }
@@ -30,20 +33,20 @@ public partial class HostViewModel
     public string PlayerInfo { get => _playerInfo; set { _playerInfo = value; Changed(); } }
     public ActivePlayer[] ActivePlayers { get => _activePlayers; set { _activePlayers = value; ChangedSilently(); } }
     public ActiveRole[] ActivePlayerRoles { get => _activePlayerRoles; set { _activePlayerRoles = value; ChangedSilently(); } }
-    public bool IsActivePlayerRoleVisible { get => _isActivePlayerRoleVisible; set { _isActivePlayerRoleVisible = value; Changed(); } }
+    public bool IsActivePlayerRoleVisible { get => _isActivePlayerRoleVisible; set { _isActivePlayerRoleVisible = value; Changed(); Changed(nameof(ContinueCommand)); } }
+    public string SelectedPlayerRoleMessage { get => _selectedPlayerRoleMessage; set { _selectedPlayerRoleMessage = value; Changed(); } }
+    public Color SelectedPlayerRoleMessageColor { get => _selectedPlayerRoleMessageColor; set { _selectedPlayerRoleMessageColor = value; Changed(); } }
 
-    public ICommand ContinueCommand => new Command(async () =>
-    {
-        await Task.Delay(20);
-        Continue();
-    }, () => game.IsActive && (interaction == null || ActivePlayers.Count(p => p.IsSelected).Between(interaction.Selection)));
+
+    public ICommand ContinueCommand => new Command(()=>Continue(), 
+        () => game.IsActive && !IsActivePlayerRoleVisible && (interaction == null || ActivePlayers.Count(p => p.IsSelected).Between(interaction.Selection)));
 
     private void ShowWakeUpMessage()
     {
         if (interaction.State.IsDay || interaction.Player == null)
             return;
-        
-        HintColor = ActivePlayers.Single(p => p.Player == interaction.Player).RoleColor;
+                
+        HintColor = GetRoleColor(interaction.Player.Role.Name);
 
         var isGroup = interaction.Player.Group.AllRoles().Count() == 1;
 
@@ -93,6 +96,40 @@ public partial class HostViewModel
         hostWaiter = null;
     }
 
+    void AttachRole(Interaction interaction, ActivePlayer activePlayer, Role role)
+    {
+        var player = interaction.State.Players0.First(p => p.Role == role);
+        activePlayer.Player = player;
+        player.User = activePlayer.User;
+        activePlayer.RoleColor = activePlayer.NickColor = GetRoleColor(activePlayer.RoleName);
+    }
+
+    private async Task SetupPlayerRoles(Interaction interaction, ActivePlayer[] activePlayers, Role[] roles)
+    {
+        var roleList = roles.ToList();
+
+        foreach (var activePlayer in activePlayers)
+        {
+            if (roleList.Distinct().Count() == 1)
+            {
+                AttachRole(interaction, activePlayer, roleList[0]);
+                roleList.RemoveAt(0);
+            }
+            else
+            {
+                SelectedPlayerRoleMessage = $"Выберите роль игрока {activePlayer.Nick}";
+                await PrepareActivePlayerRoles(interaction, roleList.Distinct().ToArray());
+                IsActivePlayerRoleVisible = true;
+                await WaitForHostInteraction();
+                IsActivePlayerRoleVisible = false;
+                var selectedRole = ActivePlayerRoles.Single(r => r.IsSelected);                
+                AttachRole(interaction, activePlayer, selectedRole.Role);
+                selectedRole.RoleColor = activePlayer.RoleColor;
+                roleList.Remove(selectedRole.Role);
+            }
+        }
+    }
+
     private void CleanUpInteraction()
     {
         IsVisibleHostWakeUpHint = false;
@@ -109,8 +146,34 @@ public partial class HostViewModel
 
         await ShowFallAsleepMessage();
         ShowWakeUpMessage();
-        ShowHostMessage();
 
+        if (interaction.State.DayNumber == 1 && interaction.Player != null)
+        {
+            activePlayerSelectionMode = "firstWakeup";
+            PrepareActivePlayersForFirstWakeup();
+
+            var groupRoles = interaction.Player.Group.AllRoles().ToArray();
+            var wakeupRoles = GetSelectedMultipliedRoles().Where(groupRoles.Contains).ToList();
+            var killedRoles = interaction.State.LatestDayNews.Killed.Select(p => p.Role).Where(wakeupRoles.Contains).ToArray();
+            killedRoles.ForEach(r => wakeupRoles.Remove(r));
+
+            firstWakeupCount = wakeupRoles.Count;
+
+            await WaitForHostInteraction();
+            activePlayerSelectionMode = "interaction";
+
+            var wakeUpPlayers = ActivePlayers.Where(p => p.IsSelected).ToArray();
+            await SetupPlayerRoles(interaction, wakeUpPlayers, wakeupRoles.ToArray());
+
+            var lastRoles = GetSelectedRoles().Except(ActivePlayers.Where(p => p.Player != null).Select(p => p.Player.Role)).ToArray();
+            
+            if (lastRoles.Length == 1)
+            {
+                ActivePlayers.Where(p => p.Player != null).ForEach(p => AttachRole(interaction, p, lastRoles[0]));
+            }
+        }
+
+        ShowHostMessage();
         PrepareActivePlayers(interaction);
 
         await WaitForHostInteraction();
@@ -119,8 +182,10 @@ public partial class HostViewModel
         {
             Selected = ActivePlayers.Where(p => p.IsSelected).ToArray()
         };
-
-
+        
+        // todo: rule show card
+        if (interaction.State.IsDay)
+            await SetupPlayerRoles(interaction, result.Selected, GetSelectedRoles());
 
         CleanUpInteraction();
 
@@ -135,26 +200,30 @@ public partial class HostViewModel
         return result;
     }
 
-
-    private void Continue() => hostWaiter?.SetResult();
-
-    private void PrepareActivePlayerRoles(Interaction interaction)
+    private void Continue(int timeout = 20)
     {
-        string[] except = ActivePlayers.Where(p => p.Player != null).Select(p => p.Player.Role.Name)
-            .Concat(interaction.State.LatestDayNews.Killed.Select(p => p.Role.Name)).ToArray();
-        
-        ActivePlayerRoles = ActiveRoles.Where(r=>r.IsSelected).Where(r => !except.Contains(r.Role.Name))
-            .Select(r => new ActiveRole(r.Role, OnActivePlayerRoleChange, nameof(ActivePlayerRoles)) { RoleColorSilent = r.RoleColor }).ToArray();
+        Task.Run(async () =>
+        {
+            await Task.Delay(timeout);
+            hostWaiter?.SetResult();
+        });
     }
 
+    private async Task PrepareActivePlayerRoles(Interaction interaction, Role[] roles)
+    {
+        ActivePlayerRoles = roles.Select(r => new ActiveRole(r, OnActivePlayerRoleChange, nameof(ActivePlayerRoles)) { RoleColorSilent = GetRoleColor(r.Name), IsEnabledSilent = true }).ToArray();
+    }
+
+    object skipKey = null;
     private void OnActivePlayerRoleChange(string name, ActiveRole role)
     {
-        var isEnabled = ActivePlayerRoles.Count(a => a.IsSelected) == 0;
+        var isSelected = ActivePlayerRoles.Count(a => a.IsSelected) == 1;
 
-        UpdateActivePlayerRoles(role =>
+        if (isSelected && ActivePlayerRoles != skipKey)
         {
-            role.IsEnabled = isEnabled;
-        }, role => !role.IsSelected);
+            skipKey = ActivePlayerRoles;
+            Continue();
+        }
     }
 
     private void UpdateActivePlayerRoles(Action<ActiveRole> action, Func<ActiveRole, bool>? predicate = null)
@@ -164,12 +233,36 @@ public partial class HostViewModel
                 activeRole.DoSilent(nameof(ActivePlayerRoles), () => action(activeRole));
     }
 
+    private string arrow = "⮕";
+    private string minus = "⭐";
+    private int firstWakeupCount = 0;
 
-    private void PrepareActivePlayers(Interaction interaction)
+    private void PrepareActivePlayersForFirstWakeup()
     {
         UpdateActivePlayers(p =>
         {
-            p.Operation = interaction.Killed.Contains(p.Player) ? Messages["killed"] : "";
+            p.Operation = arrow;
+            p.OperationColor = options.CityColor;
+            p.IsEnabled = true;
+            p.IsSelected = false;
+        });
+    }
+
+    private void FirstWakeupChanged()
+    {
+        if (ActivePlayers.Where(p => p.IsSelected).Count() == firstWakeupCount)
+            Continue();
+    }
+
+    private void PrepareActivePlayers(Interaction interaction)
+    {
+        var operationColor = interaction.NeedSelection ? Colors.Red : options.CityColor;
+        var operation = interaction.NeedSelection ? arrow : minus;
+
+        UpdateActivePlayers(p =>
+        {
+            p.Operation = interaction.Killed.Contains(p.Player) ? Messages["killed"] : operation;
+            p.OperationColor = operationColor;
             p.IsEnabled = !interaction.Except.Contains(p.Player);
             p.IsSelected = false;
         });
@@ -201,6 +294,15 @@ public partial class HostViewModel
         if (interaction == null)
             return;
 
-        UpdateActivePlayers(interaction);
+        switch (activePlayerSelectionMode)
+        {
+            case "interaction":
+                UpdateActivePlayers(interaction);
+                break;
+            case "firstWakeup":
+                FirstWakeupChanged();
+                break;
+        }
+        
     }
 }

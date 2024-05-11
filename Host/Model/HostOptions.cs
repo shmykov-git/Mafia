@@ -6,6 +6,7 @@ public class HostOptions
     public bool AdjustWindow {  get; set; }
     public Rect WindowRect { get; set; }
     public required TimeSpan HostFallAsleepMessageDelay { get; set; }
+    public required TimeSpan SkipAnimationDelay { get; set; }    
     public required int PresetPlayerCount { get; set; }
     public required int PresetPlayerSelectedCount { get; set; }
     public required Color CityColor { get; set; }

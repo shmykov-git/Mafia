@@ -18,7 +18,7 @@ public partial class HostViewModel : IHost
 
     public string[] GetGameRoles()
     {
-        return ActiveRoles.Where(r => r.IsSelected).SelectMany(r => Enumerable.Range(0, r.Count).Select(_ => r.Role.Name)).ToArray();
+        return GetSelectedMultipliedRoles().Select(r=>r.Name).ToArray();
     }
 
     private Color GetRoleColor(string roleName) => 
@@ -36,7 +36,7 @@ public partial class HostViewModel : IHost
     public async Task StartGame(State state)
     {
         ActivePlayers = [];
-        await Task.Delay(100); // skip list replace animations
+        await Task.Delay(options.SkipAnimationDelay);
         ActivePlayers = ActiveUsers.Where(u => u.IsSelected).Select(u => new ActivePlayer(Messages, u.User, OnActivePlayerChange, nameof(ActivePlayers))
         {
             NickColor = options.CityColor,
@@ -67,7 +67,7 @@ public partial class HostViewModel : IHost
                 State = state
             });
 
-            ActivePlayers = ActivePlayers.Where(p => state.Players.Contains(p.Player)).ToArray();
+            ActivePlayers = ActivePlayers.Where(p => p.Player == null || state.Players.Contains(p.Player)).ToArray();
 
             Log($"Alive players: {state.Players.SJoin(", ")}");
         }
