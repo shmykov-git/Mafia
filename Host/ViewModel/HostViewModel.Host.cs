@@ -60,19 +60,19 @@ public partial class HostViewModel : IHost
         }
         else
         {
-            var kills = state.LatestNews.Killed.Select(p => ActivePlayers.Single(a => a.Player == p)).Select(p => p.Nick).SJoin(", ");
+            var kills = state.LatestNews.FactKilled.Select(p => ActivePlayers.Single(a => a.Player == p)).Select(p => p.Nick).SJoin(", ");
 
             await Interact(new Interaction
             {
                 Name = "WakeUpCity",
-                SubName = state.LatestNews.Killed.Any() ? "KillsInTheCity" : "NoKillsInTheCity",
+                SubName = state.LatestNews.FactKilled.Any() ? "KillsInTheCity" : "NoKillsInTheCity",
                 Args = [kills],
-                Killed = state.LatestNews.Killed,
+                Killed = state.LatestNews.FactKilled,
                 State = state
             });
 
 
-            state.LatestNews.Killed.ForEach(p => ActivePlayers.First(a => a.Player == p).IsAlive = false);
+            state.LatestNews.FactKilled.ForEach(p => ActivePlayers.First(a => a.Player == p).IsAlive = false);
             Changed(nameof(FilteredActivePlayers));
             //ActivePlayers = ActivePlayers.Where(p => p.Player == null || state.Players.Contains(p.Player)).ToArray();
 

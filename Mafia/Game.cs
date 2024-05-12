@@ -80,7 +80,7 @@ public class Game
                 result.Collect(await action.DoOperations(state));
         }
 
-        DoKnowWhomSelect();
+        state.DoKnowAllLatestWhom();
     }
 
     private async Task PlayNight()
@@ -100,18 +100,7 @@ public class Game
             }
         }
 
-        DoKnowWhomSelect();
-    }
-
-    private void DoKnowWhomSelect()
-    {
-        if (state.Stopping) 
-            return;
-
-        foreach (var select in state.LatestNews.AllSelects().Where(s => s.IsWhomUnknown))
-        {
-            select.Whom = select.UserWhom.Select(u=>state.Players0.Single(p=>p.User == u)).ToArray();
-        }
+        state.DoKnowAllLatestWhom();
     }
 
     /// <summary>
@@ -119,44 +108,24 @@ public class Game
     /// </summary>
     private void CalcNightKills()
     {
-        var locks = state.LatestNews.AllLocks();
-        var checks = state.LatestNews.AllChecks();
-
-        var kills = state.LatestNews.AllKills()
-            .Where(s=>!locks.Any(l=>l.Whom.Contains(s.Who)))
-            .SelectMany(k=>k.Whom)
-            .GroupBy(v=>v).Select(gv=>(p: gv.Key, c:gv.Count())).ToArray();
-
-        var heals = state.LatestNews.AllHeals()
-            .Where(s => !locks.Any(l => l.Whom.Contains(s.Who)))
-            .SelectMany(k => k.Whom)
-            .GroupBy(v => v).Select(gv => (p: gv.Key, c: gv.Count())).ToArray();
-
-        var factKills = city.GetRule(RuleName.HealSingleKill).Accepted
-            ? kills.Where(k => heals.FirstOrDefault(h => h.p == k.p).c < k.c).Select(k => k.p).ToArray()
-            : kills.Where(k => heals.FirstOrDefault(h => h.p == k.p).c == 0).Select(k => k.p).ToArray();
-
-        state.LatestNews.Locked = locks.SelectMany(l => l.Whom).ToArray();
-        state.LatestNews.Checked = checks.SelectMany(l => l.Whom).ToArray();
-        state.LatestNews.Healed = heals.Select(v=>v.p).ToArray();
-        state.LatestNews.Killed = factKills;
+        state.LatestNews.FactKilled = state.GetLatestFactKills();
     }
 
     private void CalcDayKills()
     {
-        state.LatestNews.Killed = state.LatestNews.GetKills();
+        state.LatestNews.FactKilled = state.GetLatestFactKills();
     }
 
     private void ApplyKills()
     {
-        foreach(var player in state.LatestNews.Killed)
+        foreach(var player in state.LatestNews.FactKilled)
             state.Players.Remove(player);
     }
 
     private async Task PlayOnDeathKills()
     {
         var stack = new Stack<Player>();
-        state.LatestNews.Killed.ForEach(stack.Push);
+        state.LatestNews.FactKilled.ForEach(stack.Push);
         // нужно определить роль убитого
         var dailyNews = new DailyNews();
 
@@ -178,7 +147,7 @@ public class Game
 
         if (city.GetRule(RuleName.KillOnDeathNoHeal).Accepted)
         {
-            state.LatestNews.Killed = state.LatestNews.Killed.Concat(dailyNews.GetKills()).ToArray();
+            state.LatestNews.FactKilled = state.LatestNews.FactKilled.Concat(dailyNews.GetKills()).ToArray();
         }
         else
         {

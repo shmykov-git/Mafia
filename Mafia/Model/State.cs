@@ -73,4 +73,26 @@ public class State
 
         return except.ToArray();
     }
+
+    public Player[] GetLatestFactKills()
+    {
+        var locks = LatestNews.AllKnownLocks(this);
+        var kills = LatestNews.AllKnownKills(this)
+            .Where(s => !locks.Any(l => l.Whom.Contains(s.Who)))
+            .SelectMany(k => k.Whom)
+            .GroupBy(v => v).Select(gv => (p: gv.Key, c: gv.Count())).ToArray();
+
+        var heals = LatestNews.AllKnownHeals(this)
+            .Where(s => !locks.Any(l => l.Whom.Contains(s.Who)))
+            .SelectMany(k => k.Whom)
+            .GroupBy(v => v).Select(gv => (p: gv.Key, c: gv.Count())).ToArray();
+
+        var factKills = City.GetRule(RuleName.HealSingleKill).Accepted
+            ? kills.Where(k => heals.FirstOrDefault(h => h.p == k.p).c < k.c).Select(k => k.p).ToArray()
+            : kills.Where(k => heals.FirstOrDefault(h => h.p == k.p).c == 0).Select(k => k.p).ToArray();
+
+        return factKills;
+    }
+
+    public void DoKnowAllLatestWhom() => LatestNews.DoKnowAllWhom(this);
 }

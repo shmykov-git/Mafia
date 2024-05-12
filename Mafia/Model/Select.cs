@@ -1,4 +1,6 @@
-﻿namespace Mafia.Model;
+﻿using Mafia.Extensions;
+
+namespace Mafia.Model;
 
 public class Select
 {
@@ -7,6 +9,8 @@ public class Select
     public Player[] Whom { get; set; } = [];
     public required User[] UserWhom { get; set; }
 
-    public bool IsWhomUnknown => UserWhom.Length != Whom.Length;
+    public bool IsWhomUnknown => UserWhom.Length == Whom.Length;
     public bool IsCity => Who == null;
+
+    public override string ToString() => $"{Who} {Operation} {(IsWhomUnknown ? UserWhom.Select(u=>$"{u.Nick}-?").SJoin(", ") : Whom.SJoin(", "))}";
 }

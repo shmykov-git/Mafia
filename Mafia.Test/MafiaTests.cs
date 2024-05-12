@@ -28,11 +28,13 @@ public class MafiaTests : MafiaTestsBase
     }
 
     [Fact]
-    public async Task Vicino_ru_Classic15()
+    public async Task Vicino_ru_Classic12()
     {
+        // проверить, что комиссар не просыпается, когда его убили
+
         (int, int[])[][] validGames =
         [
-            [(-1, [4]), (0, [14]), (2, [10]), (3, [11]), (-1, []), (0, [8]), (2, [5]), (3, [13]), (-1, [11]), (0, [2]), (2, [3]), (3, [13]), (-1, [6]), (0, [9]), (-1, [1]), (0, [12]), (-1, [7])],
+            [(-1, [4]), (0, [3]), (2, [11]), (-1, [2]), (0, [10]), (-1, [1]), (0, [6]), (-1, [0]), (5, [7]), (-1, [8])]
         ];
 
         foreach (var selections in validGames)
@@ -40,7 +42,7 @@ public class MafiaTests : MafiaTestsBase
             var provider = CreateTest("mafia-vicino-ru.json", options =>
             {
                 options.Debug = false;
-                options.TestRoles = [("Дон", 1), ("Бомж", 1), ("Маньяк", 1), ("Комиссар", 1), ("Доктор", 1), ("Мафия", 2), ("Мирный", 8)];
+                options.TestRoles = [("Дон", 1), ("Бомж", 1), ("Маньяк", 1), ("Комиссар", 1), ("Доктор", 1), ("Мафия", 1), ("Мирный", 6)];
                 options.Selections = selections;
             });
             var game = provider.GetRequiredService<Game>();

@@ -11,7 +11,4 @@ public class Player
     public bool Is(string role) => Role.Name == role;
 
     public override string ToString() => $"{User?.Nick??"Unknown"}-{Role}";
-    //public override string ToString() => Group.AllRoles().Count() == 1 
-    //    ? $"{User.Nick}-{Role}" 
-    //    : $"{User.Nick}-{Role} ({Group.Name})";
 }

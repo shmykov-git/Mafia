@@ -14,6 +14,6 @@ public static class Values
     /// <summary>
     /// Can be checked during current night (or day). Example: Prostitute (Putana) visited Maniac, Maniac cannot kill same night right after the visit
     /// </summary>
-    public static string[] ActiveConditions = [nameof(Conditions.Locked), nameof(Conditions.NotLocked)];
+    public static string[] ActiveConditions = [nameof(Conditions.NotLocked), nameof(Conditions.NotKilledAlone)];
     public static string[] SkippableConditions = [nameof(CityConditions.CitySkippable), nameof(Conditions.Skippable)];
 }

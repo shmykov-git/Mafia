@@ -1,20 +1,20 @@
 ﻿using Mafia.Executions;
+using Mafia.Extensions;
 using Mafia.Libraries;
 
 namespace Mafia.Model;
 
 /// <summary>
-/// todo:
+/// В первый день неизвестно, под каким игроком находится роль в Player, т.е. Player.User = null
+/// по мере прохождения первой ночи роли могут определяться. 
+/// Определение связи Player - User происходит по мере поступления информации и по мере необходимости ее знать
 /// </summary>
 public class DailyNews
 {
     public List<Select>? Selects { get; set; }
 
     // <calculated>
-    public Player[] Locked { get; set; } = [];
-    public Player[] Healed { get; set; } = [];
-    public Player[] Killed { get; set; } = [];
-    public Player[] Checked { get; set; } = [];
+    public Player[] FactKilled { get; set; } = [];
     // </calculated>
 
     public void Collect(DailyNews other)
@@ -29,14 +29,29 @@ public class DailyNews
     }
 
     public IEnumerable<Select> AllSelects() => Selects ?? [];
+    public Player[] GetKills() => AllSelects().Where(s => Values.KillOperations.Contains(s.Operation)).SelectMany(s=>s.Whom).ToArray();
 
-    public Player[] GetKills() => GetWhom(Values.KillOperations);
 
-    public Select[] AllLocks() => GetSelects(Values.LockOperations);
-    public Select[] AllKills() => GetSelects(Values.KillOperations);
-    public Select[] AllHeals() => GetSelects(Values.HealOperations);
-    public Select[] AllChecks() => GetSelects(Values.CheckOperations);
+    public Select[] AllKnownLocks(State state) => GetKnownSelects(state, Values.LockOperations);
+    public Select[] AllKnownKills(State state) => GetKnownSelects(state, Values.KillOperations);
+    public Select[] AllKnownHeals(State state) => GetKnownSelects(state, Values.HealOperations);
+    //public Select[] AllKnownChecks(State state) => GetKnownSelects(state, Values.CheckOperations);
 
-    private Select[] GetSelects(string[] operations) => AllSelects().Where(s => operations.Contains(s.Operation)).ToArray();
-    private Player[] GetWhom(string[] operations) => AllSelects().Where(s => operations.Contains(s.Operation)).SelectMany(s => s.Whom).ToArray();
+    public void DoKnowAllWhom(State state) => AllSelects().ForEach(s => DoKnowWhom(state, s));
+
+    private void DoKnowWhom(State state, Select select)
+    {
+        if (select.IsWhomUnknown)
+            return;
+
+        select.Whom = select.UserWhom.Select(u => state.Players0.Single(p => p.User == u)).ToArray();
+    }
+
+    private Select[] GetKnownSelects(State state, string[] operations)
+    {
+        var selects = AllSelects().Where(s => operations.Contains(s.Operation)).ToArray();
+        selects.ForEach(s => DoKnowWhom(state, s));
+
+        return selects;
+    }
 }
