@@ -1,0 +1,206 @@
+﻿{
+  "name": "Мафия Вицино",
+  "groups": [
+    {
+      "name": "Мафия",
+      "roles": [
+        {
+          "name": "Дон",
+          "rank": 1,
+          "actions": [
+            {
+              "operations": [ "Kill" ],
+              "conditions": [ "SeniorRank", "NotLocked" ]
+            }
+          ]
+        },
+        {
+          "name": "Бомж",
+          "rank": 2,
+          "actions": [
+            {
+              "operations": [ "Kill" ],
+              "conditions": [ "SeniorRank", "NotLocked" ]
+            }
+          ]
+        },
+        {
+          "name": "Мафия",
+          "rank": 3,
+          "isMultiple": true,
+          "actions": [
+            {
+              "operations": [ "Kill" ],
+              "conditions": [ "SeniorRank", "NotLocked" ]
+            }
+          ]
+        },
+        {
+          "name": "Проститутка",
+          "rank": 4,
+          "actions": [
+            {
+              "operations": [ "Kill" ],
+              "conditions": [ "SeniorRank", "Single" ]
+            },
+            {
+              "operations": [ "Lock" ],
+              "conditions": [ "NotSingle" ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Маньяк",
+      "roles": [
+        {
+          "name": "Маньяк",
+          "actions": [
+            {
+              "name": "Kill",
+              "operations": [ "Kill" ],
+              "conditions": [ "NotLocked" ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Мирный",
+      "roles": [
+        {
+          "name": "Мирный",
+          "isMultiple": true
+        }
+      ],
+      "groups": [
+        {
+          "name": "Комиссар",
+          "roles": [
+            {
+              "name": "Комиссар",
+              "rank": 1,
+              "actions": [
+                {
+                  "operations": [ "Check" ],
+                  "conditions": [ "SeniorRank", "NotLocked" ]
+                }
+              ]
+            },
+            {
+              "name": "Сержант",
+              "rank": 2,
+              "actions": [
+                {
+                  "operations": [ "Check" ],
+                  "conditions": [ "SeniorRank", "NotLocked" ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Доктор",
+          "roles": [
+            {
+              "name": "Доктор",
+              "actions": [
+                {
+                  "operations": [ "Heal" ],
+                  "conditions": [ "NotLocked" ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Камикадзе",
+          "roles": [
+            {
+              "name": "Камикадзе",
+              "actions": [
+                {
+                  "operations": [ "Hello" ],
+                  "conditions": [ "FirstDay" ]
+                },
+                {
+                  "operations": [ "Kill" ],
+                  "conditions": [ "Killed", "Skippable" ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Шахид",
+          "roles": [
+            {
+              "name": "Шахид",
+              "actions": [
+                {
+                  "operations": [ "Hello" ],
+                  "conditions": [ "FirstDay" ]
+                },
+                {
+                  "operations": [ "RoundKill" ],
+                  "conditions": [ "Killed" ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "dayActions": [
+    {
+      "operations": [ "CityKill" ],
+      "conditions": [ "CitySkippable" ]
+    }
+  ],
+  "nightEvents": [
+    "Мафия",
+    "Маньяк",
+    "Доктор",
+    "Комиссар",
+    "Камикадзе",
+    "Шахид"
+  ],
+  "rules": [
+    {
+      "name": "HealSingleKill",
+      "description": "Если в игрока стреляли два и более раза, то он умирает даже если его лечили один раз",
+      "accepted": true
+    },
+    {
+      "name": "EvenDoctorDays",
+      "description": "Доктор лечит одного и того же игрока только через раз",
+      "values": [ "Доктор" ],
+      "accepted": false
+    },
+    {
+      "name": "DoctorOnceSelfHeal",
+      "description": "Доктор лечит себя один раз за игру",
+      "values": [ "Доктор" ],
+      "accepted": true
+    },
+    {
+      "name": "KillOnDeathNoHeal",
+      "description": "Смерти от камикадзе и шахида не лечатся",
+      "accepted": true
+    },
+    {
+      "name": "MafiaWin",
+      "description": "Мафия побеждает, если живы только игроки группы Mafia и игроки с перечисленными ролями Civilian и количество мафиози больше или равно количеству мирных",
+      "values": [ "Мафия", "Комиссар, Сержант, Мирный" ],
+      "accepted": true
+    },
+    {
+      "name": "ManiacWin",
+      "description": "Маньяк побеждает, если живы только игроки группы Maniac и игроки с перечисленными ролями Civilian и количество маньяков больше или равно количеству мирных",
+      "values": [ "Маньяк", "Комиссар, Сержант, Мирный" ],
+      "accepted": true
+    }
+  ]
+}

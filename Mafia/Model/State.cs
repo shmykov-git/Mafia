@@ -37,7 +37,7 @@ public class State
     public bool IsAliveRole(Role role) => Players.Any(p => p.Role == role);
 
     public bool IsSelfSelected(Player player) => News.Select(ps => ps).Any(ops => ops.Selects?.Any(s => s.Who == player && s.Whom.Contains(player)) ?? false);
-    public Player[] GetGroupActivePlayers(Group group) => Players.Where(IsCurrentlyAllowed).Where(p => p.Group == group).GroupBy(p=>p.Role).Select(gr=>gr.First()).OrderBy(p=>p.Role.Rank).ToArray();
+    public Player[] GetGroupActivePlayers(Group group) => Players.Where(IsCurrentlyAllowed).Where(p => p.Group == group).GroupBy(p=>p.Role).Select(gr=>gr.MinBy(p=>p.Id)).OrderBy(p=>p.Role.Rank).ToArray();
     public Player[] GetTeam(Player player) => Players.Where(p => player.Group.Roles!.Contains(p.Role)).ToArray();
     public Player[] GetTeamOthers(Player player) => Players.Where(p => p != player && player.Group.Roles!.Contains(p.Role)).ToArray();
     public Player[] GetOtherTeams(Player player) => Players.Where(p => p.Group != player.Group).ToArray();

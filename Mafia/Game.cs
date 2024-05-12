@@ -225,7 +225,7 @@ public class Game
 
     public async Task Start()
     {
-        var players0 = host.GetGameRoles().Select((role, i) => city.CreatePlayer(city.GetRole(role), $"P{i + 1}")).ToArray();
+        var players0 = host.GetGameRoles().Select((role, i) => city.CreatePlayer(city.GetRole(role), $"P{(i + 1).ToString().PadLeft(2, '0')}")).ToArray();
 
         state = new State 
         { 

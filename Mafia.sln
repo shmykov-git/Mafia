@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Run", "Run\Run.csproj", "{9
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mafia", "Mafia\Mafia.csproj", "{D39BA9C6-1A05-4963-B028-04EE91E6B834}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Host", "Host\Host.csproj", "{8DAAE24D-C2D4-4745-8C61-60E19B06B272}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Host", "Host\Host.csproj", "{8DAAE24D-C2D4-4745-8C61-60E19B06B272}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mafia.Test", "Mafia.Test\Mafia.Test.csproj", "{8CAE1707-7B05-4A65-AD23-8A12D7B639E7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,6 +31,10 @@ Global
 		{8DAAE24D-C2D4-4745-8C61-60E19B06B272}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8DAAE24D-C2D4-4745-8C61-60E19B06B272}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8DAAE24D-C2D4-4745-8C61-60E19B06B272}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{8CAE1707-7B05-4A65-AD23-8A12D7B639E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CAE1707-7B05-4A65-AD23-8A12D7B639E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CAE1707-7B05-4A65-AD23-8A12D7B639E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8CAE1707-7B05-4A65-AD23-8A12D7B639E7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
