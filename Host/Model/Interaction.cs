@@ -5,6 +5,7 @@ namespace Host.Model;
 public class Interaction
 {
     public required string Name { get; set; }
+    public string? SubName { get; set; }
     public string[]? Args { get; set; }
     public Role[] WakeupRoles { get; set; } = [];
     public required State State { get; set; }

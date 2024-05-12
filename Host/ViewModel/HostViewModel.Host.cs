@@ -64,7 +64,8 @@ public partial class HostViewModel : IHost
 
             await Interact(new Interaction
             {
-                Name = state.LatestNews.Killed.Any() ? "KillsInTheCity" : "NoKillsInTheCity",
+                Name = "WakeUpCity",
+                SubName = state.LatestNews.Killed.Any() ? "KillsInTheCity" : "NoKillsInTheCity",
                 Args = [kills],
                 Killed = state.LatestNews.Killed,
                 State = state
@@ -93,7 +94,7 @@ public partial class HostViewModel : IHost
     {
         if (state.DayNumber > 1)
         {
-            await AskCityToWakeUp(state);
+            //await AskCityToWakeUp(state);
 
             Log($"===== </night {state.DayNumber}> =====");
         }
@@ -170,14 +171,14 @@ public partial class HostViewModel : IHost
         return result.SelectedUsers;
     }
 
-    private async Task AskCityToWakeUp(State state)
-    {
-        await Interact(new Interaction
-        {
-            Name = "WakeUpCity",
-            State = state
-        });
-    }
+    //private async Task AskCityToWakeUp(State state)
+    //{
+    //    await Interact(new Interaction
+    //    {
+    //        Name = "WakeUpCity",
+    //        State = state
+    //    });
+    //}
 
     private async Task AskCityToFallAsleep(State state)
     {

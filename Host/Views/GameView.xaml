@@ -47,6 +47,7 @@
                                             HorizontalOptions="Start" />
 
                                     <Label Grid.Column="2"
+                                           FontSize="30"
                                             Text="{Binding Operation}"
                                             TextColor="{Binding OperationColor}"
                                             FontAttributes="Bold"

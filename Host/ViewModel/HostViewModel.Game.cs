@@ -26,6 +26,11 @@ public partial class HostViewModel
     private Interaction? prevInteraction = null;
     private Interaction? _interaction = null;
 
+    private string arrow = "⮕";
+    private string minus = "⭐";
+    private string killed = "💀";
+    private int wakeupRolesCount = 0;
+
 
     private Interaction? Interaction { get => _interaction; set { _interaction = value; Changed(nameof(ContinueCommand)); } }
     private ContinueGameMode ContinueMode { get => _continueMode; set { _continueMode = value; Changed(nameof(ContinueCommand)); } }
@@ -222,7 +227,14 @@ public partial class HostViewModel
     private void ShowHostMessage()
     {
         var message = Messages[Interaction.Name].With(Interaction.Args);
-        SubHostHint = message;
+        HostHint = message;
+
+        if (Interaction.SubName.HasText())
+        {
+            var subMessage = Messages[Interaction.SubName].With(Interaction.Args);
+            SubHostHint = subMessage;
+        }
+
         Log(message);
     }
 
@@ -309,10 +321,6 @@ public partial class HostViewModel
                 activeRole.DoSilent(nameof(ActivePlayerRoles), () => action(activeRole));
     }
 
-    private string arrow = "⮕";
-    private string minus = "⭐";
-    private int wakeupRolesCount = 0;
-
     private void PrepareActivePlayersForFirstWakeup()
     {
         UpdateActivePlayers(p =>
@@ -343,7 +351,7 @@ public partial class HostViewModel
 
         UpdateActivePlayers(p =>
         {
-            p.Operation = Interaction.Killed.Contains(p.Player) ? Messages["killed"] : operation;
+            p.Operation = Interaction.Killed.Contains(p.Player) ? /*Messages["killed"]*/killed : operation;
             p.OperationColor = operationColor;
             p.IsEnabled = !Interaction.Except.Contains(p.Player);
             p.IsSelected = false;
