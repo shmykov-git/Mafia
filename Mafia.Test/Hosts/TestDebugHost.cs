@@ -30,9 +30,7 @@ public class TestDebugHost : IHost
     public async Task StartGame(State state)
     {
         var n = state.Players0.Length;
-        var users = Enumerable.Range(1, n + 1).Select(i => new User { Nick = $"U{i}", LastPlay = DateTime.Now }).ToArray();
-        users.Shaffle(n + 7, rnd);
-
+        var users = Enumerable.Range(0, n).Select(i => new User { Nick = $"U{(i).ToString().PadLeft(2, '0')}", LastPlay = DateTime.Now }).ToArray();
         state.Players0.ForEach((p, i) => p.User = users[i]);
     }
 

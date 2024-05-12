@@ -15,12 +15,12 @@ public static class Conditions
     public static bool Skippable(State state, Player player) => true;
 
     /// <summary>
-    /// No interaction condition (cannot use state.Host here!)
+    /// ActiveCondition
     /// </summary>
-    public static bool Locked(State state, Player player) => state.LatestNews.Selects?.Any(s => s.Operation == nameof(Operations.Lock) && s.Whom.Contains(player)) ?? false;
+    public static bool Locked(State state, Player player) => state.LatestNews.Selects?.Any(s => s.Operation == nameof(Operations.Lock) && s.UserWhom.Contains(player.User)) ?? false;
 
     /// <summary>
-    /// No interaction condition
+    /// ActiveCondition
     /// </summary>
     public static bool NotLocked(State state, Player player) => !Locked(state, player);
 }

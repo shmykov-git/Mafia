@@ -29,7 +29,7 @@ public class TestHost : IHost
     public async Task StartGame(State state)
     {
         var n = state.Players0.Length;
-        var users = Enumerable.Range(0, n).Select(i => new User { Nick = $"U{i}", LastPlay = DateTime.Now }).ToArray();
+        var users = Enumerable.Range(0, n).Select(i => new User { Nick = $"U{(i).ToString().PadLeft(2, '0')}", LastPlay = DateTime.Now }).ToArray();
         state.Players0.ForEach((p, i) => p.User = users[i]);
     }
 
@@ -81,7 +81,8 @@ public class TestHost : IHost
         var players = GetSelectedPlayers(state);
         players.ForEach(p => state.Players.Should().Contain(p));
 
-        Debug.WriteLine($"{(who == null ? "city" : who.ToString())} --> {players.SJoin(", ")}");
+        if (options.Debug)
+            Debug.WriteLine($"{(who == null ? "city" : who.ToString())} --> {players.SJoin(", ")}");
 
         eventIndex++;
         return players.Select(p => p.User).ToArray();
