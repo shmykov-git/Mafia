@@ -105,8 +105,8 @@ public class Game
 
     private void DoKnowWhomSelect()
     {
-        if (state.Players0.Any(p => p.User == null))
-            throw new UnknownUsersException();
+        if (state.Stopping) 
+            return;
 
         foreach (var select in state.LatestNews.AllSelects().Where(s => s.IsWhomUnknown))
         {

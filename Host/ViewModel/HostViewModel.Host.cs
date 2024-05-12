@@ -35,6 +35,9 @@ public partial class HostViewModel : IHost
 
     public async Task StartGame(State state)
     {
+        prevInteraction = null;
+        ContinueMode = ContinueGameMode.Interaction;
+
         ActivePlayers = [];
         await Task.Delay(options.SkipAnimationDelay);
         ActivePlayers = ActiveUsers.Where(u => u.IsSelected).Select(u => new ActivePlayer(Messages, u.User, OnActivePlayerChange, nameof(ActivePlayers))
@@ -67,7 +70,10 @@ public partial class HostViewModel : IHost
                 State = state
             });
 
-            ActivePlayers = ActivePlayers.Where(p => p.Player == null || state.Players.Contains(p.Player)).ToArray();
+
+            state.LatestNews.Killed.ForEach(p => ActivePlayers.First(a => a.Player == p).IsAlive = false);
+            Changed(nameof(FilteredActivePlayers));
+            //ActivePlayers = ActivePlayers.Where(p => p.Player == null || state.Players.Contains(p.Player)).ToArray();
 
             Log($"Alive players: {state.Players.SJoin(", ")}");
         }
@@ -114,7 +120,7 @@ public partial class HostViewModel : IHost
         Log($"GameEnd, the winner is {winnerGroup.Name}");
         Log($"===== </day {state.DayNumber}> =====");
 
-        ActivePlayers = ActivePlayers.Where(p => state.Players0.Contains(p.Player)).ToArray();
+        //ActivePlayers = ActivePlayers.Where(p => state.Players0.Contains(p.Player)).ToArray();
 
         await Interact(new Interaction
         {

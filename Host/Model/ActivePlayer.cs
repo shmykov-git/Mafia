@@ -2,7 +2,6 @@
 using Microsoft.Maui.Controls;
 
 namespace Host.Model;
-
 public class ActivePlayer : NotifyPropertyChanged
 {
     private readonly Dictionary<string, string> messages;
@@ -44,5 +43,7 @@ public class ActivePlayer : NotifyPropertyChanged
 
     public bool IsEnabledSilent { get; set; }
     public bool IsEnabled { get => IsEnabledSilent; set { IsEnabledSilent = value; Changed(); } }
-    
+
+    public bool IsAliveSilent { get; set; } = true;
+    public bool IsAlive { get => IsAliveSilent; set { IsAliveSilent = value; Changed(); } }
 }
