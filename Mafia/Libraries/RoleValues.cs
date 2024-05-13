@@ -1,13 +1,15 @@
-﻿namespace Mafia.Libraries;
+﻿using Mafia.Model;
+
+namespace Mafia.Libraries;
 
 public static class RoleValues
 {
-    public static (string name, int count)[] GetRolesPreset(string[] singleRoles, string mafiaRole, string civilianRole, int n, double k = 3.5)
+    public static (string name, int count)[] GetRolePreset(RolePreset preset, int n)
     {
-        var nn = n - singleRoles.Length;
-        var nMafia = (int)(nn / k);
+        var nn = n - preset.SingleRoles.Length;
+        var nMafia = (int)(nn / preset.Ratio);
         var nCivilian = nn - nMafia;
 
-        return singleRoles.Select(r => (r, 1)).Concat([(mafiaRole, nMafia), (civilianRole, nCivilian)]).ToArray();
+        return preset.SingleRoles.Select(r => (r, 1)).Concat([(preset.MafiaRole, nMafia), (preset.CivilianRole, nCivilian)]).ToArray();
     }
 }

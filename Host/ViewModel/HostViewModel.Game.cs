@@ -84,7 +84,12 @@ public partial class HostViewModel
             return new InteractionResult();
 
         Interaction = interaction;
-        GameInfo = $"День {interaction.State.DayNumber}. В городе {(interaction.State.IsDay ? "день" : "ночь")}, {interaction.State.Players.Count} живых из {interaction.State.Players0.Length}";
+        
+        GameInfo = Messages["GameInfo"].With(
+            interaction.State.DayNumber, 
+            interaction.State.IsDay ? Messages["day"] : Messages["night"], 
+            interaction.State.Players.Count, 
+            interaction.State.Players0.Length);
 
         await ShowFallAsleepMessage();
         interaction.WakeupRoles = GetWakeupRoles();
@@ -163,8 +168,8 @@ public partial class HostViewModel
             return;
 
         SubHostHint = detachedGroupRoles.Length == 1
-            ? $"Выберите проснувшегося игрока"
-            : $"Выберите всех {detachedGroupRoles.Length} проснувшихся игроков";
+            ? Messages["SelectWakedupPlayer"]
+            : Messages["SelectAllWakedupPlayers"].With(detachedGroupRoles.Length);
 
         ContinueMode = ContinueGameMode.FirstDayWakeup;
         
@@ -284,7 +289,7 @@ public partial class HostViewModel
             }
             else
             {
-                SelectedPlayerRoleMessage = $"Роль игрока {activePlayer.Nick}?";
+                SelectedPlayerRoleMessage = Messages["WhatIsThePlayerRole"].With(activePlayer.Nick);
                 await PrepareActivePlayerRoles(roleList.Distinct().ToArray());
                 IsActivePlayerRoleVisible = true;
                 await WaitForHostInteraction();

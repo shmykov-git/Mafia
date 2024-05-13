@@ -1,4 +1,6 @@
-﻿namespace Host.Model;
+﻿using Mafia.Model;
+
+namespace Host.Model;
 
 public class HostOptions
 {
@@ -9,6 +11,7 @@ public class HostOptions
     public required TimeSpan SkipAnimationDelay { get; set; }    
     public required int PresetPlayerCount { get; set; }
     public required int PresetPlayerSelectedCount { get; set; }
+    public required RolePreset RolePreset { get; set; }
     public required Color CityColor { get; set; }
     public required GroupColor[] GroupColors { get; set; }
     public required Message[] Messages { get; set; }

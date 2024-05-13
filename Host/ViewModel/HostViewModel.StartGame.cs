@@ -12,8 +12,7 @@ public partial class HostViewModel
 
     private (string name, int count)[] GetRolesPreset(int n)
     {
-        return RoleValues.GetRolesPreset(["Дон", "Бомж", "Маньяк", "Комиссар", "Доктор"], "Мафия", "Мирный", n, 3.5);
-        //return RoleValues.GetRolesPreset(["DonMafia", "BumMafia", "Maniac", "Commissar", "Doctor"], "Mafia", "Civilian", n, 3.5);
+        return RoleValues.GetRolePreset(options.RolePreset, n);
     }
 
     public bool IsStartGameTabAvailable => ActiveRoles.Length > 0;
@@ -33,9 +32,10 @@ public partial class HostViewModel
     private void InitActiveRoles()
     {
         var n = ActiveUsers.Count(u => u.IsSelected);
+        var preset = RoleValues.GetRolePreset(options.RolePreset, n);
 
         ActiveRoles = city.AllRoles()
-            .Select(r => (role: r, preset: GetRolesPreset(n).FirstOrDefault(rr => rr.name == r.Name)))
+            .Select(r => (role: r, preset: preset.FirstOrDefault(rr => rr.name == r.Name)))
             .Select(v => new ActiveRole(v.role, OnActiveRoleChange, nameof(ActiveRoles)) 
             { 
                 RoleColorSilent = GetRoleColor(v.role.Name),
