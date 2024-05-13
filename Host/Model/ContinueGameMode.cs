@@ -2,7 +2,7 @@
 
 public enum ContinueGameMode
 {
-    Interaction,
+    RolesSelections,
     PreviousGroupFallAsleep,
-    FirstDayWakeup
+    WakeupOnFirstDay
 }

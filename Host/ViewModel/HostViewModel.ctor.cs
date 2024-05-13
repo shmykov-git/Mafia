@@ -20,6 +20,7 @@ public partial class HostViewModel : NotifyPropertyChanged
     private Random rnd;
     private readonly City city;
     private HostOptions options;
+    private string navigationPath;
 
     public Dictionary<string, string> Messages { get; }
 
@@ -38,9 +39,13 @@ public partial class HostViewModel : NotifyPropertyChanged
 
     public ICommand NavigatedCommand => new Command(Shell_Navigated);
 
+
+
     private void Shell_Navigated(object path)
     {
-        switch (path)
+        navigationPath = path.ToString()!;
+
+        switch (navigationPath)
         {
             case "//pages/UserView":
                 OnTabUsersNavigated();

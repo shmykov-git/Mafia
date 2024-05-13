@@ -37,7 +37,7 @@ public partial class HostViewModel : IHost
     public async Task StartGame(State state)
     {
         prevInteraction = null;
-        ContinueMode = ContinueGameMode.Interaction;
+        ContinueMode = ContinueGameMode.RolesSelections;
 
         ActivePlayers = [];
         await Task.Delay(options.SkipAnimationDelay);
@@ -47,6 +47,24 @@ public partial class HostViewModel : IHost
             RoleColor = options.CityColor
         }).OrderBy(p => p.Nick).ToArray();
             //.OrderBy(p => p.Player.Group.Name).ThenBy(p => p.Player.Role.Rank).ToArray();
+    }
+
+    public async Task NotifyGameEnd(State state, Group winnerGroup)
+    {
+        Log($"GameEnd, the winner is {winnerGroup.Name}");
+        Log($"===== </day {state.DayNumber}> =====");
+
+        ActivePlayerFilter.Killed = true;
+
+        await Interact(new Interaction
+        {
+            Name = "GameEnd",
+            Args = [winnerGroup.Name],
+            State = state
+        });
+
+        if (navigationPath == "//pages/GameView")
+            await Shell.Current.GoToAsync("//pages/StartGameView");
     }
 
     public async Task NotifyCityAfterNight(State state)
@@ -89,21 +107,6 @@ public partial class HostViewModel : IHost
         return false;
     }
 
-    public async Task NotifyGameEnd(State state, Group winnerGroup)
-    {
-        Log($"GameEnd, the winner is {winnerGroup.Name}");
-        Log($"===== </day {state.DayNumber}> =====");
-
-        //ActivePlayers = ActivePlayers.Where(p => state.Players0.Contains(p.Player)).ToArray();
-
-        await Interact(new Interaction
-        {
-            Name = "GameEnd",
-            Args = [winnerGroup.Name],
-            State = state
-        });
-    }
-
     private async Task TellTheNews(State state, bool afterNight)
     {
         if (!state.HasNews)
@@ -118,7 +121,7 @@ public partial class HostViewModel : IHost
         {
             var kills = state.LatestNews.FactKilled.Select(p => ActivePlayers.Single(a => a.Player == p)).ToArray();
 
-            if (state.IsNight || kills.Length > 0)
+            if (afterNight || kills.Length > 0)
             {
                 var newsName = state.LatestNews.FactKilled.Any() ? "KillsInTheCity" : "NoKillsInTheCity";
                 var (name, subName) = afterNight ? ("WakeUpCity", newsName) : (newsName, "");

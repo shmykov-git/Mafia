@@ -14,7 +14,9 @@ public abstract class NotifyPropertyChanged : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    protected void SubscribeNoSilent(Action<string> onChange) 
+    protected void Subscribe(Action onChange) => Subscribe(_ => onChange());
+
+    protected void Subscribe(Action<string> onChange) 
     { 
         subscribers += onChange; 
     }

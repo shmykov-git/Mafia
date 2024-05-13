@@ -35,7 +35,7 @@ public class ActivePlayer : NotifyPropertyChanged
     public string OperationSilent { get; set; } = string.Empty;
     public string Operation { get => OperationSilent; set { OperationSilent = value; Changed(); } }
     
-    public Color OperationColorSilent { get; set; } = Colors.Red;
+    public Color OperationColorSilent { get; set; } = Colors.Black;
     public Color OperationColor { get => OperationColorSilent; set { OperationColorSilent = value; Changed(); } }
 
     public bool IsSelectedSilent { get; set; }

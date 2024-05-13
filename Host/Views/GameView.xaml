@@ -13,14 +13,16 @@
                 IsVisible="{Binding IsHostHintVisible}"
                 Text="{Binding HostHint}"
                 Style="{StaticResource HostHintline}"
-                HorizontalOptions="Start" />
+                HorizontalOptions="Start" 
+                VerticalOptions="Center" />
             
             <Label
                 TextColor="{Binding HintColor}"
                 IsVisible="{Binding IsSubHostHintVisible}"
                 Text="{Binding SubHostHint}"
                 Style="{StaticResource HostHintline}"
-                HorizontalOptions="Start" />
+                HorizontalOptions="Start" 
+                VerticalOptions="Center" />
 
             <Grid>
                 <ListView ItemsSource="{Binding FilteredActivePlayers}" ItemTapped="ListView_ItemTapped">
@@ -60,7 +62,13 @@
                                               IsChecked="{Binding IsSelected}"                                           
                                               Color="{Binding OperationColor}"
                                               VerticalOptions="Center"
-                                              HorizontalOptions="End" />
+                                              HorizontalOptions="End" >
+                                        <CheckBox.Triggers>
+                                            <Trigger TargetType="CheckBox" Property="IsEnabled" Value="False">
+                                                <Setter Property="Color" Value="{Binding OperationColor}"/>
+                                            </Trigger>
+                                        </CheckBox.Triggers>
+                                    </CheckBox>
                                 </Grid>
                             </ViewCell>
                         </DataTemplate>
@@ -82,7 +90,7 @@
                         </LinearGradientBrush>
                     </Border.Stroke>
 
-                    <VerticalStackLayout Spacing="25" >
+                    <VerticalStackLayout Spacing="25">
                         <Label                                             
                             Text="{Binding SelectedPlayerRoleMessage}"
                             TextColor="{Binding SelectedPlayerRoleMessageColor}"
@@ -118,9 +126,18 @@
                 </Border>
             </Grid>
 
-            <Label
-                Text="{Binding GameInfo}"
-                HorizontalOptions="Start" />
+            <Grid ColumnDefinitions="0.8*,0.2*">
+                <Label Grid.Column="0"
+                    Text="{Binding GameInfo}"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Start" />
+
+                <CheckBox Grid.Column="1"
+                    IsChecked="{Binding ActivePlayerFilter.Killed}"
+                        VerticalOptions="Center"
+                        HorizontalOptions="End" >
+                </CheckBox>
+            </Grid>
 
             <Button 
                     Text="{Binding Messages[Continue]}" 
