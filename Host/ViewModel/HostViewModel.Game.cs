@@ -21,7 +21,7 @@ public partial class HostViewModel
     private Color _hintColor;
     private Color _selectedPlayerRoleMessageColor;
     private ActiveRole[] _activePlayerRoles;
-    private ActivePlayer[] _activePlayers;
+    private ActivePlayer[] _activePlayers = [];
     private ContinueGameMode _continueMode = ContinueGameMode.Interaction;
     private Interaction? prevInteraction = null;
     private Interaction? _interaction = null;
@@ -31,6 +31,8 @@ public partial class HostViewModel
     private string killed = "💀";
     private int wakeupRolesCount = 0;
 
+    public bool IsGameOn => hostWaiter != null;
+    public bool IsGameTabAvailable => ActivePlayers.Length > 0;
 
     private Interaction? Interaction { get => _interaction; set { _interaction = value; Changed(nameof(ContinueCommand)); } }
     private ContinueGameMode ContinueMode { get => _continueMode; set { _continueMode = value; Changed(nameof(ContinueCommand)); } }
@@ -44,7 +46,7 @@ public partial class HostViewModel
     public string HostHint { get => _hostHint; set { _hostHint = value; Changed(); Changed(nameof(IsHostHintVisible)); } }
     public string GameInfo { get => _gameInfo; set { _gameInfo = value; Changed(); } }
     public string PlayerInfo { get => _playerInfo; set { _playerInfo = value; Changed(); } }
-    public ActivePlayer[] ActivePlayers { get => _activePlayers; set { _activePlayers = value; ChangedSilently(); Changed(nameof(FilteredActivePlayers)); Changed(nameof(ContinueCommand)); } }
+    public ActivePlayer[] ActivePlayers { get => _activePlayers; set { _activePlayers = value; ChangedSilently(); Changed(nameof(FilteredActivePlayers)); Changed(nameof(ContinueCommand)); Changed(nameof(IsGameTabAvailable)); } }
     public IEnumerable<ActivePlayer> FilteredActivePlayers => ActivePlayers.Where(p => p.IsAlive == ActivePlayerFilter.IsAlive);
     public IEnumerable<ActivePlayer> AliveActivePlayers => ActivePlayers.Where(p => p.IsAlive);
     public ActiveRole[] ActivePlayerRoles { get => _activePlayerRoles; set { _activePlayerRoles = value; ChangedSilently(); Changed(nameof(ContinueCommand)); } }
@@ -54,6 +56,11 @@ public partial class HostViewModel
 
     //public ActivePlayer[] SelectedActivePlayers => ActivePlayers.Where(a => a.IsSelected).ToArray();
     //public int ActivePlayersCount => ActivePlayers.Count(a => a.IsSelected);
+    
+    private void OnTabGameNavigated()
+    {
+
+    }
 
     private bool IsContinueAvailable()
     {
@@ -62,8 +69,8 @@ public partial class HostViewModel
 
         return ContinueMode switch
         {
-            ContinueGameMode.Interaction => ActivePlayers != null && ActivePlayers.Count(p => p.IsSelected).Between(Interaction.Selection),
-            ContinueGameMode.FirstDayWakeup => ActivePlayers != null && ActivePlayers.Count(p => p.IsSelected) == Interaction.WakeupRoles.Length,
+            ContinueGameMode.Interaction => ActivePlayers.Count(p => p.IsSelected).Between(Interaction.Selection),
+            ContinueGameMode.FirstDayWakeup => ActivePlayers.Count(p => p.IsSelected) == Interaction.WakeupRoles.Length,
             ContinueGameMode.PreviousGroupFallAsleep => false,
             _ => false,
         };

@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Host.Extensions;
 using Host.Model;
+using Host.Views;
 using Mafia;
 using Mafia.Extensions;
 using Mafia.Libraries;
@@ -34,6 +35,26 @@ public partial class HostViewModel : NotifyPropertyChanged
         Messages = this.options.Messages.ToDictionary(v => v.Name, v => v.Text);
 
         Task.Run(InitDatabaseUsers).Wait();
+    }
+
+    public ICommand NavigatedCommand => new Command(Shell_Navigated);
+
+    private void Shell_Navigated(object path)
+    {
+        switch (path)
+        {
+            case "//pages/UserView":
+                OnTabUsersNavigated();
+                break;
+
+            case "//pages/StartGameView":
+                OnTabStartGameNavigated();
+                break;
+
+            case "//pages/GameView":
+                OnTabGameNavigated();
+                break;
+        }
     }
 
     private void RefreshCommands() => GetType().GetProperties().Where(p => p.PropertyType == typeof(ICommand)).ForEach(p => Changed(p.Name));

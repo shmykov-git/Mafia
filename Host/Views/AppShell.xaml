@@ -5,9 +5,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:Host.Views"
     Shell.FlyoutBehavior="Disabled"
-    Title="Mafia Host">
+    Title="Mafia Host" Navigated="Shell_Navigated" >
 
-    <FlyoutItem Route="pages"
+    <FlyoutItem Route="pages"                
                 FlyoutDisplayOptions="AsMultipleItems">
 
         <ShellContent
@@ -17,15 +17,15 @@
             Route="UserView" />
 
         <ShellContent
-            Icon="start.jpg"
-            IsEnabled="{Binding AreUsersSelected}"
-            Title="{Binding Messages[NewGame]}"
+            Icon="start.jpg"            
+            IsVisible="{Binding IsStartGameTabAvailable}"
+            Title="{Binding Messages[NewGame]}"            
             ContentTemplate="{DataTemplate local:StartGameView}"
             Route="StartGameView" />
 
         <ShellContent
             Icon="game.png"
-            IsEnabled="{Binding AreUsersSelected}"
+            IsVisible="{Binding IsGameTabAvailable}"
             Title="{Binding Messages[Game]}"
             ContentTemplate="{DataTemplate local:GameView}"
             Route="GameView" />

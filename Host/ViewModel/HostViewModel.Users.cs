@@ -12,13 +12,19 @@ public partial class HostViewModel
     private const string UsersSecureKey = "Mafia_Host_Users";
     private List<User> users;
     
-    private ObservableCollection<ActiveUser> _activeUsers;
-    public ObservableCollection<ActiveUser> ActiveUsers { get => _activeUsers; set { _activeUsers = value; ChangedSilently(); } }
+    private ObservableCollection<ActiveUser> _activeUsers = [];
+    public ObservableCollection<ActiveUser> ActiveUsers { get => _activeUsers; set { _activeUsers = value; ChangedSilently(); Changed(nameof(IsUsersTabAvailable)); } }
 
-    public bool AreUsersSelected => ActiveUsers != null;
+    public bool IsUsersTabAvailable => ActiveUsers.Count > 0;
+
+    private void OnTabUsersNavigated()
+    {
+
+    }
 
     public ICommand SelectRolesCommand => new Command(async () =>
     {
+        await StopCurrentGame();
         InitActiveRoles();
         await Shell.Current.GoToAsync("//pages/StartGameView");
     });

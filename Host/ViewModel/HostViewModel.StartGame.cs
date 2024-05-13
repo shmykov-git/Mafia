@@ -16,11 +16,19 @@ public partial class HostViewModel
         //return RoleValues.GetRolesPreset(["DonMafia", "BumMafia", "Maniac", "Commissar", "Doctor"], "Mafia", "Civilian", n, 3.5);
     }
 
-    public ActiveRole[] ActiveRolesSilent;
-    public ActiveRole[] ActiveRoles { get => ActiveRolesSilent; set { ActiveRolesSilent = value; ChangedSilently(); } }
+    public bool IsStartGameTabAvailable => ActiveRoles.Length > 0;
+
+
+    public ActiveRole[] ActiveRolesSilent = [];
+    public ActiveRole[] ActiveRoles { get => ActiveRolesSilent; set { ActiveRolesSilent = value; ChangedSilently(); Changed(nameof(IsStartGameTabAvailable)); } }
 
     private Role[] GetSelectedMultipliedRoles() => ActiveRoles.Where(r => r.IsSelected).SelectMany(r => Enumerable.Range(0, r.Count).Select(_ => r.Role)).ToArray();
     private Role[] GetSelectedRoles() => ActiveRoles.Where(r => r.IsSelected).Select(r => r.Role).ToArray();
+
+    private void OnTabStartGameNavigated()
+    {
+
+    }
 
     private void InitActiveRoles()
     {
@@ -59,15 +67,35 @@ public partial class HostViewModel
     public ICommand StartNewGameCommand => new Command(async () =>
     {
         await StartNewGame();
+        
+        for(var i = 0; i<100;i++)
+        {
+            await Task.Delay(10);
+            
+            if (IsGameTabAvailable)
+                break;
+        }
+
         await Shell.Current.GoToAsync("//pages/GameView");
     });
 
+    // todo: ask user to restart the game
+    private async Task StopCurrentGame()
+    {
+        if (IsGameOn)
+        {
+            // stop previous game execution task line
+            var stopTask = game.Stop();
+            Continue();
+            await stopTask;
+        }
+
+        ActivePlayers = [];
+    }
+
     private async Task StartNewGame()
     {
-        // stop previous game execution task line
-        var stopTask = game.Stop();
-        Continue();
-        await stopTask;
+        await StopCurrentGame();
 
         // setup game variant
         var seed = this.seed.HasValue ? this.seed.Value + 1 : options.FirstSeed;
