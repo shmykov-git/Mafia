@@ -12,10 +12,10 @@ public interface IHost
     Task NotifyCityAfterNight(State state);
     Task NotifyNightStart(State state);
     Task NotifyDayStart(State state);
-    Task<User[]> AskCityToSelect(State state, CityAction action);
+    Task<User[]> AskCityToSelect(State state, CityAction action, string operation);
     Task NotifyCityAfterDay(State state);
     Task NotifyGameEnd(State state, Group group);
-    Task<User[]> AskToSelect(State state, Player player, Action action);
-    Task<User[]> GetNeighbors(State state, Player player, Action action);
+    Task<User[]> AskToSelect(State state, Player player, Action action, string operation);
+    Task<User[]> GetNeighbors(State state, Player player, Action action, string operation);
     Task<bool> IsGameEnd(State state);
 }

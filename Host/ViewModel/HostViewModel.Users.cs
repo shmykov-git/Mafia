@@ -13,9 +13,11 @@ public partial class HostViewModel
     private List<User> users;
     
     private ObservableCollection<ActiveUser> _activeUsers = [];
-    public ObservableCollection<ActiveUser> ActiveUsers { get => _activeUsers; set { _activeUsers = value; ChangedSilently(); Changed(nameof(IsUsersTabAvailable)); } }
+    public ObservableCollection<ActiveUser> ActiveUsers { get => _activeUsers; set { _activeUsers = value; ChangedSilently(); Changed(nameof(IsUsersTabAvailable), nameof(PlayerInfo), nameof(PlayerRoleInfo)); } }
 
     public bool IsUsersTabAvailable => ActiveUsers.Count > 0;
+
+    public string PlayerInfo => Messages["PlayerCountInfo"].With(ActiveUsers.Where(r => r.IsSelected).Count());
 
     private void OnTabUsersNavigated()
     {
@@ -42,8 +44,6 @@ public partial class HostViewModel
         }
 
         ActiveUsers = users.OrderBy(u => u.Nick).Take(options.PresetPlayerCount).Select(GetActiveUser).ToObservableCollection();
-        
-        ShowPlayerInfo();
     }
 
     private ActiveUser GetActiveUser(User user, int i) => new ActiveUser(user, onActiveUserChange, nameof(ActiveUsers)) 
@@ -54,13 +54,7 @@ public partial class HostViewModel
 
     private void onActiveUserChange(string name)
     {
-        ShowPlayerInfo();
-    }
-
-    private void ShowPlayerInfo()
-    {
-        var count = ActiveUsers.Where(r => r.IsSelected).Count();
-        PlayerInfo = Messages["PlayerCountInfo"].With(count);
+        Changed(nameof(PlayerInfo));
     }
 
     private async Task<List<User>> ReadUsers()

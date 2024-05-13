@@ -27,14 +27,14 @@ public partial class HostViewModel
     private Interaction? _interaction = null;
 
     private string arrow = "⮕";
-    private string minus = "⭐";
+    private string empty = "";
     private string killed = "💀";
     private int wakeupRolesCount = 0;
 
     public bool IsGameOn => hostWaiter != null;
     public bool IsGameTabAvailable => ActivePlayers.Length > 0;
 
-    private Interaction? Interaction { get => _interaction; set { _interaction = value; Changed(nameof(ContinueCommand)); } }
+    private Interaction Interaction { get => _interaction; set { _interaction = value; Changed(nameof(ContinueCommand)); } }
     private ContinueGameMode ContinueMode { get => _continueMode; set { _continueMode = value; Changed(nameof(ContinueCommand)); } }
 
 
@@ -45,7 +45,6 @@ public partial class HostViewModel
     public bool IsHostHintVisible => HostHint.HasText();
     public string HostHint { get => _hostHint; set { _hostHint = value; Changed(); Changed(nameof(IsHostHintVisible)); } }
     public string GameInfo { get => _gameInfo; set { _gameInfo = value; Changed(); } }
-    public string PlayerInfo { get => _playerInfo; set { _playerInfo = value; Changed(); } }
     public ActivePlayer[] ActivePlayers { get => _activePlayers; set { _activePlayers = value; ChangedSilently(); Changed(nameof(FilteredActivePlayers)); Changed(nameof(ContinueCommand)); Changed(nameof(IsGameTabAvailable)); } }
     public IEnumerable<ActivePlayer> FilteredActivePlayers => ActivePlayers.Where(p => p.IsAlive == ActivePlayerFilter.IsAlive);
     public IEnumerable<ActivePlayer> AliveActivePlayers => ActivePlayers.Where(p => p.IsAlive);
@@ -54,9 +53,6 @@ public partial class HostViewModel
     public string SelectedPlayerRoleMessage { get => _selectedPlayerRoleMessage; set { _selectedPlayerRoleMessage = value; Changed(); } }
     public Color SelectedPlayerRoleMessageColor { get => _selectedPlayerRoleMessageColor; set { _selectedPlayerRoleMessageColor = value; Changed(); } }
 
-    //public ActivePlayer[] SelectedActivePlayers => ActivePlayers.Where(a => a.IsSelected).ToArray();
-    //public int ActivePlayersCount => ActivePlayers.Count(a => a.IsSelected);
-    
     private void OnTabGameNavigated()
     {
 
@@ -78,6 +74,9 @@ public partial class HostViewModel
 
     public ICommand ContinueCommand => new Command(()=>Continue(), IsContinueAvailable);
 
+    /// <summary>
+    /// Single interact for single selection process
+    /// </summary>
     private async Task<InteractionResult> Interact(Interaction interaction)
     {
         if (game.Stopping)
@@ -94,7 +93,7 @@ public partial class HostViewModel
         await ShowFallAsleepMessage();
         interaction.WakeupRoles = GetWakeupRoles();
 
-        ShowWakeUpMessage(interaction.WakeupRoles);
+        ShowWakeUpMessage();
 
         if (interaction.NeedFirstDayWakeup)
             await FirstDayWakeup();
@@ -127,7 +126,7 @@ public partial class HostViewModel
 
     private Role[] GetWakeupRoles()
     {
-        if (Interaction?.Player == null)
+        if (Interaction.Player == null)
             return [];
 
         var groupRoles = Interaction.Player.Group.AllRoles().ToArray();
@@ -201,17 +200,20 @@ public partial class HostViewModel
         });
     }
 
-    private void ShowWakeUpMessage(Role[] wakeupRoles)
+    private void ShowWakeUpMessage()
     {
         if (Interaction.State.IsDay || Interaction.Player == null)
             return;
+        
+        var count = Interaction.WakeupRoles.Length;
 
-        var wakeUpMessage = wakeupRoles.Length == 1
+        var wakeUpMessage = count == 1
             ? Messages["PlayerWakeUp"].With(Interaction.Player.Role.Name)
-            : Messages["GroupWakeUp"].With(Interaction.Player.Group.Name, wakeupRoles.Length, Interaction.State.GetGroupActivePlayers(Interaction.Player.Group).Select(p => p.Role.Name).SJoin(", "));
+            : Messages["GroupWakeUp"].With(Interaction.Player.Group.Name, count, Interaction.State.GetGroupActivePlayers(Interaction.Player.Group).Select(p => p.Role.Name).SJoin(", "));
 
         HintColor = GetRoleColor(Interaction.Player.Role.Name);
-        HostHint = wakeUpMessage;        
+        HostHint = wakeUpMessage;
+        SubHostHint = "";
     }
 
     private async Task ShowFallAsleepMessage()
@@ -239,12 +241,16 @@ public partial class HostViewModel
     private void ShowHostMessage()
     {
         var message = Messages[Interaction.Name].With(Interaction.Args);
-        HostHint = message;
 
         if (Interaction.SubName.HasText())
         {
             var subMessage = Messages[Interaction.SubName].With(Interaction.Args);
+            HostHint = message;
             SubHostHint = subMessage;
+        }
+        else
+        {
+            SubHostHint = message;
         }
 
         Log(message);
@@ -338,7 +344,7 @@ public partial class HostViewModel
         UpdateActivePlayers(p =>
         {
             p.Operation = arrow;
-            p.OperationColor = options.CityColor;
+            p.OperationColor = options.WakeupColor;
             p.IsEnabled = p.Player == null;
             p.IsSelected = false;
         });
@@ -358,13 +364,13 @@ public partial class HostViewModel
 
     private void PrepareActivePlayers()
     {
-        var operationColor = Interaction.NeedSelection ? Colors.Red : options.CityColor;
-        var operation = Interaction.NeedSelection ? arrow : minus;
+        var operationColor = Interaction.NeedSelection ? GetOperationColor(Interaction.Operation) : options.NoOperationColor;
+        var operation = Interaction.NeedSelection ? arrow : empty;
 
         UpdateActivePlayers(p =>
         {
             p.Operation = Interaction.Killed.Contains(p.Player) ? /*Messages["killed"]*/killed : operation;
-            p.OperationColor = operationColor;
+            p.OperationColor = Interaction.Unwanted.Contains(p.Player) ? options.UnwantedColor : operationColor;
             p.IsEnabled = !Interaction.Except.Contains(p.Player);
             p.IsSelected = false;
         });
@@ -376,10 +382,12 @@ public partial class HostViewModel
 
     private void UpdateActivePlayers(Interaction interaction)
     {
+        var operationColor = Interaction.NeedSelection ? GetOperationColor(Interaction.Operation) : options.CityColor;
         var isEnabled = ActivePlayers.Count(a => a.IsSelected).Between(0, interaction.Selection.to - 1);
 
         UpdateActivePlayers(p =>
         {
+            p.OperationColor = isEnabled && !interaction.Except.Contains(p.Player) ? operationColor : options.NoOperationColor;
             p.IsEnabled = isEnabled && !interaction.Except.Contains(p.Player);
         }, p => p.IsAlive && !p.IsSelected);
     }

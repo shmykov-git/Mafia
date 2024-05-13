@@ -13,6 +13,11 @@ public class HostOptions
     public required int PresetPlayerSelectedCount { get; set; }
     public required RolePreset RolePreset { get; set; }
     public required Color CityColor { get; set; }
+    public required Color WakeupColor { get; set; }
+    public required Color UnwantedColor { get; set; }    
+    public required Color NoOperationColor { get; set; }
     public required GroupColor[] GroupColors { get; set; }
+    public required OperationColor[] OperationColors { get; set; }
+    
     public required Message[] Messages { get; set; }
 }

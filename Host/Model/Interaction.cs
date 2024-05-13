@@ -11,8 +11,10 @@ public class Interaction
     public required State State { get; set; }
     public Player? Player { get; set; }
     public Player[] Except { get; set; } = [];
+    public Player[] Unwanted { get; set; } = [];
     public Player[] Killed { get; set; } = [];
     public (int from, int to) Selection { get; set; } = (0, 0);
+    public string? Operation { get; set; }
 
     public bool NeedFirstDayWakeup => State.DayNumber == 1 && Player != null;
     public bool NeedSelection => Selection != (0, 0);

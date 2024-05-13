@@ -15,14 +15,14 @@ public class CityAction
     {
         var result = new DailyNews();
 
-        foreach (var name in Operations)
-            result.Collect(await DoOperation(name, state));
+        foreach (var operation in Operations)
+            result.Collect(await DoOperation(operation, state));
 
         return result;
     }
     public bool IsSkippable() => AllConditions().Intersect(Values.SkippableConditions).Any();
 
-    public Task<DailyNews> DoOperation(string name, State state) => Execution.Operations[name](state, this);
+    public Task<DailyNews> DoOperation(string operation, State state) => Execution.Operations[operation](state, this);
 
     public IEnumerable<string> AllConditions() => Conditions ?? [];
     public required CityExecution Execution { get; set; }

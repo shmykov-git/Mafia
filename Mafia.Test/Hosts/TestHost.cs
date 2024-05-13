@@ -88,17 +88,17 @@ public class TestHost : IHost
         return players.Select(p => p.User).ToArray();
     }
 
-    public async Task<User[]> AskCityToSelect(State state, CityAction action)
+    public async Task<User[]> AskCityToSelect(State state, CityAction action, string operation)
     {
         return GetSelectedUsers(state, null);
     }
 
-    public async Task<User[]> GetNeighbors(State state, Player player, Action action)
+    public async Task<User[]> GetNeighbors(State state, Player player, Action action, string operation)
     {
         return GetSelectedUsers(state, player);
     }
 
-    public async Task<User[]> AskToSelect(State state, Player player, Action action)
+    public async Task<User[]> AskToSelect(State state, Player player, Action action, string operation)
     {
         return GetSelectedUsers(state, player);
     }

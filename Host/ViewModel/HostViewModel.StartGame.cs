@@ -17,6 +17,8 @@ public partial class HostViewModel
 
     public bool IsStartGameTabAvailable => ActiveRoles.Length > 0;
 
+    public string PlayerRoleInfo => Messages["SelectPlayerRoles"].With(ActiveUsers.Where(r => r.IsSelected).Count());
+
 
     public ActiveRole[] ActiveRolesSilent = [];
     public ActiveRole[] ActiveRoles { get => ActiveRolesSilent; set { ActiveRolesSilent = value; ChangedSilently(); Changed(nameof(IsStartGameTabAvailable)); } }

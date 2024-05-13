@@ -14,7 +14,7 @@
                 Aspect="AspectFit" />
 
             <Label
-                Text="{Binding PlayerInfo}"
+                Text="{Binding PlayerRoleInfo}"
                 Style="{StaticResource Headline}"
                 HorizontalOptions="Start"
                 SemanticProperties.HeadingLevel="Level1" />

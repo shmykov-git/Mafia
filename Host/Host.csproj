@@ -98,13 +98,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="Resources\Mafia\mafia-drive.json">
+	  <None Update="Resources\Maps\mafia-drive.json">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Resources\Mafia\mafia-vicino-ru.json">
+	  <None Update="Resources\Maps\mafia-vicino-ru.json">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Resources\Mafia\mafia-vicino.json">
+	  <None Update="Resources\Maps\mafia-vicino.json">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>

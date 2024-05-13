@@ -15,15 +15,15 @@ public class Action
     public async Task<DailyNews> DoOperations(State state, Player player)
     {
         var result = new DailyNews();
-        foreach (var name in Operations)
-            result.Collect(await DoOperation(name, state, player));
+        foreach (var operation in Operations)
+            result.Collect(await DoOperation(operation, state, player));
 
         return result;
     }
 
     public bool IsSkippable() => AllConditions().Intersect(Values.SkippableConditions).Any();
 
-    public Task<DailyNews> DoOperation(string name, State state, Player player) => Execution.Operations[name](state, player, this);
+    public Task<DailyNews> DoOperation(string operation, State state, Player player) => Execution.Operations[operation](state, player, this);
 
     public IEnumerable<string> AllConditions() => Conditions ?? [];
     public required Execution Execution { get; set; }

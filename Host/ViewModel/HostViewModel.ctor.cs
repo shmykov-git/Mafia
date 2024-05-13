@@ -23,7 +23,6 @@ public partial class HostViewModel : NotifyPropertyChanged
 
     public Dictionary<string, string> Messages { get; }
 
-
     public HostViewModel(Game game, City city, IOptions<HostOptions> options)
     {
         rnd = new Random();
@@ -58,6 +57,10 @@ public partial class HostViewModel : NotifyPropertyChanged
     }
 
     private void RefreshCommands() => GetType().GetProperties().Where(p => p.PropertyType == typeof(ICommand)).ForEach(p => Changed(p.Name));
+
+    private Color GetOperationColor(string? operation) =>
+        options.OperationColors.FirstOrDefault(v => v.Operation == operation)?.Color ??
+        options.OperationColors.Single(v => v.Operation == "Unknown").Color;
 
     private void Log(string text)
     {

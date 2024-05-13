@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Mafia.Extensions;
 
 namespace Host.Model;
 
@@ -43,9 +44,15 @@ public abstract class NotifyPropertyChanged : INotifyPropertyChanged
         onChange();
     }
 
+    protected void Changed(string propertyName1, string propertyName2, params string[] propertyNames)
+    {
+        Changed(propertyName1);
+        Changed(propertyName2);
+        propertyNames.ForEach(Changed);
+    }
+
     protected void Changed([CallerMemberName] string propertyName = "")
     {
-        //Debug.WriteLine($"PropertyChanged: {propertyName}");
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         subscribers(propertyName);

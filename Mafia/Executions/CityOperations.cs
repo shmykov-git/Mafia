@@ -1,5 +1,4 @@
 ﻿using Mafia.Model;
-using Action = Mafia.Model.Action;
 
 namespace Mafia.Executions;
 
@@ -7,10 +6,8 @@ public delegate Task<DailyNews> CityOperation(State state, CityAction action);
 
 public static class CityOperations
 {
-    private static async Task<DailyNews> CitySelect(string name, State state, CityAction action) => new DailyNews
+    public static async Task<DailyNews> CityKill(State state, CityAction action) => new DailyNews
     {
-        Selects = [new Select { Operation = name, Who = null!, UserWhom = await state.Host.AskCityToSelect(state, action) }]
+        Selects = [new Select { Operation = nameof(CityKill), Who = null!, UserWhom = await state.Host.AskCityToSelect(state, action, nameof(CityKill)) }]
     };
-
-    public static Task<DailyNews> CityKill(State state, CityAction action) => CitySelect(nameof(CityKill), state, action);
 }

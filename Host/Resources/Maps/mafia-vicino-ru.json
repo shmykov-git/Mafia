@@ -84,7 +84,7 @@
               "actions": [
                 {
                   "operations": [ "Check" ],
-                  "conditions": [ "SeniorRank", "NotLocked" ]
+                  "conditions": [ "SeniorRank", "NotLocked", "NotKilledAlone" ]
                 }
               ]
             },
@@ -94,7 +94,7 @@
               "actions": [
                 {
                   "operations": [ "Check" ],
-                  "conditions": [ "SeniorRank", "NotLocked" ]
+                  "conditions": [ "SeniorRank", "NotLocked", "NotKilledAlone" ]
                 }
               ]
             }

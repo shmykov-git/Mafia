@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using Host.Model;
 using Mafia.Extensions;
+using Mafia.Libraries;
 using Mafia.Model;
 using Action = Mafia.Model.Action;
 
@@ -48,46 +49,14 @@ public partial class HostViewModel : IHost
             //.OrderBy(p => p.Player.Group.Name).ThenBy(p => p.Player.Role.Rank).ToArray();
     }
 
-    private async Task TellTheNews(State state)
-    {
-        if (!state.HasNews)
-        {
-            await Interact(new Interaction 
-            { 
-                Name = "HelloCity",
-                State = state 
-            });
-        }
-        else
-        {
-            var kills = state.LatestNews.FactKilled.Select(p => ActivePlayers.Single(a => a.Player == p)).Select(p => p.Nick).SJoin(", ");
-
-            await Interact(new Interaction
-            {
-                Name = "WakeUpCity",
-                SubName = state.LatestNews.FactKilled.Any() ? "KillsInTheCity" : "NoKillsInTheCity",
-                Args = [kills],
-                Killed = state.LatestNews.FactKilled,
-                State = state
-            });
-
-
-            state.LatestNews.FactKilled.ForEach(p => ActivePlayers.First(a => a.Player == p).IsAlive = false);
-            Changed(nameof(FilteredActivePlayers));
-            //ActivePlayers = ActivePlayers.Where(p => p.Player == null || state.Players.Contains(p.Player)).ToArray();
-
-            Log($"Alive players: {state.Players.SJoin(", ")}");
-        }
-    }
-
     public async Task NotifyCityAfterNight(State state)
     {
-        await TellTheNews(state);
+        await TellTheNews(state, true);
     }
 
     public async Task NotifyCityAfterDay(State state)
     {
-        await TellTheNews(state);
+        await TellTheNews(state, false);
     }
 
     public async Task NotifyDayStart(State state)
@@ -104,7 +73,11 @@ public partial class HostViewModel : IHost
 
     public async Task NotifyNightStart(State state)
     {
-        await AskCityToFallAsleep(state);
+        await Interact(new Interaction
+        {
+            Name = "FallAsleepCity",
+            State = state
+        });
 
         Log($"===== </day {state.DayNumber}> =====");
         Log($"===== <night {state.DayNumber}> =====");
@@ -131,32 +104,75 @@ public partial class HostViewModel : IHost
         });
     }
 
-    public async Task<User[]> AskCityToSelect(State state, CityAction action)
+    private async Task TellTheNews(State state, bool afterNight)
+    {
+        if (!state.HasNews)
+        {
+            await Interact(new Interaction
+            {
+                Name = "HelloCity",
+                State = state
+            });
+        }
+        else
+        {
+            var kills = state.LatestNews.FactKilled.Select(p => ActivePlayers.Single(a => a.Player == p)).ToArray();
+
+            if (state.IsNight || kills.Length > 0)
+            {
+                var newsName = state.LatestNews.FactKilled.Any() ? "KillsInTheCity" : "NoKillsInTheCity";
+                var (name, subName) = afterNight ? ("WakeUpCity", newsName) : (newsName, "");
+
+                await Interact(new Interaction
+                {
+                    Name = name,
+                    SubName = subName,
+                    Args = [kills.Select(p => p.Nick).SJoin(", ")],
+                    Killed = state.LatestNews.FactKilled,
+                    State = state
+                });
+            }
+
+            state.LatestNews.FactKilled.ForEach(p => ActivePlayers.First(a => a.Player == p).IsAlive = false);
+            Changed(nameof(FilteredActivePlayers));
+            //ActivePlayers = ActivePlayers.Where(p => p.Player == null || state.Players.Contains(p.Player)).ToArray();
+
+            Log($"Alive players: {state.Players.SJoin(", ")}");
+        }
+    }
+
+    public async Task<User[]> AskCityToSelect(State state, CityAction action, string operation)
     {
         var result = await Interact(new Interaction
         {
             Name = action.IsSkippable() ? "CitySelectCanSkip" : "CitySelectNoSkip",
             Selection = (action.IsSkippable() ? 0 : 1, 1),
+            Operation = operation,
             State = state
         });
 
         return result.SelectedUsers;
     }
 
-    public async Task<User[]> GetNeighbors(State state, Player player, Action action)
+    public async Task<User[]> GetNeighbors(State state, Player player, Action action, string operation)
     {
+        // todo: exotic mafia?
         var result = await Interact(new Interaction
         {
-            Name = "RoundKilled",
+            Name = action.IsSkippable() ? "RoundKilled" : "RoundKilled",
             Args = [player.ToString()],
-            Selection = (2, 2),
+            Selection = (action.IsSkippable() ? 0 : 2, 2),
+            Except = state.GetExceptPlayers(player),
+            Unwanted = Values.UnwantedOperations.Contains(operation) ? state.GetTeam(player) : [],
+            Player = player,
+            Operation = operation,
             State = state
         });
 
         return result.SelectedUsers;
     }
 
-    public async Task<User[]> AskToSelect(State state, Player player, Action action)
+    public async Task<User[]> AskToSelect(State state, Player player, Action action, string operation)
     {
         var result = await Interact(new Interaction
         {
@@ -164,28 +180,12 @@ public partial class HostViewModel : IHost
             Args = [player.Role.Name],
             Selection = (action.IsSkippable() ? 0 : 1, 1),
             Except = state.GetExceptPlayers(player),
+            Unwanted = Values.UnwantedOperations.Contains(operation) ? state.GetTeam(player) : [],
             Player = player,
+            Operation = operation,
             State = state
         });
 
         return result.SelectedUsers;
-    }
-
-    //private async Task AskCityToWakeUp(State state)
-    //{
-    //    await Interact(new Interaction
-    //    {
-    //        Name = "WakeUpCity",
-    //        State = state
-    //    });
-    //}
-
-    private async Task AskCityToFallAsleep(State state)
-    {
-        await Interact(new Interaction
-        {
-            Name = "FallAsleepCity",
-            State = state
-        });
     }
 }

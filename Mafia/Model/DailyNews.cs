@@ -44,7 +44,7 @@ public class DailyNews
         if (select.IsWhomUnknown)
             return;
 
-        select.Whom = select.UserWhom.Select(u => state.Players0.Single(p => p.User == u)).ToArray();
+        select.Whom = select.UserWhom.Select(u => state.Players0.SingleOrDefault(p => p.User == u)).Where(p => p != null).ToArray()!;
     }
 
     private Select[] GetKnownSelects(State state, string[] operations)
