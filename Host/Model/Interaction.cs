@@ -13,6 +13,7 @@ public class Interaction
     public Player[] Except { get; set; } = [];
     public Player[] Unwanted { get; set; } = [];
     public Player[] Killed { get; set; } = [];
+    public HostTail[] Tails { get; set; } = [];
     public (int from, int to) Selection { get; set; } = (0, 0);
     public string? Operation { get; set; }
 

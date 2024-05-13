@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Diagnostics;
 using Host.Model;
 using Mafia.Extensions;
 using Mafia.Libraries;
@@ -65,6 +66,8 @@ public partial class HostViewModel : IHost
 
         if (navigationPath == "//pages/GameView")
             await Shell.Current.GoToAsync("//pages/StartGameView");
+
+        SaveGameReplay(state);
     }
 
     public async Task NotifyCityAfterNight(State state)
@@ -125,6 +128,16 @@ public partial class HostViewModel : IHost
             {
                 var newsName = state.LatestNews.FactKilled.Any() ? "KillsInTheCity" : "NoKillsInTheCity";
                 var (name, subName) = afterNight ? ("WakeUpCity", newsName) : (newsName, "");
+                List<HostTail> tails = new();
+
+                if (state.DayNumber > 1)
+                {
+                    if (state.DoesDoctorHaveThanks())
+                        tails.Add(HostTail.ThanksToDoctor);
+
+
+                    // "и доктор здесь ни причем"
+                }
 
                 await Interact(new Interaction
                 {
@@ -132,6 +145,7 @@ public partial class HostViewModel : IHost
                     SubName = subName,
                     Args = [kills.Select(p => p.Nick).SJoin(", ")],
                     Killed = state.LatestNews.FactKilled,
+                    Tails = tails.ToArray(),
                     State = state
                 });
             }

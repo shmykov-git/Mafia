@@ -71,13 +71,13 @@ public class Game
 
     private async Task PlayDay()
     {
-        var result = new DailyNews();
-        state.News.Add(result);
+        var news = new DailyNews();
+        state.News.Add(news);
 
         foreach (var action in city.DayActions)
         {
             if (await action.CheckConditions(state))
-                result.Collect(await action.DoOperations(state));
+                news.Collect(await action.DoOperations(state));
         }
 
         state.DoKnowAllLatestWhom();
@@ -85,8 +85,8 @@ public class Game
 
     private async Task PlayNight()
     {
-        var result = new DailyNews();
-        state.News.Add(result);
+        var news = new DailyNews();
+        state.News.Add(news);
 
         foreach (var group in city.NightEvents.Select(city.GetGroup))
         {
@@ -95,7 +95,9 @@ public class Game
                 foreach (var action in player.Role.AllActions())
                 {
                     if (await action.CheckConditions(state, player))
-                        result.Collect(await action.DoOperations(state, player));
+                        news.Collect(await action.DoOperations(state, player));
+                    else
+                        news.Collect(await action.GetBlockNews(state, player));
                 }
             }
         }

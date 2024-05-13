@@ -7,7 +7,7 @@ public delegate Task<bool> Condition(State state, Player player);
 
 public static class Conditions
 {
-    private static bool Locked(State state, Player player) => state.LatestNews.Selects?.Any(s => s.Operation == nameof(Operations.Lock) && s.UserWhom.Contains(player.User)) ?? false;
+    public static bool Locked(State state, Player player) => state.LatestNews.Selects?.Any(s => s.Operation == nameof(Operations.Lock) && s.UserWhom.Contains(player.User)) ?? false;
     private static bool ActiveKilled(State state, Player player) => state.GetLatestFactKills().Contains(player);
 
 

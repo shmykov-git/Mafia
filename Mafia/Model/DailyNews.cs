@@ -12,6 +12,7 @@ namespace Mafia.Model;
 public class DailyNews
 {
     public List<Select>? Selects { get; set; }
+    public List<SelectLock>? SelectLocks { get; set; }
 
     // <calculated>
     public Player[] FactKilled { get; set; } = [];
@@ -19,18 +20,29 @@ public class DailyNews
 
     public void Collect(DailyNews other)
     {
-        if (other?.Selects == null) 
-            return;
+        if (other?.Selects != null)
+        {
+            if (Selects == null)
+                Selects = [];
 
-        if (Selects == null)
-            Selects = [];
+            Selects.AddRange(other.Selects);
+        }
 
-        Selects.AddRange(other.Selects);
+        if (other?.SelectLocks != null)
+        {
+            if (SelectLocks == null)
+                SelectLocks = [];
+
+            SelectLocks.AddRange(other.SelectLocks);
+        }
     }
 
     public IEnumerable<Select> AllSelects() => Selects ?? [];
-    public Player[] GetKills() => AllSelects().Where(s => Values.KillOperations.Contains(s.Operation)).SelectMany(s=>s.Whom).ToArray();
+    public IEnumerable<SelectLock> AllSelectLocks() => SelectLocks ?? [];
 
+    public Player[] GetKills() => AllSelects().Where(s => Values.KillOperations.Contains(s.Operation)).SelectMany(s=>s.Whom).ToArray();
+    public Player[] GetHeals() => AllSelects().Where(s => Values.HealOperations.Contains(s.Operation)).SelectMany(s => s.Whom).ToArray();
+    public Player[] GetLocks() => AllSelects().Where(s => Values.LockOperations.Contains(s.Operation)).SelectMany(s => s.Whom).ToArray();
 
     public Select[] AllKnownLocks(State state) => GetKnownSelects(state, Values.LockOperations);
     public Select[] AllKnownKills(State state) => GetKnownSelects(state, Values.KillOperations);
