@@ -2,7 +2,6 @@
 using Mafia.Extensions;
 using Mafia.Libraries;
 
-
 namespace Mafia.Model;
 
 public class State
@@ -18,7 +17,9 @@ public class State
     public int DayNumber { get; set; }
     public bool IsActive { get; set; }
     public bool Stopping { get; set; }
+    public bool RollingBack { get; set; }
     public bool IsFirstDay => DayNumber == 1;
+
     public bool IsDay { get; set; }
     public bool IsNight { get => !IsDay; set => IsDay = !value; }
     public bool IsMorning { get; set; }
@@ -26,6 +27,11 @@ public class State
 
     public required Player[] Players0 { get; set; }
     public required List<Player> Players { get; set; }
+
+    public void Rollback()
+    {
+        RollingBack = true;
+    }
 
     public IEnumerable<Select> AllSelects() => News.SelectMany(dn=>dn.AllSelects());
 

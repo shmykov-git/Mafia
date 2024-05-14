@@ -208,7 +208,8 @@ public partial class HostViewModel
 
     private void Rollback(int timeout = 20)
     {
-
+        Interaction.State.Rollback();
+        Continue(timeout);
     }
 
     private void ShowWakeUpMessage()
@@ -229,7 +230,7 @@ public partial class HostViewModel
 
     private async Task ShowFallAsleepMessage()
     {
-        if (Interaction.State.Stopping) 
+        if (Interaction.State.Stopping || Interaction.State.RollingBack) 
             return;
 
         if (prevInteraction?.Player?.Group == null || prevInteraction.Player.Group == Interaction.Player?.Group)
@@ -277,7 +278,7 @@ public partial class HostViewModel
 
     private async Task WaitForHostInteraction()
     {
-        if (Interaction?.State.Stopping ?? true)
+        if (Interaction.State.Stopping || Interaction.State.RollingBack)
             return;
 
         // warn when game started many times without completion or other async errors

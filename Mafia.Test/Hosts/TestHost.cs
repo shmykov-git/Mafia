@@ -64,7 +64,7 @@ public class TestHost : IHost
         //state.City.Groups.ToList().IndexOf(winnerGroup).Should().Be(options.WinGroup);
         eventIndex.Should().Be(options.Selections.Length);
     }
-
+    public void RolledBack(State state) { }
     private Player[] GetSelectedPlayers(State state) => options.Selections[eventIndex].Item2.Select(i => state.Players0[i]).ToArray();
 
     private User[] GetSelectedUsers(State state, Player? who)

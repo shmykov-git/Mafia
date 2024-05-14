@@ -85,6 +85,7 @@ public class TestDebugHost : IHost
         // Ведущий может остановить игру в результате математической победы (2 мафии, 2 мирных)
         return false;
     }
+    public void RolledBack(State state) { }
 
     public async Task NotifyGameEnd(State state, Group winnerGroup)
     {
@@ -92,7 +93,7 @@ public class TestDebugHost : IHost
         int[] GetWhom(Select s) => s.Whom.Select(p=>players.IndexOf(p)).ToArray();
         int GetWho(Select s) => s.IsCity ? -1 : players.IndexOf(s.Who);
 
-        var items = state.News.SelectMany(n=>n.Selects.Select(s=> $"({GetWho(s)}, [{GetWhom(s).SJoin(", ")}])")).SJoin(", ");
+        var items = state.News.SelectMany(n=>n.AllSelects().Select(s=> $"({GetWho(s)}, [{GetWhom(s).SJoin(", ")}])")).SJoin(", ");
 
         Debug.WriteLine($"GameEnd, the winner is {winnerGroup.Name}");
         Debug.WriteLine($"[{items}]");

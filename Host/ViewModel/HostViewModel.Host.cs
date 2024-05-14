@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Diagnostics;
+using System.Linq;
 using Host.Model;
 using Mafia.Extensions;
 using Mafia.Libraries;
@@ -108,6 +109,23 @@ public partial class HostViewModel : IHost
     {
         // Ведущий может остановить игру в результате математической победы (2 мафии, 2 мирных)
         return false;
+    }
+
+    public void RolledBack(State state) 
+    {
+        if (state.IsFirstDay)
+        {
+            var knowns = state.AllSelects().Select(s => s.Who).ToArray();
+
+            state.Players0.Where(p => !knowns.Contains(p)).ForEach(p => p.User = null);
+            ActivePlayers.Where(p => !knowns.Contains(p.Player)).ForEach(p => p.Player = null);
+            ActivePlayers.ForEach(p => p.IsAlive = true);
+            
+            if (state.HasNews)
+                state.LatestNews.FactKills.ForEach(p => ActivePlayers.First(a => a.Player == p).IsAlive = false);
+
+            Changed(nameof(FilteredActivePlayers));
+        }
     }
 
     private async Task TellTheNews(State state)

@@ -8,6 +8,7 @@ public interface IHost
     void ChangeSeed(int seed);
     string[] GetGameRoles();
     Task StartGame(State state);
+    void RolledBack(State state);
 
     Task NotifyCityAfterNight(State state);
     Task NotifyNightStart(State state);

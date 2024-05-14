@@ -164,7 +164,7 @@ public class Game
         }
     }
 
-    private async Task<bool> IsGameEnd() => GetWinnerGroup() != null || await host.IsGameEnd(state);
+    private async Task<bool> IsGameEnd() => state.Players.Count == 0 || GetWinnerGroup() != null || await host.IsGameEnd(state);
 
     private (bool success, Group winner) CheckWinRule(RuleName winRuleName)
     {
@@ -219,22 +219,16 @@ public class Game
 
         await host.StartGame(state);
 
-        while (!state.Stopping)
+        async Task<bool> Day()
         {
             state.IsDay = true;
-            if (state.DayNumber > 1)
-            {
-                CalcNightKills();
-                await PlayOnDeathKills();
-                ApplyKills();
-            }
             state.IsMorning = true;
             await host.NotifyDayStart(state);
             await host.NotifyCityAfterNight(state);
             if (await IsGameEnd())
             {
                 await host.NotifyGameEnd(state, GetWinnerGroup()!);
-                break;
+                return true;
             }
             await PlayDay();
             CalcDayKills();
@@ -245,11 +239,54 @@ public class Game
             if (await IsGameEnd())
             {
                 await host.NotifyGameEnd(state, GetWinnerGroup()!);
-                break;
+                return true;
             }
-            state.IsNight = true;
+
             await host.NotifyNightStart(state);
+
+            return false;
+        }
+
+        async Task Night()
+        {
+            state.IsNight = true;
             await PlayNight();
+
+            CalcNightKills();
+            await PlayOnDeathKills();
+            ApplyKills();
+        }
+
+        void Rollback()
+        {
+            state.Players.AddRange(state.LatestNews.FactKills);
+            state.News.RemoveAt(state.News.Count - 1);
+            host.RolledBack(state);
+        }
+
+        while (!state.Stopping)
+        {
+            var needBreak = false;
+            do
+            {
+                state.RollingBack = false;
+                needBreak = await Day();
+                
+                if (state.RollingBack)
+                    Rollback();
+            } while (state.RollingBack);
+
+            if (needBreak)
+                break;
+
+            do
+            {
+                state.RollingBack = false;
+                await Night();
+
+                if (state.RollingBack)
+                    Rollback();
+            } while (state.RollingBack);            
 
             state.DayNumber++;
         }
