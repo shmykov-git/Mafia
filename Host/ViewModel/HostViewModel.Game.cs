@@ -250,7 +250,9 @@ public partial class HostViewModel
             HostTail.DoctorHasNoDeal => Messages["DoctorHasNoDeal"],
         }).SJoin(" ");
 
-        HintColor = options.CityColor;
+        HintColor = Interaction.Player != null
+            ? GetRoleColor(Interaction.Player.Role.Name)
+            : options.CityColor;
 
         if (Interaction.SubName.HasText())
         {
@@ -366,7 +368,7 @@ public partial class HostViewModel
     {
         UpdateActivePlayers(p =>
         {
-            var isEnabled = p.Player == null && p.IsKilled;
+            var isEnabled = p.Player == null && p.IsAlive;
 
             p.Operation = p.IsKilled ? killed : arrow;
             p.OperationColor = p.IsKilled ? options.KilledColor : (isEnabled ? options.WakeupColor : options.NoOperationColor);

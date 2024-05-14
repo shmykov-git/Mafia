@@ -72,7 +72,7 @@ public class Game
     private async Task PlayDay()
     {
         var news = new DailyNews();
-        state.News.Add(news);
+        state.News.Add(news); // new latest news
 
         foreach (var action in city.DayActions)
         {
@@ -86,7 +86,9 @@ public class Game
     private async Task PlayNight()
     {
         var news = new DailyNews();
-        state.News.Add(news);
+        state.News.Add(news); // new latest news
+
+        CalcsBeforeNight();
 
         foreach (var group in city.NightEvents.Select(city.GetGroup))
         {
@@ -116,6 +118,11 @@ public class Game
     private void CalcDayKills()
     {
         state.LatestNews.FactKills = state.GetLatestFactKills();
+    }
+
+    private void CalcsBeforeNight()
+    {
+        state.LatestNews.KillGroups = state.GetKillerGroups();
     }
 
     private void ApplyKills()

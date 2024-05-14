@@ -41,15 +41,16 @@ public class State
 
     public bool DoesDoctorHaveThanks()
     {
-        var healKills = LatestNews.GetHeals().ToArray();
+        var heals = LatestNews.GetHeals().ToArray();
+        var kills = LatestNews.GetKills().ToArray();
         var factKills = LatestNews.FactKills;
 
-        return healKills.Length > 0 && !factKills.Intersect(healKills).Any();
+        return heals.Length > 0 && kills.Intersect(heals).Any() && !factKills.Intersect(heals).Any();
     }
 
     public bool DoesSomebodyExceptDoctorSkipKills()
     {
-        var expectedKillsCount = GetKillerGroups().Length;
+        var expectedKillsCount = LatestNews.KillGroups.Length;
         var factKills = LatestNews.FactKills;
 
         if (factKills.Length == expectedKillsCount)

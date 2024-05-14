@@ -15,6 +15,7 @@ public class DailyNews
     public List<SelectLock>? SelectLocks { get; set; }
 
     // <calculated>
+    public Group[] KillGroups { get; set; } = [];
     public Player[] FactKills { get; set; } = [];
     // </calculated>
 
