@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Diagnostics;
 using Mafia.Extensions;
 using Mafia.Libraries;
 
@@ -13,6 +14,8 @@ public class State
     public DailyNews LatestDayNews => IsDay ? LatestNews : (News.Count < 2 ? new DailyNews() : News[^2]);
     public DailyNews LatestNews => News.Count < 1 ? new DailyNews() : News[^1];
     public bool HasNews => News.Count > 0;
+
+    public Player[] AllFactKills() => News.SelectMany(dn => dn.FactKills).ToArray();
 
     public int DayNumber { get; set; }
     public bool IsActive { get; set; }
@@ -37,6 +40,9 @@ public class State
 
     /// <summary>
     /// Нужно чтобы в списке действий было хотя бы одно, которое не блокируется условиями текущего процесса
+    /// Используется при вычислении максимального незалоченного ранга. Например, если Дон залочен, то стреляет Бомж - рангом ниже
+    /// Не используется для вычисления незаблокированных людей в группе, т.к. на карте есть NoLocked condition, который это сделает (и запишет новость)
+    /// Должно быть использовано только для расчета условий или в операциях
     /// </summary>
     public bool IsCurrentlyAllowed(Player player) => player.Role.AllActions()
         .Select(a => (a, intersection: a.AllConditions().Intersect(Values.ActiveConditions).ToArray()))
@@ -45,35 +51,23 @@ public class State
     public bool IsAlive(Player player) => Players.Contains(player);
     public bool IsAliveRole(Role role) => Players.Any(p => p.Role == role);
 
-    public bool DoesDoctorHaveThanks()
-    {
-        var heals = LatestNews.GetHeals().ToArray();
-        var kills = LatestNews.GetKills().ToArray();
-        var factKills = LatestNews.FactKills;
+    public bool DoesDoctorHaveThanks() => LatestNews.FactHeals.Length > 0;
 
-        return heals.Length > 0 && kills.Intersect(heals).Any() && !factKills.Intersect(heals).Any();
-    }
-
+    // todo: прояснить действия путаны в разных ситуациях
     public bool DoesSomebodyExceptDoctorSkipKills()
     {
-        var expectedKillsCount = LatestNews.KillGroups.Length;
-        var factKills = LatestNews.FactKills;
+        // блокирует ли проститутка убийство того куда она идет
+        // если она его только лочит, то блокирует ли его действие, например камикадзе или шахида
+        // if you have locker in the team you cannot be locked to kill somebody
 
-        if (factKills.Length == expectedKillsCount)
-            return false;
-
-        var heals = LatestNews.GetHeals();
-
-        if (factKills.Length + heals.Length == expectedKillsCount) 
-            return false;
-
-        return true;
+        return LatestNews.GetLockedKillers().Length > 0;
     }
 
     public Group[] GetKillerGroups() => Players.Select(p => p.Group).Distinct().Where(g => g.HasAnyOperation(Values.KillOperations)).ToArray();
 
     public bool IsSelfSelected(Player player) => News.Select(ps => ps).Any(ops => ops.Selects?.Any(s => s.Who == player && s.Whom.Contains(player)) ?? false);
-    public Player[] GetGroupActivePlayers(Group group) => Players.Where(p => p.Group == group).Where(IsCurrentlyAllowed).GroupBy(p=>p.Role).Select(gr=>gr.MinBy(p=>p.Id)!).OrderBy(p=>p.Role.Rank).ToArray();
+    // 
+    public Player[] GetGroupActivePlayers(Group group) => Players.Where(p => p.Group == group)/*.Where(IsCurrentlyAllowed)*/.GroupBy(p=>p.Role).Select(gr=>gr.MinBy(p=>p.Id)!).OrderBy(p=>p.Role.Rank).ToArray();
     public Player[] GetTeam(Player player) => Players.Where(p => player.Group.Roles!.Contains(p.Role)).ToArray();
     public Player[] GetTeamOthers(Player player) => Players.Where(p => p != player && player.Group.Roles!.Contains(p.Role)).ToArray();
     public Player[] GetOtherTeams(Player player) => Players.Where(p => p.Group != player.Group).ToArray();

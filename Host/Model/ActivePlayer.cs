@@ -19,6 +19,8 @@ public class ActivePlayer : NotifyPropertyChanged
         Changed(nameof(Nick));
     }
 
+    public bool IsKnown => Player != null;
+
     public User User { get; }
     public Player? PlayerSilent { get; set; }
     public Player? Player { get => PlayerSilent; set { PlayerSilent = value; Changed(); Changed(nameof(RoleName)); } }

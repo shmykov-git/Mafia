@@ -12,7 +12,7 @@ public partial class HostViewModel
 {
     private readonly Game game;
     private TaskCompletionSource? hostWaiter = null;
-    private Interaction? prevInteraction = null;
+    private Interaction? prevNightInteraction = null;
 
     private string _hostHint;
     private string _gameInfo;
@@ -85,15 +85,16 @@ public partial class HostViewModel
     public ICommand ContinueCommand => new Command(() => Continue(), IsContinueAvailable);
     public ICommand RollbackCommand => new Command(() => Rollback(), () => IsRollbackAvailable);
 
-    /// <summary>
-    /// Single interact for single selection process
-    /// </summary>
     private async Task<InteractionResult> Interact(Interaction interaction)
     {
-        if (game.Stopping)
-            return new InteractionResult();
-
         Interaction = interaction;
+
+        if (Interaction.State.Stopping || Interaction.State.RollingBack)
+        {
+            prevNightInteraction = null;
+            return new InteractionResult();
+        }
+
         interaction.WakeupRoles = GetWakeupRoles();
 
         Changed(nameof(GameInfo));
@@ -124,8 +125,8 @@ public partial class HostViewModel
         else
             Log($"{(interaction.WithCity ? "City" : interaction.Player)} --> {result.Selected.SJoin(", ")}");
 
-        prevInteraction = interaction;
-        this.Interaction = null;
+        prevNightInteraction = interaction;
+        Interaction = null;
 
         return result;
     }
@@ -167,6 +168,9 @@ public partial class HostViewModel
 
     private async Task FirstDayWakeup()
     {
+        if (Interaction.State.Stopping || Interaction.State.RollingBack)
+            return;
+
         var detachedGroupRoles = GetDetachedPlayerGroupRoles();
 
         if (detachedGroupRoles.Length == 0) 
@@ -214,6 +218,9 @@ public partial class HostViewModel
 
     private void ShowWakeUpMessage()
     {
+        if (Interaction.State.Stopping || Interaction.State.RollingBack)
+            return;
+
         if (Interaction.State.IsDay || Interaction.Player == null)
             return;
         
@@ -233,12 +240,12 @@ public partial class HostViewModel
         if (Interaction.State.Stopping || Interaction.State.RollingBack) 
             return;
 
-        if (prevInteraction?.Player?.Group == null || prevInteraction.Player.Group == Interaction.Player?.Group)
+        if (prevNightInteraction?.Player?.Group == null || prevNightInteraction.Player.Group == Interaction.Player?.Group)
             return;
         
-        var fallAsleepMessage = prevInteraction.WakeupRoles.Length == 1
-            ? Messages["PlayerFallAsleep"].With(prevInteraction.Player.Role.Name)
-            : Messages["GroupFallAsleep"].With(prevInteraction.Player.Group.Name);
+        var fallAsleepMessage = prevNightInteraction.WakeupRoles.Length == 1
+            ? Messages["PlayerFallAsleep"].With(prevNightInteraction.Player.Role.Name)
+            : Messages["GroupFallAsleep"].With(prevNightInteraction.Player.Group.Name);
 
         ContinueMode = ContinueGameMode.PreviousGroupFallAsleep;        
         HintColor = options.FallAsleepColor;
@@ -252,6 +259,9 @@ public partial class HostViewModel
 
     private void ShowHostMessage()
     {
+        if (Interaction.State.Stopping || Interaction.State.RollingBack)
+            return;
+
         var message = Messages[Interaction.Name].With(Interaction.Args);
         var tailMessage = Interaction.Tails.Select(t => t switch
         {
@@ -300,6 +310,13 @@ public partial class HostViewModel
         activePlayer.Player = player;
         player.User = activePlayer.User;
         activePlayer.RoleColor = activePlayer.NickColor = GetRoleColor(activePlayer.RoleName);
+    }
+
+    void DetachRole(ActivePlayer activePlayer)
+    {
+        activePlayer.Player.User = null;
+        activePlayer.Player = null;
+        activePlayer.RoleColor = activePlayer.NickColor = options.CityColor;
     }
 
     private async Task AttachPlayerRoles(ActivePlayer[] activePlayers, Role[] roles)

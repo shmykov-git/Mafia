@@ -38,7 +38,7 @@ public partial class HostViewModel : IHost
 
     public async Task StartGame(State state)
     {
-        prevInteraction = null;
+        prevNightInteraction = null;
         ContinueMode = ContinueGameMode.RolesSelections;
 
         ActivePlayers = [];
@@ -115,17 +115,14 @@ public partial class HostViewModel : IHost
     {
         if (state.IsFirstDay)
         {
-            var knowns = state.AllSelects().Select(s => s.Who).ToArray();
-
-            state.Players0.Where(p => !knowns.Contains(p)).ForEach(p => p.User = null);
-            ActivePlayers.Where(p => !knowns.Contains(p.Player)).ForEach(p => p.Player = null);
-            ActivePlayers.ForEach(p => p.IsAlive = true);
-            
-            if (state.HasNews)
-                state.LatestNews.FactKills.ForEach(p => ActivePlayers.First(a => a.Player == p).IsAlive = false);
-
-            Changed(nameof(FilteredActivePlayers));
+            var cityKilled = state.AllSelects().SelectMany(s => s.Whom).ToArray();
+            ActivePlayers.Where(p => !cityKilled.Contains(p.Player)).Where(p => p.IsKnown).ForEach(DetachRole);
         }
+
+        var factKills = state.AllFactKills();
+        ActivePlayers.Where(a => !factKills.Contains(a.Player)).ForEach(p => p.IsAlive = true);
+
+        Changed(nameof(FilteredActivePlayers));
     }
 
     private async Task TellTheNews(State state)

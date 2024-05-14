@@ -1,4 +1,5 @@
-﻿using Mafia.Executions;
+﻿using System;
+using Mafia.Executions;
 using Mafia.Extensions;
 using Mafia.Libraries;
 
@@ -18,6 +19,8 @@ public class DailyNews
     public Group[] KillGroups { get; set; } = [];
     public Player[] FactKills { get; set; } = [];
     // </calculated>
+
+    public Player[] FactHeals => GetKills().Where(k => GetHeals().Contains(k) && !FactKills.Contains(k)).ToArray();
 
     public void Collect(DailyNews other)
     {
@@ -41,10 +44,11 @@ public class DailyNews
     public IEnumerable<Select> AllSelects() => Selects ?? [];
     public IEnumerable<SelectLock> AllSelectLocks() => SelectLocks ?? [];
 
-    // if you have locker in the team you cannot be locked to kill somebody
-    //public Player[] GetLockedKillers() => AllSelectLocks()
-    //    .Where(s => !s.Who.Group.HasAnyOperation(Values.LockOperations))
-    //    .Where(s => !Values.KillOperations.Intersect(s.Operations).Any()).Select(l => l.Who).ToArray();
+    public Player[] GetLockedKillers() => AllSelectLocks()
+        .Where(s => Values.NotLockedConditions.Contains(s.FailedCondition))         // putana
+        .Where(s => !s.Who.Group.HasAnyOperation(Values.LockOperations))            // no putana here
+        .Where(s => Values.KillOperations.Intersect(s.SkippedOperations).Any())     // killer
+        .Select(l => l.Who).ToArray();
 
     public Player[] GetKills() => AllSelects().Where(s => Values.KillOperations.Contains(s.Operation)).SelectMany(s=>s.Whom).ToArray();
     public Player[] GetHeals() => AllSelects().Where(s => Values.HealOperations.Contains(s.Operation)).SelectMany(s => s.Whom).ToArray();
@@ -59,7 +63,7 @@ public class DailyNews
 
     private void DoKnowWhom(State state, Select select)
     {
-        if (select.IsWhomUnknown)
+        if (select.IsWhomKnown)
             return;
 
         select.Whom = select.UserWhom.Select(u => state.Players0.SingleOrDefault(p => p.User == u)).Where(p => p != null).ToArray()!;

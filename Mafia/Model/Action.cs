@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using System.Diagnostics;
+using System.Xml.Linq;
 using Mafia.Extensions;
 using Mafia.Libraries;
 
@@ -10,21 +11,21 @@ public class Action
     public string[]? Conditions { get; set; }
     public required string[] Operations { get; set; }
 
-    public async Task<DailyNews> GetBlockNews(State state, Player player)
+    public async Task<DailyNews> GetFailedActionNews(State state, Player player)
     {
-        string? blockCondition = null;
+        string? failedCondition = null;
 
         foreach (var condition in Conditions!)
             if (!(await CheckCondition(condition, state, player)))
             {
-                blockCondition = condition;
+                failedCondition = condition;
                 break;
             }
 
-        if (blockCondition == null)
+        if (failedCondition == null)
             throw new InvalidOperationException();
 
-        return new DailyNews { SelectLocks = [new SelectLock { Condition = blockCondition, Who = player, Operations = Operations }] };
+        return new DailyNews { SelectLocks = [new SelectLock { FailedCondition = failedCondition, Who = player, SkippedOperations = Operations }] };
     }
 
     public async Task<bool> CheckConditions(State state, Player player) => Conditions == null || await Conditions.AllAsync(name => CheckCondition(name, state, player));

@@ -47,7 +47,17 @@ public class TestDebugHost : IHost
         }
         else
         {
-            Debug.WriteLine($"Where killed: {state.LatestNews.FactKills.SJoin(", ")}");
+            if (state.IsMorning)
+            {
+                var d1 = state.DoesDoctorHaveThanks();
+                var d2 = state.DoesSomebodyExceptDoctorSkipKills();
+                Debug.WriteLine($"Where killed (d1={d1} d2={d2}): {state.LatestNews.FactKills.SJoin(", ")}");
+            }
+            else
+            {
+                Debug.WriteLine($"Where killed: {state.LatestNews.FactKills.SJoin(", ")}");
+            }
+
             Debug.WriteLine($"Alive players: {state.Players.SJoin(", ")}");
         }
     }

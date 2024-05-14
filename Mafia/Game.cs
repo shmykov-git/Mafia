@@ -19,7 +19,6 @@ public class Game
 
     private State state;
     public bool IsActive => state?.IsActive ?? false;
-    public bool Stopping => state == null || state.Stopping;
 
     public Game(City city, Func<IHost> hostFactory)
     {
@@ -99,7 +98,7 @@ public class Game
                     if (await action.CheckConditions(state, player))
                         news.Collect(await action.DoOperations(state, player));
                     else
-                        news.Collect(await action.GetBlockNews(state, player));
+                        news.Collect(await action.GetFailedActionNews(state, player));
                 }
             }
         }
