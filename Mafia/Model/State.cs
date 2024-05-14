@@ -18,8 +18,11 @@ public class State
     public int DayNumber { get; set; }
     public bool IsActive { get; set; }
     public bool Stopping { get; set; }
+    public bool IsFirstDay => DayNumber == 1;
     public bool IsDay { get; set; }
     public bool IsNight { get => !IsDay; set => IsDay = !value; }
+    public bool IsMorning { get; set; }
+    public bool IsEvening { get => !IsMorning; set => IsMorning = !value; }
 
     public required Player[] Players0 { get; set; }
     public required List<Player> Players { get; set; }
@@ -38,11 +41,29 @@ public class State
 
     public bool DoesDoctorHaveThanks()
     {
-        var healKills = LatestNews.GetHeals().Intersect(LatestNews.GetKills()).ToArray();
-        var hasDeadAnyway = LatestNews.FactKilled.Intersect(healKills).Any();
-        
-        return !hasDeadAnyway;
+        var healKills = LatestNews.GetHeals().ToArray();
+        var factKills = LatestNews.FactKills;
+
+        return healKills.Length > 0 && !factKills.Intersect(healKills).Any();
     }
+
+    public bool DoesSomebodyExceptDoctorSkipKills()
+    {
+        var expectedKillsCount = GetKillerGroups().Length;
+        var factKills = LatestNews.FactKills;
+
+        if (factKills.Length == expectedKillsCount)
+            return false;
+
+        var heals = LatestNews.GetHeals();
+
+        if (factKills.Length + heals.Length == expectedKillsCount) 
+            return false;
+
+        return true;
+    }
+
+    public Group[] GetKillerGroups() => Players.Select(p => p.Group).Distinct().Where(g => g.HasAnyOperation(Values.KillOperations)).ToArray();
 
     public bool IsSelfSelected(Player player) => News.Select(ps => ps).Any(ops => ops.Selects?.Any(s => s.Who == player && s.Whom.Contains(player)) ?? false);
     public Player[] GetGroupActivePlayers(Group group) => Players.Where(p => p.Group == group).Where(IsCurrentlyAllowed).GroupBy(p=>p.Role).Select(gr=>gr.MinBy(p=>p.Id)!).OrderBy(p=>p.Role.Rank).ToArray();

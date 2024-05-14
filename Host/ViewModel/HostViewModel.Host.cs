@@ -72,12 +72,12 @@ public partial class HostViewModel : IHost
 
     public async Task NotifyCityAfterNight(State state)
     {
-        await TellTheNews(state, true);
+        await TellTheNews(state);
     }
 
     public async Task NotifyCityAfterDay(State state)
     {
-        await TellTheNews(state, false);
+        await TellTheNews(state);
     }
 
     public async Task NotifyDayStart(State state)
@@ -110,7 +110,7 @@ public partial class HostViewModel : IHost
         return false;
     }
 
-    private async Task TellTheNews(State state, bool afterNight)
+    private async Task TellTheNews(State state)
     {
         if (!state.HasNews)
         {
@@ -122,37 +122,33 @@ public partial class HostViewModel : IHost
         }
         else
         {
-            var kills = state.LatestNews.FactKilled.Select(p => ActivePlayers.Single(a => a.Player == p)).ToArray();
+            var kills = state.LatestNews.FactKills.Select(p => ActivePlayers.Single(a => a.Player == p)).ToArray();
 
-            if (afterNight || kills.Length > 0)
+            if (state.IsMorning)
             {
-                var newsName = state.LatestNews.FactKilled.Any() ? "KillsInTheCity" : "NoKillsInTheCity";
-                var (name, subName) = afterNight ? ("WakeUpCity", newsName) : (newsName, "");
+                var newsName = state.LatestNews.FactKills.Any() ? "KillsInTheCity" : "NoKillsInTheCity";
+                var (name, subName) = state.IsMorning ? ("WakeUpCity", newsName) : (newsName, "");
                 List<HostTail> tails = new();
 
-                if (state.DayNumber > 1)
-                {
-                    if (state.DoesDoctorHaveThanks())
-                        tails.Add(HostTail.ThanksToDoctor);
+                if (state.DoesDoctorHaveThanks())
+                    tails.Add(HostTail.ThanksToDoctor);
 
-
-                    // "и доктор здесь ни причем"
-                }
+                if (state.DoesSomebodyExceptDoctorSkipKills())
+                    tails.Add(HostTail.DoctorHasNoDeal);
 
                 await Interact(new Interaction
                 {
                     Name = name,
                     SubName = subName,
                     Args = [kills.Select(p => p.Nick).SJoin(", ")],
-                    Killed = state.LatestNews.FactKilled,
+                    Killed = state.LatestNews.FactKills,
                     Tails = tails.ToArray(),
                     State = state
                 });
             }
 
-            state.LatestNews.FactKilled.ForEach(p => ActivePlayers.First(a => a.Player == p).IsAlive = false);
+            state.LatestNews.FactKills.ForEach(p => ActivePlayers.First(a => a.Player == p).IsAlive = false);
             Changed(nameof(FilteredActivePlayers));
-            //ActivePlayers = ActivePlayers.Where(p => p.Player == null || state.Players.Contains(p.Player)).ToArray();
 
             Log($"Alive players: {state.Players.SJoin(", ")}");
         }
@@ -191,10 +187,22 @@ public partial class HostViewModel : IHost
 
     public async Task<User[]> AskToSelect(State state, Player player, Action action, string operation)
     {
+        (string role, string name, string nameOrSkip)[] data = 
+        [
+            (KnownRoles[KnownRoleKey.Doctor], "DoctorHealPlayer", "DoctorHealPlayerOrSkip"),
+            (KnownRoles[KnownRoleKey.Commissar], "CommissarCheckPlayer", "CommissarCheckPlayerOrSkip"),
+            (KnownRoles[KnownRoleKey.Maniac], "ManiacKillPlayer", "ManiacKillPlayerOrSkip"),
+            ("kill", "PlayerKill", "PlayerKillOrSkip"),
+            ("_", "PlayerSelect", "PlayerSelectOrSkip")
+        ];
+
+        var isKill = Values.KillOperations.Contains(operation);
+        var line = data.First(v => v.role == player.Role.Name || (isKill ? v.role == "kill" : v.role == "_"));
+
         var result = await Interact(new Interaction
         {
-            Name = action.IsSkippable() ? "PlayerSelectCanSkip" : "PlayerSelectNoSkip",
-            Args = [player.Role.Name],
+            Name = action.IsSkippable() ? line.nameOrSkip : line.name,
+            Args = [player.Group.Name],
             Selection = (action.IsSkippable() ? 0 : 1, 1),
             Except = state.GetExceptPlayers(player),
             Unwanted = Values.UnwantedOperations.Contains(operation) ? state.GetTeam(player) : [],

@@ -15,7 +15,7 @@ public static class Conditions
     public static bool Single(State state, Player player) => state.GetTeam(player).Count() == 1;
     public static bool NotSingle(State state, Player player) => !Single(state, player);
     public static bool SeniorRank(State state, Player player) => state.GetTeamSeniorRank(player) == player.Role.Rank;
-    public static bool Killed(State state, Player player) => state.LatestNews.FactKilled?.Contains(player) ?? false;
+    public static bool Killed(State state, Player player) => state.LatestNews.FactKills?.Contains(player) ?? false;
     public static bool FirstDay(State state, Player player) => state.DayNumber == 1;
     public static bool Skippable(State state, Player player) => true;
 

@@ -25,7 +25,7 @@
                 VerticalOptions="Center" />
 
             <Grid>
-                <ListView ItemsSource="{Binding FilteredActivePlayers}" ItemTapped="ListView_ItemTapped">
+                <ListView ItemsSource="{Binding FilteredActivePlayers}" ItemTapped="ListView_ActivePlayer_ItemTapped">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <ViewCell>
@@ -60,12 +60,12 @@
                                     <CheckBox Grid.Column="3"
                                               IsEnabled="{Binding IsEnabled}"                                               
                                               IsChecked="{Binding IsSelected}"                                           
-                                              Color="{Binding OperationColor}"
+                                              Color="{Binding CheckboxColor}"
                                               VerticalOptions="Center"
                                               HorizontalOptions="End" >
                                         <CheckBox.Triggers>
                                             <Trigger TargetType="CheckBox" Property="IsEnabled" Value="False">
-                                                <Setter Property="Color" Value="{Binding OperationColor}"/>
+                                                <Setter Property="Color" Value="{Binding CheckboxColor}"/>
                                             </Trigger>
                                         </CheckBox.Triggers>
                                     </CheckBox>
@@ -99,7 +99,7 @@
                             VerticalTextAlignment="Center"
                             HorizontalOptions="Start" />
 
-                        <ListView ItemsSource="{Binding ActivePlayerRoles}">
+                        <ListView ItemsSource="{Binding ActivePlayerRoles}" ItemTapped="ListView_ActivePlayerRole_ItemTapped">
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <ViewCell>
@@ -129,6 +129,7 @@
             <Grid ColumnDefinitions="0.8*,0.2*">
                 <Label Grid.Column="0"
                     Text="{Binding GameInfo}"
+                    VerticalTextAlignment="Center"
                     VerticalOptions="Center"
                     HorizontalOptions="Start" />
 

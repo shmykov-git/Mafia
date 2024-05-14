@@ -19,7 +19,7 @@
                 HorizontalOptions="Start"
                 SemanticProperties.HeadingLevel="Level1" />
 
-            <ListView ItemsSource="{Binding ActiveRoles}">
+            <ListView ItemsSource="{Binding ActiveRoles}" ItemTapped="ListView_ItemTapped" >
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
@@ -27,6 +27,8 @@
                                 <Label Grid.Column="0"
                                    TextColor="{Binding RoleColor}"
                                    Text="{Binding RoleName}"
+                                   VerticalOptions="Center"
+                                   VerticalTextAlignment="Center"                                       
                                    HorizontalOptions="Start"
                                    FontAttributes="Bold" />
 
@@ -35,7 +37,7 @@
                                         IsVisible="{Binding IsCounter}"
                                         IsEnabled="{Binding IsSelected}"
                                         Text="{Binding Count}" />
-                                    <CheckBox IsChecked="{Binding IsSelected}" />
+                                    <CheckBox IsChecked="{Binding IsSelected}" VerticalOptions="Center"/>
                                 </StackLayout>
                             </Grid>
                         </ViewCell>

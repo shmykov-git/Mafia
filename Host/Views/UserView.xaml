@@ -19,14 +19,16 @@
                 HorizontalOptions="Start"
                 SemanticProperties.HeadingLevel="Level1" />
 
-            <ListView ItemsSource="{Binding ActiveUsers}">
+            <ListView ItemsSource="{Binding ActiveUsers}" ItemTapped="ListView_ItemTapped">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
                             <Grid ColumnDefinitions="0.8*,0.2*">
                                 <Label Grid.Column="0"      
                                        TextColor="{Binding NickColor}"
-                                       Text="{Binding Nick}"                                            
+                                       Text="{Binding Nick}"     
+                                       VerticalOptions="Center"
+                                       VerticalTextAlignment="Center"
                                        HorizontalOptions="Start"                                            
                                        FontAttributes="Bold" />
 

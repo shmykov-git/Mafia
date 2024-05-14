@@ -15,7 +15,7 @@ public class DailyNews
     public List<SelectLock>? SelectLocks { get; set; }
 
     // <calculated>
-    public Player[] FactKilled { get; set; } = [];
+    public Player[] FactKills { get; set; } = [];
     // </calculated>
 
     public void Collect(DailyNews other)
@@ -39,6 +39,11 @@ public class DailyNews
 
     public IEnumerable<Select> AllSelects() => Selects ?? [];
     public IEnumerable<SelectLock> AllSelectLocks() => SelectLocks ?? [];
+
+    // if you have locker in the team you cannot be locked to kill somebody
+    //public Player[] GetLockedKillers() => AllSelectLocks()
+    //    .Where(s => !s.Who.Group.HasAnyOperation(Values.LockOperations))
+    //    .Where(s => !Values.KillOperations.Intersect(s.Operations).Any()).Select(l => l.Who).ToArray();
 
     public Player[] GetKills() => AllSelects().Where(s => Values.KillOperations.Contains(s.Operation)).SelectMany(s=>s.Whom).ToArray();
     public Player[] GetHeals() => AllSelects().Where(s => Values.HealOperations.Contains(s.Operation)).SelectMany(s => s.Whom).ToArray();

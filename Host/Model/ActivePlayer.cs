@@ -38,6 +38,9 @@ public class ActivePlayer : NotifyPropertyChanged
     public Color OperationColorSilent { get; set; } = Colors.Black;
     public Color OperationColor { get => OperationColorSilent; set { OperationColorSilent = value; Changed(); } }
 
+    public Color CheckboxColorSilent { get; set; } = Colors.Black;
+    public Color CheckboxColor { get => CheckboxColorSilent; set { CheckboxColorSilent = value; Changed(); } }
+
     public bool IsSelectedSilent { get; set; }
     public bool IsSelected { get => IsSelectedSilent; set { IsSelectedSilent = value; Changed(); } }
 
@@ -46,4 +49,6 @@ public class ActivePlayer : NotifyPropertyChanged
 
     public bool IsAliveSilent { get; set; } = true;
     public bool IsAlive { get => IsAliveSilent; set { IsAliveSilent = value; Changed(); } }
+
+    public bool IsKilled => !IsAlive;
 }

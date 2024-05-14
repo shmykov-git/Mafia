@@ -9,12 +9,20 @@ public partial class GameView : ContentPage
         InitializeComponent();
     }
 
-    private void ListView_ItemTapped(object sender, ItemTappedEventArgs e)
+    private void ListView_ActivePlayer_ItemTapped(object sender, ItemTappedEventArgs e)
     {
         if (e.Item is ActivePlayer activePlayer)
         {
             if (activePlayer.IsEnabled)
                 activePlayer.IsSelected = !activePlayer.IsSelected;
+        }
+    }
+
+    private void ListView_ActivePlayerRole_ItemTapped(object sender, ItemTappedEventArgs e)
+    {
+        if (e.Item is ActiveRole activePlayerRole)
+        {
+            activePlayerRole.IsSelected = !activePlayerRole.IsSelected;
         }
     }
 }

@@ -18,7 +18,7 @@ public class HostOptions
     public required Color UnwantedColor { get; set; }
     public required Color NoOperationColor { get; set; }
     public required Color KilledColor { get; set; }
-    
+    public required KnownRole[] KnownRoles {  get; set; }
     public required GroupColor[] GroupColors { get; set; }
     public required OperationColor[] OperationColors { get; set; }
     

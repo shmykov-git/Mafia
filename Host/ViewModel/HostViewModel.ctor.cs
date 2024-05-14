@@ -21,7 +21,8 @@ public partial class HostViewModel : NotifyPropertyChanged
     private readonly City city;
     private HostOptions options;
     private string navigationPath;
-
+    
+    public Dictionary<KnownRoleKey, string> KnownRoles { get; }
     public Dictionary<string, string> Messages { get; }
 
     public HostViewModel(Game game, City city, IOptions<HostOptions> options)
@@ -33,6 +34,7 @@ public partial class HostViewModel : NotifyPropertyChanged
         HintColor = this.options.CityColor;
         SelectedPlayerRoleMessageColor = this.options.CityColor;
         Messages = this.options.Messages.ToDictionary(v => v.Name, v => v.Text);
+        KnownRoles = this.options.KnownRoles.ToDictionary(v => v.Key, v => v.Name);
 
         Task.Run(InitDatabaseUsers).Wait();
     }

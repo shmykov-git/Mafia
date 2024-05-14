@@ -9,8 +9,8 @@
           "rank": 1,
           "actions": [
             {
-              "operations": [ "Kill" ],
-              "conditions": [ "SeniorRank", "NotLocked" ]
+              "conditions": [ "SeniorRank", "NotLocked" ],
+              "operations": [ "Kill" ]
             }
           ]
         },
@@ -19,8 +19,8 @@
           "rank": 2,
           "actions": [
             {
-              "operations": [ "Kill" ],
-              "conditions": [ "SeniorRank", "NotLocked" ]
+              "conditions": [ "SeniorRank", "NotLocked" ],
+              "operations": [ "Kill" ]
             }
           ]
         },
@@ -30,8 +30,8 @@
           "isMultiple": true,
           "actions": [
             {
-              "operations": [ "Kill" ],
-              "conditions": [ "SeniorRank", "NotLocked" ]
+              "conditions": [ "SeniorRank", "NotLocked" ],
+              "operations": [ "Kill" ]
             }
           ]
         },
@@ -40,12 +40,12 @@
           "rank": 4,
           "actions": [
             {
-              "operations": [ "Kill" ],
-              "conditions": [ "SeniorRank", "Single" ]
+              "conditions": [ "SeniorRank", "Single" ],
+              "operations": [ "Kill" ]
             },
             {
-              "operations": [ "Lock" ],
-              "conditions": [ "NotSingle" ]
+              "conditions": [ "NotSingle" ],
+              "operations": [ "Lock" ]
             }
           ]
         }
@@ -59,8 +59,8 @@
           "actions": [
             {
               "name": "Kill",
-              "operations": [ "Kill" ],
-              "conditions": [ "NotLocked" ]
+              "conditions": [ "NotLocked" ],
+              "operations": [ "Kill" ]
             }
           ]
         }
@@ -83,8 +83,8 @@
               "rank": 1,
               "actions": [
                 {
-                  "operations": [ "Check" ],
-                  "conditions": [ "SeniorRank", "NotLocked", "NotKilledAlone" ]
+                  "conditions": [ "SeniorRank", "NotLocked", "NotKilledAlone" ],
+                  "operations": [ "Check" ]
                 }
               ]
             },
@@ -93,8 +93,8 @@
               "rank": 2,
               "actions": [
                 {
-                  "operations": [ "Check" ],
-                  "conditions": [ "SeniorRank", "NotLocked", "NotKilledAlone" ]
+                  "conditions": [ "SeniorRank", "NotLocked", "NotKilledAlone" ],
+                  "operations": [ "Check" ]
                 }
               ]
             }
@@ -107,8 +107,8 @@
               "name": "Доктор",
               "actions": [
                 {
-                  "operations": [ "Heal" ],
-                  "conditions": [ "NotLocked" ]
+                  "conditions": [ "NotLocked" ],
+                  "operations": [ "Heal" ]
                 }
               ]
             }
@@ -121,12 +121,12 @@
               "name": "Камикадзе",
               "actions": [
                 {
-                  "operations": [ "Hello" ],
-                  "conditions": [ "FirstDay" ]
+                  "conditions": [ "FirstDay" ],
+                  "operations": [ "Hello" ]
                 },
                 {
-                  "operations": [ "Kill" ],
-                  "conditions": [ "Killed", "Skippable" ]
+                  "conditions": [ "Killed", "Skippable" ],
+                  "operations": [ "Kill" ]
                 }
               ]
             }
@@ -139,12 +139,12 @@
               "name": "Шахид",
               "actions": [
                 {
-                  "operations": [ "Hello" ],
-                  "conditions": [ "FirstDay" ]
+                  "conditions": [ "FirstDay" ],
+                  "operations": [ "Hello" ]
                 },
                 {
-                  "operations": [ "RoundKill" ],
-                  "conditions": [ "Killed" ]
+                  "conditions": [ "Killed" ],
+                  "operations": [ "RoundKill" ]
                 }
               ]
             }

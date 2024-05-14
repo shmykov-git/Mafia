@@ -5,7 +5,6 @@ using Host.Model;
 using Mafia;
 using Mafia.Extensions;
 using Mafia.Model;
-
 using Newtonsoft.Json;
 
 namespace Host.ViewModel;
@@ -58,7 +57,7 @@ public partial class HostViewModel
     public string GameInfo => Interaction == null ? "" : 
         Messages["GameInfo"].With(
             Interaction.State.DayNumber,
-            Interaction.State.IsDay ? Messages["day"] : Messages["night"],
+            Interaction.State.IsNight ? Messages["night"] : (Interaction.State.IsMorning ? Messages["morning"] : Messages["evening"]),
             Interaction.State.Players.Count,
             Interaction.State.Players0.Length);
 
@@ -103,7 +102,7 @@ public partial class HostViewModel
             await FirstDayWakeup();
 
         ShowHostMessage();
-        PrepareActivePlayers();
+        PrepareActivePlayers_RolesSelections();
         await WaitForHostInteraction();
 
         var result = new InteractionResult()
@@ -176,7 +175,7 @@ public partial class HostViewModel
 
         ContinueMode = ContinueGameMode.WakeupOnFirstDay;
         
-        PrepareActivePlayersForFirstWakeup();
+        PrepareActivePlayers_WakeupOnFirstDay();
 
         wakeupRolesCount = detachedGroupRoles.Length;
 
@@ -236,7 +235,7 @@ public partial class HostViewModel
         HintColor = options.FallAsleepColor;
         HostHint = fallAsleepMessage;
         SubHostHint = "";
-        PrepareActivePlayersForFallAsleep();
+        PrepareActivePlayers_PreviousGroupFallAsleep();
         await Task.Delay(options.HostFallAsleepMessageDelay);
         HostHint = "";
         ContinueMode = ContinueGameMode.RolesSelections;
@@ -245,19 +244,24 @@ public partial class HostViewModel
     private void ShowHostMessage()
     {
         var message = Messages[Interaction.Name].With(Interaction.Args);
+        var tailMessage = Interaction.Tails.Select(t => t switch
+        {
+            HostTail.ThanksToDoctor => Messages["ThanksToDoctor"],
+            HostTail.DoctorHasNoDeal => Messages["DoctorHasNoDeal"],
+        }).SJoin(" ");
+
         HintColor = options.CityColor;
 
         if (Interaction.SubName.HasText())
         {
             var subMessage = Messages[Interaction.SubName].With(Interaction.Args);
             HostHint = message;
-            SubHostHint = subMessage;
+            SubHostHint = tailMessage.HasText() ? $"{subMessage}. {tailMessage}" : subMessage;
         }
         else
         {
-            SubHostHint = message;
+            SubHostHint = tailMessage.HasText() ? $"{message}. {tailMessage}" : message;
         }
-
         Log(message);
     }
 
@@ -322,7 +326,7 @@ public partial class HostViewModel
 
     private async Task PrepareActivePlayerRoles(Role[] roles)
     {
-        ActivePlayerRoles = roles.Select(r => new ActiveRole(r, OnActivePlayerRoleChange, nameof(ActivePlayerRoles)) { RoleColorSilent = GetRoleColor(r.Name), IsEnabledSilent = true }).ToArray();
+        ActivePlayerRoles = roles.Select(r => new ActiveRole(r, OnActivePlayerRoleChange, nameof(ActivePlayerRoles)) { RoleColorSilent = GetRoleColor(r.Name) }).ToArray();
     }
 
     object skipRolesKey = null;
@@ -344,18 +348,29 @@ public partial class HostViewModel
                 activeRole.DoSilent(nameof(ActivePlayerRoles), () => action(activeRole));
     }
 
-    // PreviousGroupFallAsleep mode
-    private void PrepareActivePlayersForFallAsleep()
+    private void PrepareActivePlayers_PreviousGroupFallAsleep()
     {
         UpdateActivePlayers(p =>
         {
-            var isKilled = !p.IsAlive;
-            var isEnabled = false;
-            var color = options.NoOperationColor;
-            var operation = isKilled ? killed : arrow;
+            p.Operation = p.IsKilled ? killed : arrow;
+            p.OperationColor = p.IsKilled ? options.KilledColor : options.NoOperationColor;
+            p.CheckboxColor = options.NoOperationColor;
+            p.IsEnabled = false;
+            p.IsSelected = false;
+        });
 
-            p.Operation = operation;
-            p.OperationColor = isKilled ? options.KilledColor : (isEnabled ? color : options.NoOperationColor);
+        Changed(nameof(ContinueCommand));
+    }
+
+    private void PrepareActivePlayers_WakeupOnFirstDay()
+    {
+        UpdateActivePlayers(p =>
+        {
+            var isEnabled = p.Player == null && p.IsKilled;
+
+            p.Operation = p.IsKilled ? killed : arrow;
+            p.OperationColor = p.IsKilled ? options.KilledColor : (isEnabled ? options.WakeupColor : options.NoOperationColor);
+            p.CheckboxColor = isEnabled ? options.WakeupColor : options.NoOperationColor;
             p.IsEnabled = isEnabled;
             p.IsSelected = false;
         });
@@ -363,27 +378,7 @@ public partial class HostViewModel
         Changed(nameof(ContinueCommand));
     }
 
-    // WakeupOnFirstDay mode
-    private void PrepareActivePlayersForFirstWakeup()
-    {
-        UpdateActivePlayers(p =>
-        {
-            var isKilled = !p.IsAlive;
-            var isEnabled = p.Player == null && !isKilled;
-            var color = options.WakeupColor;
-            var operation = isKilled ? killed : arrow;
-
-            p.Operation = operation;
-            p.OperationColor = isKilled ? options.KilledColor : (isEnabled ? color : options.NoOperationColor);
-            p.IsEnabled = isEnabled;
-            p.IsSelected = false;
-        });
-
-        Changed(nameof(ContinueCommand));
-    }
-
-    // WakeupOnFirstDay mode
-    private void UpdateActivePlayerOnFirstWakeup()
+    private void UpdateActivePlayer_WakeupOnFirstDay()
     {
         var areSelected = ActivePlayers.Where(p => p.IsSelected).Count() == wakeupRolesCount;
 
@@ -393,33 +388,34 @@ public partial class HostViewModel
         }, p=> p.IsAlive && !p.IsSelected);
     }
 
-    // RolesSelections mode
-    private void PrepareActivePlayers()
+    private void PrepareActivePlayers_RolesSelections()
     {
         var staticOperationColor = Interaction.NeedSelection ? GetOperationColor(Interaction.Operation) : options.NoOperationColor;
+        var color = Interaction.NeedSelection ? GetOperationColor(Interaction.Operation) : options.CityColor;
         var staticOperation = Interaction.NeedSelection ? arrow : empty;
 
         UpdateActivePlayers(p =>
         {
             var isKilled = Interaction.Killed.Contains(p.Player) || !p.IsAlive;
             var isEnabled = !Interaction.Except.Contains(p.Player) && !isKilled;
-            var color = Interaction.Unwanted.Contains(p.Player) ? options.UnwantedColor : staticOperationColor;
             var operation = isKilled ? killed : staticOperation;
+            var color = Interaction.Unwanted.Contains(p.Player) ? options.UnwantedColor : staticOperationColor;
 
             p.Operation = operation;
             p.OperationColor = isKilled ? options.KilledColor : (isEnabled ? color : options.NoOperationColor);
+            p.CheckboxColor = isEnabled ? color : options.NoOperationColor;
             p.IsEnabled = isEnabled;
             p.IsSelected = false;
         });
 
-        UpdateActivePlayers(Interaction);
+        UpdateActivePlayers_RolesSelections(Interaction);
 
         Changed(nameof(ContinueCommand));
     }
 
-    // RolesSelections mode
-    private void UpdateActivePlayers(Interaction interaction)
+    private void UpdateActivePlayers_RolesSelections(Interaction interaction)
     {
+        var staticOperationColor = Interaction.NeedSelection ? GetOperationColor(Interaction.Operation) : options.NoOperationColor;
         var color = Interaction.NeedSelection ? GetOperationColor(Interaction.Operation) : options.CityColor;
         var staticIsEnabled = ActivePlayers.Count(a => a.IsSelected).Between(0, interaction.Selection.to - 1);
 
@@ -427,8 +423,10 @@ public partial class HostViewModel
         {
             var isKilled = !p.IsAlive;
             var isEnabled = staticIsEnabled && !interaction.Except.Contains(p.Player);
+            var color = Interaction.Unwanted.Contains(p.Player) ? options.UnwantedColor : staticOperationColor;
 
             p.OperationColor = isKilled ? options.KilledColor : (isEnabled ? color : options.NoOperationColor);
+            p.CheckboxColor = isEnabled ? color : options.NoOperationColor;
             p.IsEnabled = isEnabled;
         }, p => p.IsAlive && !p.IsSelected);
     }
@@ -448,10 +446,10 @@ public partial class HostViewModel
         switch (ContinueMode)
         {
             case ContinueGameMode.RolesSelections:
-                UpdateActivePlayers(Interaction);
+                UpdateActivePlayers_RolesSelections(Interaction);
                 break;
             case ContinueGameMode.WakeupOnFirstDay:
-                UpdateActivePlayerOnFirstWakeup();
+                UpdateActivePlayer_WakeupOnFirstDay();
                 break;
         }
 

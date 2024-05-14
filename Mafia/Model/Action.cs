@@ -24,7 +24,7 @@ public class Action
         if (blockCondition == null)
             throw new InvalidOperationException();
 
-        return new DailyNews { SelectLocks = [new SelectLock { Condition = blockCondition, Who = player }] };
+        return new DailyNews { SelectLocks = [new SelectLock { Condition = blockCondition, Who = player, Operations = Operations }] };
     }
 
     public async Task<bool> CheckConditions(State state, Player player) => Conditions == null || await Conditions.AllAsync(name => CheckCondition(name, state, player));

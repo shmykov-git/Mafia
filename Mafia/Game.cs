@@ -110,24 +110,24 @@ public class Game
     /// </summary>
     private void CalcNightKills()
     {
-        state.LatestNews.FactKilled = state.GetLatestFactKills();
+        state.LatestNews.FactKills = state.GetLatestFactKills();
     }
 
     private void CalcDayKills()
     {
-        state.LatestNews.FactKilled = state.GetLatestFactKills();
+        state.LatestNews.FactKills = state.GetLatestFactKills();
     }
 
     private void ApplyKills()
     {
-        foreach(var player in state.LatestNews.FactKilled)
+        foreach(var player in state.LatestNews.FactKills)
             state.Players.Remove(player);
     }
 
     private async Task PlayOnDeathKills()
     {
         var stack = new Stack<Player>();
-        state.LatestNews.FactKilled.ForEach(stack.Push);
+        state.LatestNews.FactKills.ForEach(stack.Push);
         // нужно определить роль убитого
         var dailyNews = new DailyNews();
 
@@ -149,7 +149,7 @@ public class Game
 
         if (city.GetRule(RuleName.KillOnDeathNoHeal).Accepted)
         {
-            state.LatestNews.FactKilled = state.LatestNews.FactKilled.Concat(dailyNews.GetKills()).ToArray();
+            state.LatestNews.FactKills = state.LatestNews.FactKills.Concat(dailyNews.GetKills()).ToArray();
         }
         else
         {
@@ -221,6 +221,7 @@ public class Game
                 await PlayOnDeathKills();
                 ApplyKills();
             }
+            state.IsMorning = true;
             await host.NotifyDayStart(state);
             await host.NotifyCityAfterNight(state);
             if (await IsGameEnd())
@@ -232,6 +233,7 @@ public class Game
             CalcDayKills();
             await PlayOnDeathKills();
             ApplyKills();
+            state.IsEvening = true;
             await host.NotifyCityAfterDay(state);
             if (await IsGameEnd())
             {

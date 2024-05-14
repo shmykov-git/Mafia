@@ -47,7 +47,7 @@ public class TestDebugHost : IHost
         }
         else
         {
-            Debug.WriteLine($"Where killed: {state.LatestNews.FactKilled.SJoin(", ")}");
+            Debug.WriteLine($"Where killed: {state.LatestNews.FactKills.SJoin(", ")}");
             Debug.WriteLine($"Alive players: {state.Players.SJoin(", ")}");
         }
     }
