@@ -18,7 +18,7 @@
                 Style="{StaticResource Headline}"
                 HorizontalOptions="Start"
                 SemanticProperties.HeadingLevel="Level1" />
-
+            
             <ListView ItemsSource="{Binding ActiveUsers}" ItemTapped="ListView_ItemTapped">
                 <ListView.ItemTemplate>
                     <DataTemplate>
