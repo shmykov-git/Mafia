@@ -13,17 +13,9 @@ namespace Host;
 
 public static class MauiProgram
 {
-    public class A { public string a; public Color b; }
-
     public static MauiApp CreateMauiApp()
     {
-
-        A[] ColorInfos() => typeof(Colors).GetFields().Select(f => new A { a = f.Name, b = (Color)f.GetValue(null) }).ToArray();
-        ColorInfos().ForEach(c=>Debug.WriteLine($"<Color>{c.a}</Color>"));
-
-
-
-    var mafiaFileName = "Resources/Maps/mafia-vicino-ru.json";
+        var mafiaFileName = "Resources/Maps/mafia-vicino-ru.json";
         var settingsFileName = "appsettings.json";
 
         using Stream mafiaStream = FileSystem.Current.OpenAppPackageFileAsync(mafiaFileName).Result;
