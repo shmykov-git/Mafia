@@ -18,6 +18,7 @@ public partial class HostViewModel
     private string _gameInfo;
     private string _hostWakeUpHint;
     private bool _isActivePlayerRoleVisible;
+    private bool _isRollbackAvailable;
     private string _selectedPlayerRoleMessage;
     private string _playerInfo;
     private Color _hintColor;
@@ -51,6 +52,7 @@ public partial class HostViewModel
     public IEnumerable<ActivePlayer> AliveActivePlayers => ActivePlayers.Where(p => p.IsAlive);
     public ActiveRole[] ActivePlayerRoles { get => _activePlayerRoles; set { _activePlayerRoles = value; ChangedSilently(); Changed(nameof(ContinueCommand)); } }
     public bool IsActivePlayerRoleVisible { get => _isActivePlayerRoleVisible; set { _isActivePlayerRoleVisible = value; Changed(); Changed(nameof(ContinueCommand)); } }
+    public bool IsRollbackAvailable { get => _isRollbackAvailable; set { _isRollbackAvailable = value; Changed(); Changed(nameof(RollbackCommand)); } }
     public string SelectedPlayerRoleMessage { get => _selectedPlayerRoleMessage; set { _selectedPlayerRoleMessage = value; Changed(); } }
     public Color SelectedPlayerRoleMessageColor { get => _selectedPlayerRoleMessageColor; set { _selectedPlayerRoleMessageColor = value; Changed(); } }
 
@@ -80,7 +82,8 @@ public partial class HostViewModel
         };
     }
 
-    public ICommand ContinueCommand => new Command(()=>Continue(), IsContinueAvailable);
+    public ICommand ContinueCommand => new Command(() => Continue(), IsContinueAvailable);
+    public ICommand RollbackCommand => new Command(() => Rollback(), () => IsRollbackAvailable);
 
     /// <summary>
     /// Single interact for single selection process
@@ -201,6 +204,11 @@ public partial class HostViewModel
             await Task.Delay(timeout);
             hostWaiter?.SetResult();
         });
+    }
+
+    private void Rollback(int timeout = 20)
+    {
+
     }
 
     private void ShowWakeUpMessage()
