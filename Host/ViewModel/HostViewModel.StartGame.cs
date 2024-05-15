@@ -45,6 +45,8 @@ public partial class HostViewModel
                 CountSilent = v.preset.count > 0 ? v.preset.count : 1 
             }).ToArray();
     }
+    
+    public bool AreRolesValid() => ActiveRoles.Where(a => a.IsCounter).Min(a => a.Count) >= 0;
 
     private void OnActiveRoleChange(string name, ActiveRole activeRole)
     {
@@ -54,16 +56,13 @@ public partial class HostViewModel
         if (n == k)
             return;
 
-        switch (name)
-        {
-            case nameof(ActiveRole.IsSelected):
-                ActiveRoles.Where(a => a.IsCounter).MaxBy(a => a.Count).Count += n - k;
-                break;
+        var update = AreRolesValid()
+            ? ActiveRoles.Where(a => a != activeRole).Where(a => a.IsCounter).MaxBy(a => a.Count)
+            : ActiveRoles.Where(a => a != activeRole).Where(a => a.IsCounter).MinBy(a => a.Count);
 
-            case nameof(ActiveRole.Count):
-                ActiveRoles.Where(a => a != activeRole).Where(a => a.IsCounter).MaxBy(a => a.Count).Count += n - k;
-                break;                
-        }
+        update!.Count += (n - k);
+
+        Changed(nameof(StartNewGameCommand));
     }
 
     public ICommand StartNewGameCommand => new Command(async () =>
@@ -79,7 +78,7 @@ public partial class HostViewModel
         }
 
         await Shell.Current.GoToAsync("//pages/GameView");
-    });
+    }, AreRolesValid);
 
     // todo: ask user to restart the game
     private async Task StopCurrentGame()

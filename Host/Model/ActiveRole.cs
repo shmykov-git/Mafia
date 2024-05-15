@@ -22,6 +22,6 @@ public class ActiveRole : NotifyPropertyChanged
     public bool IsSelectedSilent { get; set; }
     public bool IsSelected { get => IsSelectedSilent; set { IsSelectedSilent = value; Changed(); } }
 
-    public int CountSilent { get; set; }
-    public int Count { get => CountSilent; set { CountSilent = value; Changed(); } }
+    public int CountSilent;
+    public int Count { get => CountSilent; set { IfChanged(ref CountSilent, value); } }
 }
