@@ -65,6 +65,7 @@ public class TestHost : IHost
         eventIndex.Should().Be(options.Selections.Length);
     }
     public void RolledBack(State state) { }
+    public async Task Hello(State state, Player player) { }
     private Player[] GetSelectedPlayers(State state) => options.Selections[eventIndex].Item2.Select(i => state.Players0[i]).ToArray();
 
     private User[] GetSelectedUsers(State state, Player? who)

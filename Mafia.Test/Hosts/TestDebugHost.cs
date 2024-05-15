@@ -30,8 +30,15 @@ public class TestDebugHost : IHost
     public async Task StartGame(State state)
     {
         var n = state.Players0.Length;
-        var users = Enumerable.Range(0, n).Select(i => new User { Nick = $"U{(i).ToString().PadLeft(2, '0')}", LastPlay = DateTime.Now }).ToArray();
+        var users = Enumerable.Range(0, n).Select(i => new User { Nick = $"U{(i).ToString().PadLeft(2, '0')}", LastPlay = DateTime.Today }).ToArray();
         state.Players0.ForEach((p, i) => p.User = users[i]);
+        
+        if (options.Shaffle)
+        {
+            var places = state.Players.ToArray();
+            places.Shaffle(n + 7, rnd);
+            state.Players = places.ToList();
+        }
     }
 
     public string[] GetGameRoles()
@@ -108,6 +115,12 @@ public class TestDebugHost : IHost
         Debug.WriteLine($"GameEnd, the winner is {winnerGroup.Name}");
         Debug.WriteLine($"[{items}]");
         Debug.WriteLine($"===== </day {state.DayNumber}> =====");
+    }
+
+    public async Task Hello(State state, Player player) 
+    {
+        if (options.HostInstructions)
+            Debug.WriteLine($"{player} --> hello!");
     }
 
     public async Task<User[]> AskCityToSelect(State state, CityAction action, string operation)

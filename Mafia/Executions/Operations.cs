@@ -7,19 +7,33 @@ public delegate Task<DailyNews> Operation(State state, Player player, Action act
 
 public static class Operations
 {
-    private static async Task<DailyNews> Select(State state, Player player, Action action, string operation) => new DailyNews
+    private static async Task<DailyNews> Select(State state, Player player, Action action, string operation)
     {
-        Selects = [new Select { Operation = operation, Who = player, UserWhom = await state.Host.AskToSelect(state, player, action, operation) }]
-    };
+        var dailyNews = new DailyNews
+        {
+            Selects = [new Select { Operation = operation, Who = player, UserWhom = await state.Host.AskToSelect(state, player, action, operation) }]
+        };
+
+        dailyNews.DoKnowAllWhom(state);
+
+        return dailyNews;
+    }
 
     public static Task<DailyNews> Kill(State state, Player player, Action action) => Select(state, player, action, nameof(Kill));
     public static Task<DailyNews> Lock(State state, Player player, Action action) => Select(state, player, action, nameof(Lock));
     public static Task<DailyNews> Check(State state, Player player, Action action) => Select(state, player, action, nameof(Check));
     public static Task<DailyNews> Heal(State state, Player player, Action action) => Select(state, player, action, nameof(Heal));
-    public static DailyNews Hello(State state, Player player, Action action) => new DailyNews();
+    public static async Task<DailyNews> Hello(State state, Player player, Action action) { await state.Host.Hello(state, player); return new DailyNews(); }
 
-    public static async Task<DailyNews> RoundKill(State state, Player player, Action action) => new DailyNews
+    public static async Task<DailyNews> RoundKill(State state, Player player, Action action)
     {
-        Selects = [new Select { Operation = nameof(RoundKill), Who = player, UserWhom = await state.Host.GetNeighbors(state, player, action, nameof(RoundKill)) }]
-    };
+        var dailyNews = new DailyNews
+        {
+            Selects = [new Select { Operation = nameof(RoundKill), Who = player, UserWhom = await state.Host.GetNeighbors(state, player, action, nameof(RoundKill)) }]
+        };
+
+        dailyNews.DoKnowAllWhom(state);
+
+        return dailyNews;
+    }
 }

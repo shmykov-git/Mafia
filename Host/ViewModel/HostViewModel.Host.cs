@@ -125,6 +125,16 @@ public partial class HostViewModel : IHost
         Changed(nameof(FilteredActivePlayers));
     }
 
+    public async Task Hello(State state, Player player) 
+    {
+        await Interact(new Interaction
+        {
+            Name = null!,
+            Player = player,
+            State = state
+        });
+    }
+
     private async Task TellTheNews(State state)
     {
         if (!state.HasNews)

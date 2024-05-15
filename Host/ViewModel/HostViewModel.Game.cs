@@ -105,9 +105,7 @@ public partial class HostViewModel
         if (interaction.NeedFirstDayWakeup)
             await FirstDayWakeup();
 
-        ShowHostMessage();
-        PrepareActivePlayers_RolesSelections();
-        await WaitForHostInteraction();
+        await ShowHostMainMessage();
 
         var result = new InteractionResult()
         {
@@ -257,9 +255,12 @@ public partial class HostViewModel
         ContinueMode = ContinueGameMode.RolesSelections;
     }
 
-    private void ShowHostMessage()
+    private async Task ShowHostMainMessage()
     {
         if (Interaction.State.Stopping || Interaction.State.RollingBack)
+            return;
+
+        if (!Interaction.Name.HasText())
             return;
 
         var message = Messages[Interaction.Name].With(Interaction.Args);
@@ -283,6 +284,10 @@ public partial class HostViewModel
         {
             SubHostHint = tailMessage.HasText() ? $"{message}. {tailMessage}" : message;
         }
+
+        PrepareActivePlayers_RolesSelections();
+        await WaitForHostInteraction();
+
         Log(message);
     }
 

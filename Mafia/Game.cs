@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Diagnostics;
+using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using Mafia.Exceptions;
@@ -79,7 +80,7 @@ public class Game
                 news.Collect(await action.DoOperations(state));
         }
 
-        state.DoKnowAllLatestWhom();
+        CalcKills();
     }
 
     private async Task PlayNight()
@@ -103,20 +104,54 @@ public class Game
             }
         }
 
+        CalcKills();
+    }
+
+    private async Task PlayOnDeathKills()
+    {
+        HashSet<Player> set = new();
+        var stack = new Stack<Player>();
+        state.LatestNews.FactKills.ForEach(stack.Push);
+        state.LatestNews.FactKills.ForEach(k => set.Add(k));
+
+        while (stack.TryPop(out var kill))
+        {
+            var dailyNews = new DailyNews();
+
+            foreach (var action in kill.Role.AllActions().Where(a => a.AllConditions().Intersect(Values.OnDeathConditions).Any()))
+            {
+                if (await action.CheckConditions(state, kill))
+                {
+                    var actionNews = await action.DoOperations(state, kill);
+                    var actionKills = actionNews.GetKills();
+                    actionKills.Where(p => !set.Contains(p)).ForEach(stack.Push);
+                    dailyNews.Collect(actionNews);
+                }
+            }
+
+            state.LatestNews.Collect(dailyNews);
+            CalcOnDeathKills(dailyNews);
+        }
+    }
+
+    private void CalcKills()
+    {
         state.DoKnowAllLatestWhom();
-    }
-
-    /// <summary>
-    /// todo: config
-    /// </summary>
-    private void CalcNightKills()
-    {
         state.LatestNews.FactKills = state.GetLatestFactKills();
     }
 
-    private void CalcDayKills()
+    private void CalcOnDeathKills(DailyNews onDeathDailyNews)
     {
-        state.LatestNews.FactKills = state.GetLatestFactKills();
+        state.DoKnowAllLatestWhom();
+
+        if (city.GetRule(RuleName.KillOnDeathNoHeal).Accepted)
+        {
+            state.LatestNews.FactKills = state.LatestNews.FactKills.Concat(onDeathDailyNews.GetKills()).ToArray();
+        }
+        else
+        {
+            state.LatestNews.FactKills = state.GetLatestFactKills();
+        }
     }
 
     private void CalcsBeforeNight()
@@ -128,39 +163,6 @@ public class Game
     {
         foreach(var player in state.LatestNews.FactKills)
             state.Players.Remove(player);
-    }
-
-    private async Task PlayOnDeathKills()
-    {
-        var stack = new Stack<Player>();
-        state.LatestNews.FactKills.ForEach(stack.Push);
-        // нужно определить роль убитого
-        var dailyNews = new DailyNews();
-
-        while(stack.TryPop(out var kill))
-        {
-            foreach(var action in kill.Role.AllActions().Where(a=>a.AllConditions().Intersect(Values.OnDeathConditions).Any()))
-            {
-                if (await action.CheckConditions(state, kill))
-                {
-                    var actionNews = await action.DoOperations(state, kill);
-                    var actionKills = actionNews.GetKills();
-                    actionKills.ForEach(stack.Push);
-                    dailyNews.Collect(actionNews);
-                }
-            }
-        }
-
-        state.LatestNews.Collect(dailyNews);
-
-        if (city.GetRule(RuleName.KillOnDeathNoHeal).Accepted)
-        {
-            state.LatestNews.FactKills = state.LatestNews.FactKills.Concat(dailyNews.GetKills()).ToArray();
-        }
-        else
-        {
-            CalcNightKills();
-        }
     }
 
     private async Task<bool> IsGameEnd() => state.Players.Count == 0 || GetWinnerGroup() != null || await host.IsGameEnd(state);
@@ -224,17 +226,18 @@ public class Game
             state.IsMorning = true;
             await host.NotifyDayStart(state);
             await host.NotifyCityAfterNight(state);
+
             if (await IsGameEnd())
             {
                 await host.NotifyGameEnd(state, GetWinnerGroup()!);
                 return true;
             }
-            await PlayDay();
-            CalcDayKills();
+            await PlayDay();            
             await PlayOnDeathKills();
             ApplyKills();
             state.IsEvening = true;
             await host.NotifyCityAfterDay(state);
+
             if (await IsGameEnd())
             {
                 await host.NotifyGameEnd(state, GetWinnerGroup()!);
@@ -250,8 +253,6 @@ public class Game
         {
             state.IsNight = true;
             await PlayNight();
-
-            CalcNightKills();
             await PlayOnDeathKills();
             ApplyKills();
         }

@@ -11,104 +11,71 @@ public class MafiaDebugTests : MafiaTestsBase
     [Fact]
     public async Task Debug_Classic12_100()
     {
-        var n = 100;
-
         void SetOptions(TestDebugOptions options)
         {
-            options.Seed = 0;
             options.HostInstructions = false;
             options.CitySelections = true;
             options.RolesPreset = [("Дон", 1), ("Бомж", 1), ("Маньяк", 1), ("Комиссар", 1), ("Доктор", 1), ("Мафия", 1), ("Мирный", 6)];
         }
 
-        var provider = CreateTestDebug("mafia-vicino-ru.json", SetOptions);
-        var host = provider.GetRequiredService<IHost>();
-        var game = provider.GetRequiredService<Game>();
-        var city = provider.GetRequiredService<City>();
-
-        for (var k = 0; k < n; k++)
-        {
-            Debug.WriteLine($"\r\n'{city.Name}' game {k}");
-            host.ChangeSeed(k);
-            await game.Start();
-        }
+        await RunDebugGames("mafia-vicino-ru.json", 100, 0, SetOptions);
     }
 
     [Fact]
     public async Task Debug_Classic15_100()
     {
-        var n = 100;
-
         void SetOptions(TestDebugOptions options)
         {
-            options.Seed = 0;
-            options.HostInstructions = false;
+            options.HostInstructions = true;
             options.CitySelections = true;
             options.RolesPreset = [("Дон", 1), ("Бомж", 1), ("Маньяк", 1), ("Комиссар", 1), ("Доктор", 1), ("Камикадзе", 1), ("Мафия", 2), ("Мирный", 7)];
         }
 
-        var provider = CreateTestDebug("mafia-vicino-ru.json", SetOptions);
-        var host = provider.GetRequiredService<IHost>();
-        var game = provider.GetRequiredService<Game>();
-        var city = provider.GetRequiredService<City>();
-
-        for (var k = 0; k < n; k++)
-        {
-            Debug.WriteLine($"\r\n'{city.Name}' game {k}");
-            host.ChangeSeed(k);
-            await game.Start();
-        }
+        await RunDebugGames("mafia-vicino-ru.json", 100, 0, SetOptions);
     }
 
     [Fact]
     public async Task Debug_Difficult15_100()
     {
-        var n = 100;
-
         void SetOptions(TestDebugOptions options)
         {
-            options.Seed = 0;
             options.HostInstructions = false;
             options.CitySelections = true;
             options.RolesPreset = [("Дон", 1), ("Бомж", 1), ("Проститутка", 1), ("Маньяк", 1), ("Комиссар", 1), ("Доктор", 1), ("Мафия", 2), ("Мирный", 7)];
         }
 
-        var provider = CreateTestDebug("mafia-vicino-ru.json", SetOptions);
-        var host = provider.GetRequiredService<IHost>();
-        var game = provider.GetRequiredService<Game>();
-        var city = provider.GetRequiredService<City>();
-
-        for (var k = 0; k < n; k++)
-        {
-            Debug.WriteLine($"\r\n'{city.Name}' game {k}");
-            host.ChangeSeed(k);
-            await game.Start();
-        }
+        await RunDebugGames("mafia-vicino-ru.json", 100, 0, SetOptions);
     }
 
 
     [Fact]
     public async Task Debug_FullDifficult20_100()
     {
-        var n = 100;
-
-        void SetOptions(TestDebugOptions options)
+        async void SetOptions(TestDebugOptions options)
         {
-            options.Seed = 0;
+            options.Shaffle = true;
             options.HostInstructions = false;
             options.CitySelections = true;
             options.RolesPreset = [("Дон", 1), ("Бомж", 1), ("Проститутка", 1), ("Маньяк", 1), ("Комиссар", 1), ("Сержант", 1), ("Доктор", 1), ("Камикадзе", 1), ("Шахид", 1), ("Мафия", 3), ("Мирный", 8)];
         }
 
-        var provider = CreateTestDebug("mafia-vicino-ru.json", SetOptions);
+        await RunDebugGames("mafia-vicino-ru.json", 100, 777, SetOptions);
+    }
+
+
+
+    private async Task RunDebugGames(string map, int n, int startSeed, Action<TestDebugOptions> setOptions)
+    {
+        var provider = CreateTestDebug(map, setOptions);
         var host = provider.GetRequiredService<IHost>();
         var game = provider.GetRequiredService<Game>();
         var city = provider.GetRequiredService<City>();
 
         for (var k = 0; k < n; k++)
         {
-            Debug.WriteLine($"\r\n'{city.Name}' game {k}");
-            host.ChangeSeed(k);
+            var seed = k + startSeed;
+            Debug.WriteLine($"\r\n'{city.Name}' game {seed}");
+            host.ChangeSeed(seed);
             await game.Start();
         }
     }
