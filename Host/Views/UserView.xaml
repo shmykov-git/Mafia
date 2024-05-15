@@ -18,21 +18,22 @@
                 Style="{StaticResource Headline}"
                 HorizontalOptions="Start"
                 SemanticProperties.HeadingLevel="Level1" />
-            
-            <ListView ItemsSource="{Binding ActiveUsers}" ItemTapped="ListView_ItemTapped">
+
+            <ListView ItemsSource="{Binding FilteredActiveUsers}" ItemTapped="ListView_ItemTapped">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
-                            <Grid ColumnDefinitions="0.8*,0.2*">
-                                <Label Grid.Column="0"      
+                            <Grid ColumnDefinitions="*,*,*">
+                                <Editor Grid.Column="0"
                                        TextColor="{Binding NickColor}"
                                        Text="{Binding Nick}"     
                                        VerticalOptions="Center"
                                        VerticalTextAlignment="Center"
-                                       HorizontalOptions="Start"                                            
+                                       HorizontalOptions="Fill"                                            
                                        FontAttributes="Bold" />
 
-                                <CheckBox Grid.Column="1"
+                                <CheckBox Grid.Column="2"
+                                          VerticalOptions="Center"
                                           IsChecked="{Binding IsSelected}"                                           
                                           HorizontalOptions="End" />
                             </Grid>
@@ -40,9 +41,21 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
+
+            <Grid ColumnDefinitions="*,*,*">
+                <Button Grid.Column="0"
+                    Text="{Binding Messages[AddUser]}" 
+                    Command="{Binding AddUserCommand}"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Fill" />
+
+                <CheckBox Grid.Column="2"
+                    IsChecked="{Binding AreSelectedOnly}"
+                    HorizontalOptions="End"
+                    VerticalOptions="Center" />
+            </Grid>
             
-            <Button
-                    Text="{Binding Messages[SelectRoles]}" 
+            <Button Text="{Binding Messages[SelectRoles]}" 
                     Command="{Binding SelectRolesCommand}"
                     HorizontalOptions="Fill" />
         </VerticalStackLayout>

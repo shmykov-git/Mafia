@@ -4,10 +4,10 @@ namespace Host.Model;
 
 public class ActiveUser : NotifyPropertyChanged
 {
-    public ActiveUser(User user, Action<string> onChange, string propertyName)
+    public ActiveUser(User user, Action<string, ActiveUser> onChange, string propertyName)
     {
         User = user;
-        Subscribe(onChange, propertyName);
+        Subscribe((name, obj) => onChange(name, (ActiveUser)obj), propertyName);
     }
 
     public Color NickColorSilent { get; set; } = Colors.Black;
@@ -18,7 +18,16 @@ public class ActiveUser : NotifyPropertyChanged
     public string Nick { get => User.Nick; set { User.Nick = value; Changed(); } }
 
     public bool IsSelectedSilent { get; set; }
-    public bool IsSelected { get => IsSelectedSilent; set { IsSelectedSilent = value; Changed(); } }
-
-
+    public bool IsSelected 
+    { 
+        get => IsSelectedSilent; 
+        set         
+        {
+            var changed = IsSelectedSilent != value;
+            IsSelectedSilent = value; 
+            
+            if (changed) 
+                Changed(); 
+        } 
+    }
 }

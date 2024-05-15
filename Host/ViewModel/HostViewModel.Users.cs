@@ -1,8 +1,10 @@
 ﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Windows.Input;
 using Host.Extensions;
 using Host.Model;
 using Mafia.Extensions;
+using Mafia.Libraries;
 using Mafia.Model;
 
 namespace Host.ViewModel;
@@ -11,11 +13,15 @@ public partial class HostViewModel
 {
     private const string UsersSecureKey = "Mafia_Host_Users";
     private List<User> users;
+    private bool _areSelectedOnly = true;
     
-    private ObservableCollection<ActiveUser> _activeUsers = [];
-    public ObservableCollection<ActiveUser> ActiveUsers { get => _activeUsers; set { _activeUsers = value; ChangedSilently(); Changed(nameof(IsUsersTabAvailable), nameof(PlayerInfo), nameof(PlayerRoleInfo)); } }
+    private List<ActiveUser> _activeUsers = [];
+    public List<ActiveUser> ActiveUsers { get => _activeUsers; set { _activeUsers = value; ChangedSilently(); Changed(nameof(IsUsersTabAvailable), nameof(PlayerInfo), nameof(PlayerRoleInfo), nameof(FilteredActiveUsers)); } }
+    public IEnumerable<ActiveUser> FilteredActiveUsers => ActiveUsers.Where(u => !AreSelectedOnly || u.IsSelected);
 
     public bool IsUsersTabAvailable => ActiveUsers.Count > 0;
+
+    public bool AreSelectedOnly { get => _areSelectedOnly; set { _areSelectedOnly = value; Changed(); Changed(nameof(FilteredActiveUsers)); } }
 
     public string PlayerInfo => Messages["PlayerCountInfo"].With(ActiveUsers.Where(r => r.IsSelected).Count());
 
@@ -23,6 +29,20 @@ public partial class HostViewModel
     {
 
     }
+    
+    public ICommand AddUserCommand => new Command(() =>
+    {
+        var user = new User { Nick = $"Nick{ActiveUsers.Count + 1}", LastPlay = DateTime.Today };
+        users.Add(user);
+
+        ActiveUsers.Add(new ActiveUser(user, OnActiveUserChange, nameof(ActiveUsers))
+        {
+            NickColorSilent = options.CityColor,
+            IsSelectedSilent = true,
+        });
+
+        Changed(nameof(FilteredActiveUsers));
+    });
 
     public ICommand SelectRolesCommand => new Command(async () =>
     {
@@ -43,18 +63,27 @@ public partial class HostViewModel
             await WriteUsers(users);
         }
 
-        ActiveUsers = users.OrderBy(u => u.Nick).Take(options.PresetPlayerCount).Select(GetActiveUser).ToObservableCollection();
+        ActiveUsers = users.OrderBy(u => u.Nick).Take(options.PresetPlayerCount).Select(GetActiveUser).ToList();
     }
 
-    private ActiveUser GetActiveUser(User user, int i) => new ActiveUser(user, onActiveUserChange, nameof(ActiveUsers)) 
+    private ActiveUser GetActiveUser(User user, int i) => new ActiveUser(user, OnActiveUserChange, nameof(ActiveUsers)) 
     {
         NickColorSilent = options.CityColor,
         IsSelectedSilent = i < options.PresetPlayerSelectedCount
     };
 
-    private void onActiveUserChange(string name)
+    private void OnActiveUserChange(string name, ActiveUser activeUser)
     {
-        Changed(nameof(PlayerInfo));
+        async Task Changed_FilteredActiveUsers() => Changed(nameof(FilteredActiveUsers));
+        Task WriteUsers_users() => WriteUsers(users);
+
+        Runs.FirstInTime(WriteUsers_users, TimeSpan.FromMilliseconds(500));
+
+        if (name == nameof(ActiveUser.IsSelected))
+        {
+            Changed(nameof(PlayerInfo));
+            Runs.FirstInTime(Changed_FilteredActiveUsers, TimeSpan.FromMilliseconds(1000));
+        }                
     }
 
     private async Task<List<User>> ReadUsers()
