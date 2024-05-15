@@ -91,13 +91,11 @@ public partial class HostViewModel : NotifyPropertyChanged
         Debug.WriteLine(text);
     }
 
-    private void SaveGameReplay(State state)
+    private async Task SaveGameReplay(State state)
     {
-        var players = state.Players0.ToList();
-        int[] GetWhom(Select s) => s.Whom.Select(p => players.IndexOf(p)).ToArray();
-        int GetWho(Select s) => s.IsCity ? -1 : players.IndexOf(s.Who);
-        var items = state.News.SelectMany(n => n.Selects.Select(s => $"({GetWho(s)}, [{GetWhom(s).SJoin(", ")}])")).SJoin(", ");
-        Debug.WriteLine($"[{items}]");
+        replays.Add(state.Replay);
+        await WriteReplace(replays);
+        Debug.WriteLine($"[{state.Replay}]");
     }
 
 

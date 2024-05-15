@@ -209,7 +209,7 @@ public class Game
         state = new State 
         { 
             Host = host, 
-            Replay = new Replay() { MapName = city.Name, MapVersion = city.Version },
+            Replay = new Replay() { MapName = city.Name, MapVersion = city.Version, StartTime = DateTime.Now, EndTime = DateTime.Now },
             City = city,
             Players0 = players0, 
             Players = players0.ToList(), 
@@ -278,6 +278,7 @@ public class Game
             int GetWho(Select s) => s.IsCity ? -1 : players.IndexOf(s.Who);
 
             state.Replay.Selections = state.News.Select(n => n.AllSelects().Select(s => (GetWho(s), GetWhom(s))).ToArray()).ToArray();
+            state.Replay.EndTime = DateTime.Now;
         }
 
         while (!state.Stopping)

@@ -48,13 +48,17 @@ public partial class HostViewModel : IHost
             NickColor = options.CityColor,
             RoleColor = options.CityColor
         }).OrderBy(p => p.Nick).ToArray();
-            //.OrderBy(p => p.Player.Group.Name).ThenBy(p => p.Player.Role.Rank).ToArray();
+        //.OrderBy(p => p.Player.Group.Name).ThenBy(p => p.Player.Role.Rank).ToArray();
+
+        replays.Add(state.Replay);        
     }
 
     public async Task NotifyGameEnd(State state, Group winnerGroup)
     {
         Log($"GameEnd, the winner is {winnerGroup.Name}");
         Log($"===== </day {state.DayNumber}> =====");
+
+        await SaveGameReplay(state);
 
         ActivePlayerFilter.Killed = true;
 
@@ -67,8 +71,6 @@ public partial class HostViewModel : IHost
 
         if (navigationPath == "//pages/GameView")
             await Shell.Current.GoToAsync("//pages/StartGameView");
-
-        SaveGameReplay(state);
     }
 
     public async Task NotifyCityAfterNight(State state)
