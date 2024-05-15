@@ -53,6 +53,14 @@ public abstract class NotifyPropertyChanged : INotifyPropertyChanged
         propertyNames.ForEach(Changed);
     }
 
+    protected T IfChanged<T>(T prev, T t, [CallerMemberName] string propertyName = "") where T : IEquatable<T>
+    {
+        if (!prev.Equals(t))
+            Changed(propertyName);
+
+        return t;
+    }
+
     protected void Changed([CallerMemberName] string propertyName = "")
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
