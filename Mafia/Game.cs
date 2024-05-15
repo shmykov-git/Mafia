@@ -209,6 +209,7 @@ public class Game
         state = new State 
         { 
             Host = host, 
+            Replay = new Replay() { MapName = city.Name, MapVersion = city.Version },
             City = city,
             Players0 = players0, 
             Players = players0.ToList(), 
@@ -264,6 +265,21 @@ public class Game
             host.RolledBack(state);
         }
 
+        void UpdateStateReplay()
+        {
+            if (state.IsFirstDay)
+                return;
+
+            if (state.Replay.Players.Length == 0)
+                state.Replay.Players = state.Players0.Select(p => (p.User!.Nick, p.Role.Name)).ToArray();
+
+            var players = state.Players0.ToList();
+            int[] GetWhom(Select s) => s.Whom.Select(p => players.IndexOf(p)).ToArray();
+            int GetWho(Select s) => s.IsCity ? -1 : players.IndexOf(s.Who);
+
+            state.Replay.Selections = state.News.Select(n => n.AllSelects().Select(s => (GetWho(s), GetWhom(s))).ToArray()).ToArray();
+        }
+
         while (!state.Stopping)
         {
             var needBreak = false;
@@ -286,11 +302,15 @@ public class Game
 
                 if (state.RollingBack)
                     Rollback();
-            } while (state.RollingBack);            
+            } while (state.RollingBack);
+
+            if (!state.IsFirstDay)
+                UpdateStateReplay();
 
             state.DayNumber++;
         }
 
+        UpdateStateReplay();
         state.IsActive = false;
         
         if (stopping != null)

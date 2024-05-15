@@ -10,6 +10,7 @@ public class State
     public required IHost Host { get; set; }
     public required City City { get; set; }
     public required List<DailyNews> News { get; set; }
+    public required Replay Replay { get; set; }
     public DailyNews YesterdayNews => News.Count < 3 ? new DailyNews() : News[^3];
     public DailyNews LatestDayNews => IsDay ? LatestNews : (News.Count < 2 ? new DailyNews() : News[^2]);
     public DailyNews LatestNews => News.Count < 1 ? new DailyNews() : News[^1];

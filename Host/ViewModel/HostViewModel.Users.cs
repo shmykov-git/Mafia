@@ -12,6 +12,7 @@ namespace Host.ViewModel;
 public partial class HostViewModel
 {
     private const string UsersSecureKey = "Mafia_Host_Users";
+
     private List<User> users;
     private bool _areSelectedOnly = true;
     
@@ -51,21 +52,6 @@ public partial class HostViewModel
         await Shell.Current.GoToAsync("//pages/StartGameView");
     });
 
-    private async Task InitDatabaseUsers()
-    {
-        users = await ReadUsers();
-        
-        if (users.Count < options.PresetPlayerCount)
-        {
-            var lastPlay = DateTime.Now.Date;
-            var newUsers = Enumerable.Range(users.Count + 1, options.PresetPlayerCount - users.Count + 1).Select(i => new User { Nick = $"Nick{i}", LastPlay = lastPlay }).ToArray();
-            users.AddRange(newUsers);
-            await WriteUsers(users);
-        }
-
-        ActiveUsers = users.OrderBy(u => u.Nick).Take(options.PresetPlayerCount).Select(GetActiveUser).ToList();
-    }
-
     private ActiveUser GetActiveUser(User user, int i) => new ActiveUser(user, OnActiveUserChange, nameof(ActiveUsers)) 
     {
         NickColorSilent = options.CityColor,
@@ -100,4 +86,5 @@ public partial class HostViewModel
     {
         await SecureStorage.Default.SetAsync(UsersSecureKey, users.ToJson());
     }
+
 }
