@@ -30,12 +30,12 @@
     <FlyoutItem Route="roles"                
                 Icon="mafia1.jpg"
                 IsEnabled="{Binding IsStartGameTabAvailable}"
-                Title="{Binding Messages[NewGame]}">
+                Title="{Binding Messages[Roles]}">
 
         <ShellContent
-            Title="{Binding Messages[NewGame]}"
-            ContentTemplate="{DataTemplate local:StartGameView}"
-            Route="StartGameView" />
+            Title="{Binding Messages[Roles]}"
+            ContentTemplate="{DataTemplate local:RoleView}"
+            Route="RoleView" />
     </FlyoutItem>
 
     <FlyoutItem Route="games"                

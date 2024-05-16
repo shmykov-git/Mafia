@@ -7,13 +7,7 @@ public partial class AppShell : Shell
 {
     public AppShell()
     {
-        try
-        {
-            InitializeComponent();
-        }
-        catch(FileNotFoundException e) when (!e.Message.HasText())
-        {
-        }
+        InitializeComponent();
     }
 
     private void Shell_Navigated(object sender, ShellNavigatedEventArgs e)

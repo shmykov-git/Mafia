@@ -7,13 +7,7 @@ public partial class UserView : ContentPage
 {
     public UserView()
     {
-        try
-        {
-            InitializeComponent();
-        }
-        catch (FileNotFoundException e) when (!e.Message.HasText())
-        {
-        }
+        InitializeComponent();
     }
 
     private void ListView_ItemTapped(object sender, ItemTappedEventArgs e)

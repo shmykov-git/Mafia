@@ -51,12 +51,12 @@
                 Command="{Binding SelectRolesCommand}"
                 HorizontalOptions="Fill" />
 
-                <VerticalStackLayout Grid.Column="1" Padding="25,0,0,0">
+                <StackLayout Grid.Column="1" Padding="25,0,0,0">
                     <CheckBox
                     IsChecked="{Binding AreSelectedOnly}"
                     HorizontalOptions="End"
                     VerticalOptions="Center" />
-                </VerticalStackLayout>
+                </StackLayout>
             </Grid>
         </VerticalStackLayout>
     </Grid>

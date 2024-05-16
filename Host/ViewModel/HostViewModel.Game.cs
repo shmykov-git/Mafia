@@ -52,7 +52,8 @@ public partial class HostViewModel
     public IEnumerable<ActivePlayer> AliveActivePlayers => ActivePlayers.Where(p => p.IsAlive);
     public ActiveRole[] ActivePlayerRoles { get => _activePlayerRoles; set { _activePlayerRoles = value; ChangedSilently(); Changed(nameof(ContinueCommand)); } }
     public bool IsActivePlayerRoleVisible { get => _isActivePlayerRoleVisible; set { _isActivePlayerRoleVisible = value; Changed(); Changed(nameof(ContinueCommand)); } }
-    public bool IsRollbackAvailable { get => _isRollbackAvailable; set { _isRollbackAvailable = value; Changed(); Changed(nameof(RollbackCommand)); } }
+    public bool IsRollbackAvailable { get => _isRollbackAvailable; set { _isRollbackAvailable = value; Changed(); Changed(nameof(RollbackCommand), nameof(IsRollbackNotAvailable)); } }
+    public bool IsRollbackNotAvailable { get => !IsRollbackAvailable; set { IsRollbackAvailable = !value; Changed(); Changed(nameof(RollbackCommand), nameof(IsRollbackAvailable)); } }
     public string SelectedPlayerRoleMessage { get => _selectedPlayerRoleMessage; set { _selectedPlayerRoleMessage = value; Changed(); } }
     public Color SelectedPlayerRoleMessageColor { get => _selectedPlayerRoleMessageColor; set { _selectedPlayerRoleMessageColor = value; Changed(); } }
 
@@ -336,11 +337,11 @@ public partial class HostViewModel
                 await PrepareActivePlayerRoles(roleList.Distinct().ToArray());
                 IsActivePlayerRoleVisible = true;
                 await WaitForHostInteraction();
+                IsActivePlayerRoleVisible = false;
 
                 if (state.Stopping || state.RollingBack)
                     return;
 
-                IsActivePlayerRoleVisible = false;
                 var selectedRole = ActivePlayerRoles.Single(r => r.IsSelected);                
                 AttachRole(activePlayer, selectedRole.Role);
                 selectedRole.RoleColor = activePlayer.RoleColor;

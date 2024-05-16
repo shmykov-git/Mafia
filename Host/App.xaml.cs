@@ -11,15 +11,9 @@ public partial class App : Application
 
     public App(IOptions<HostOptions> options, AppShell shell)
     {
-        try
-        {
-            InitializeComponent();
-        }
-        catch (FileNotFoundException e) when (!e.Message.HasText())
-        {
-        }
-        MainPage = shell;
+        InitializeComponent();
         this.options = options.Value;
+        MainPage = shell;
     }
 
     protected override Window CreateWindow(IActivationState? activationState)

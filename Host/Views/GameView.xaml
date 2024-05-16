@@ -1,37 +1,32 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Host.Views.GameView">
-
-    <ScrollView>
-        <VerticalStackLayout 
-            Padding="30,0"
-            Spacing="25" >
-            
+             x:Class="Host.Views.GameView"
+             Padding="30,0" >
+    <Grid RowDefinitions="Auto,*,Auto" >
+        <VerticalStackLayout Grid.Row="0">
             <Label
                 TextColor="{Binding HintColor}"
                 IsVisible="{Binding IsHostHintVisible}"
                 Text="{Binding HostHint}"
-                Style="{StaticResource InfoLine}"
-                HorizontalOptions="Start" 
-                VerticalOptions="Center" />
-            
-            <Label
+                Style="{StaticResource InfoLine}" />
+
+            <Label Padding="0,10,0,0"
                 TextColor="{Binding HintColor}"
                 IsVisible="{Binding IsSubHostHintVisible}"
                 Text="{Binding SubHostHint}"
-                Style="{StaticResource InfoLine}"
-                HorizontalOptions="Start" 
-                VerticalOptions="Center" />
+                Style="{StaticResource InfoLine}" />
+        </VerticalStackLayout>
 
-            <Grid>
-                <ListView ItemsSource="{Binding FilteredActivePlayers}" ItemTapped="ListView_ActivePlayer_ItemTapped">
+        <Grid Grid.Row="1">
+            <ScrollView>
+                <ListView ItemsSource="{Binding FilteredActivePlayers}" ItemTapped="ListView_ActivePlayer_ItemTapped" SelectionMode="None" >
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <ViewCell>
-                                <Grid ColumnDefinitions="0.2*,0.2*,0.4*,0.2*">
-                                    <Label Grid.Column="0"
-                                       
+                                <VerticalStackLayout Padding="0,5,0,5">
+                                    <Grid ColumnDefinitions="*,*,0.5*,Auto">
+                                        <Label Grid.Column="0"                                       
                                             Text="{Binding Nick}"
                                             TextColor="{Binding NickColor}"
                                             FontAttributes="Bold"
@@ -39,8 +34,7 @@
                                             VerticalTextAlignment="Center"
                                             HorizontalOptions="Start" />
 
-                                    <Label Grid.Column="1"
-                                       
+                                        <Label Grid.Column="1"                                       
                                             Text="{Binding RoleName}"
                                             TextColor="{Binding RoleColor}"
                                             FontAttributes="Bold"
@@ -48,8 +42,8 @@
                                             VerticalTextAlignment="Center"
                                             HorizontalOptions="Start" />
 
-                                    <Label Grid.Column="2"
-                                           FontSize="24"
+                                        <Label Grid.Column="2"
+                                            FontSize="24"
                                             Text="{Binding Operation}"
                                             TextColor="{Binding OperationColor}"
                                             FontAttributes="Bold"
@@ -57,60 +51,56 @@
                                             VerticalTextAlignment="Center"
                                             HorizontalOptions="Center" />
 
-                                    <CheckBox Grid.Column="3"
-                                              IsEnabled="{Binding IsEnabled}"                                               
-                                              IsChecked="{Binding IsSelected}"                                           
-                                              Color="{Binding CheckboxColor}"
-                                              VerticalOptions="Center"
-                                              HorizontalOptions="End" >
-                                        <CheckBox.Triggers>
-                                            <Trigger TargetType="CheckBox" Property="IsEnabled" Value="False">
-                                                <Setter Property="Color" Value="{Binding CheckboxColor}"/>
-                                            </Trigger>
-                                        </CheckBox.Triggers>
-                                    </CheckBox>
-                                </Grid>
+                                        <CheckBox Grid.Column="3"
+                                            IsEnabled="{Binding IsEnabled}"                                               
+                                            IsChecked="{Binding IsSelected}"                                           
+                                            Color="{Binding CheckboxColor}"
+                                            VerticalOptions="Center"
+                                            HorizontalOptions="End" >
+                                            <CheckBox.Triggers>
+                                                <Trigger TargetType="CheckBox" Property="IsEnabled" Value="False">
+                                                    <Setter Property="Color" Value="{Binding CheckboxColor}"/>
+                                                </Trigger>
+                                            </CheckBox.Triggers>
+                                        </CheckBox>
+                                    </Grid>
+                                </VerticalStackLayout>
                             </ViewCell>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
-                <Border 
+            </ScrollView>
+
+            <Border 
                     IsVisible="{Binding IsActivePlayerRoleVisible}"
                     StrokeThickness="4"
                     StrokeShape="RoundRectangle 40,0,0,40"
                     Background="White"                    
                     Padding="30,25"                    
                     HorizontalOptions="Center">
-                    <Border.Stroke>
-                        <LinearGradientBrush EndPoint="0,1">
-                            <GradientStop Color="Orange"
-                            Offset="0.1" />
-                            <GradientStop Color="Brown"
-                            Offset="1.0" />
-                        </LinearGradientBrush>
-                    </Border.Stroke>
+                <Border.Stroke>
+                    <LinearGradientBrush EndPoint="0,1">
+                        <GradientStop Color="Orange" Offset="0.1" />
+                        <GradientStop Color="Brown" Offset="1.0" />
+                    </LinearGradientBrush>
+                </Border.Stroke>
 
-                    <VerticalStackLayout Spacing="25">
-                        <Label                                             
+                <VerticalStackLayout Spacing="25">
+                    <Label                                             
                             Text="{Binding SelectedPlayerRoleMessage}"
                             TextColor="{Binding SelectedPlayerRoleMessageColor}"
-                            Style="{StaticResource HostHintline}"
-                            VerticalOptions="Center"
-                            VerticalTextAlignment="Center"
-                            HorizontalOptions="Start" />
+                            Style="{StaticResource Infoline}" />
 
-                        <ListView ItemsSource="{Binding ActivePlayerRoles}" ItemTapped="ListView_ActivePlayerRole_ItemTapped">
-                            <ListView.ItemTemplate>
-                                <DataTemplate>
-                                    <ViewCell>
-                                        <Grid ColumnDefinitions="0.8*,0.2*" >
-                                            <Label Grid.Column="0"                                       
-                                                Text="{Binding RoleName}"
-                                                TextColor="{Binding RoleColor}"
-                                                FontAttributes="Bold"
-                                                VerticalOptions="Center"
-                                                VerticalTextAlignment="Center"
-                                                HorizontalOptions="Start" />
+                    <ListView ItemsSource="{Binding ActivePlayerRoles}" ItemTapped="ListView_ActivePlayerRole_ItemTapped" SelectionMode="None" >
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <ViewCell>
+                                    <VerticalStackLayout Padding="0,5,0,5">
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <Label Grid.Column="0"              
+                                                       Style="{StaticResource Infoline}" 
+                                                    Text="{Binding RoleName}"
+                                                    TextColor="{Binding RoleColor}" />
 
                                             <CheckBox Grid.Column="1"
                                                     IsEnabled="{Binding IsEnabled}"
@@ -118,40 +108,46 @@
                                                     VerticalOptions="Center"
                                                     HorizontalOptions="End" />
                                         </Grid>
-                                    </ViewCell>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
-                    </VerticalStackLayout>
-                </Border>
+                                    </VerticalStackLayout>
+                                </ViewCell>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+        
+        <VerticalStackLayout Grid.Row="2" Padding="0,0,0,25" Spacing="25">
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Grid.Column="0" 
+                       Text="{Binding GameInfo}" 
+                       Style="{StaticResource InfoLine}" />
+                
+                <CheckBox Grid.Column="1" 
+                          IsVisible="{Binding IsRollbackNotAvailable}"
+                          IsChecked="{Binding IsRollbackAvailable}" />
             </Grid>
+           
+            <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding IsRollbackAvailable}">
+                <Button Text="{Binding Messages[Rollback]}" 
+                        Command="{Binding RollbackCommand}"
+                        HorizontalOptions="Fill" />
 
-            <Grid ColumnDefinitions="0.5*,0.5*">
-                <Label Grid.Column="0"
-                    Text="{Binding GameInfo}"
-                    VerticalTextAlignment="Center"
-                    VerticalOptions="Center"
-                    HorizontalOptions="Start" />
-
-                <StackLayout Grid.Column="1" Orientation="Horizontal" HorizontalOptions="End">
-                    <CheckBox IsChecked="{Binding IsRollbackAvailable}"
-                          VerticalOptions="Center" />
-                    
-                    <CheckBox IsChecked="{Binding ActivePlayerFilter.Killed}"
-                          VerticalOptions="Center" />
+                <StackLayout Grid.Column="1" Padding="25,0,0,0">
+                    <CheckBox IsChecked="{Binding IsRollbackAvailable}" />
                 </StackLayout>
             </Grid>
 
-            <Button IsVisible="{Binding IsRollbackAvailable}"
-                    Text="{Binding Messages[Rollback]}" 
-                    Command="{Binding RollbackCommand}"
-                    HorizontalOptions="Fill" />
+            <Grid ColumnDefinitions="*,Auto">
+                <Button 
+                        Text="{Binding Messages[Continue]}" 
+                        Command="{Binding ContinueCommand}"
+                        HorizontalOptions="Fill" />
 
-            <Button 
-                    Text="{Binding Messages[Continue]}" 
-                    Command="{Binding ContinueCommand}"
-                    HorizontalOptions="Fill" />
+                <StackLayout Grid.Column="1" Padding="25,0,0,0">
+                    <CheckBox IsChecked="{Binding ActivePlayerFilter.Killed}" />
+                </StackLayout>
+            </Grid>
         </VerticalStackLayout>
-    </ScrollView>
-
+    </Grid>
 </ContentPage>

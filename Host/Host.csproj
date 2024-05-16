@@ -106,8 +106,8 @@
 	  <Compile Update="Views\UserView.xaml.cs">
 	    <DependentUpon>UserView.xaml</DependentUpon>
 	  </Compile>
-	  <Compile Update="Views\StartGameView.xaml.cs">
-	    <DependentUpon>StartGameView.xaml</DependentUpon>
+	  <Compile Update="Views\RoleView.xaml.cs">
+	    <DependentUpon>RoleView.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 

@@ -35,7 +35,7 @@ public static class MauiProgram
             .AddSingleton<IHost, HostViewModel>(p => p.GetRequiredService<HostViewModel>())
             .AddTransient(p => new AppShell() { BindingContext = p.GetRequiredService<HostViewModel>() })
             .AddTransient(p => new UserView() { BindingContext = p.GetRequiredService<HostViewModel>() })
-            .AddTransient(p => new StartGameView() { BindingContext = p.GetRequiredService<HostViewModel>() })
+            .AddTransient(p => new RoleView() { BindingContext = p.GetRequiredService<HostViewModel>() })
             .AddTransient(p => new GameView() { BindingContext = p.GetRequiredService<HostViewModel>() })
             ;
 

@@ -3,17 +3,11 @@ using Mafia.Extensions;
 
 namespace Host.Views;
 
-public partial class StartGameView : ContentPage
+public partial class RoleView : ContentPage
 {
-    public StartGameView()
+    public RoleView()
     {
-        try
-        {
-            InitializeComponent();
-        }
-        catch (FileNotFoundException e) when (!e.Message.HasText())
-        {
-        }
+        InitializeComponent();
     }
 
     private void ListView_ItemTapped(object sender, ItemTappedEventArgs e)

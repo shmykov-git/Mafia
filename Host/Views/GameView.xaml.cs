@@ -7,13 +7,7 @@ public partial class GameView : ContentPage
 {
     public GameView()
     {
-        try
-        {
-            InitializeComponent();
-        }
-        catch (FileNotFoundException e) when (!e.Message.HasText())
-        {
-        }
+        InitializeComponent();
     }
 
     private void ListView_ActivePlayer_ItemTapped(object sender, ItemTappedEventArgs e)
