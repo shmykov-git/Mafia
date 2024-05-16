@@ -6,6 +6,7 @@ public class City
 {
     public required string Name { get; set; }
     public required string Version { get; set; }
+    public required string Language { get; set; }    
     public required Group[] Groups { get; set; }
     public required string[] NightEvents { get; set; }
     public required CityAction[] DayActions { get; set; }
