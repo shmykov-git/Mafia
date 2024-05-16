@@ -1,5 +1,4 @@
 ﻿using Host.Model;
-using Mafia.Extensions;
 
 namespace Host.Views;
 

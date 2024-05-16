@@ -89,7 +89,7 @@
                     <Label                                             
                             Text="{Binding SelectedPlayerRoleMessage}"
                             TextColor="{Binding SelectedPlayerRoleMessageColor}"
-                            Style="{StaticResource Infoline}" />
+                            Style="{StaticResource InfoLine}" />
 
                     <ListView ItemsSource="{Binding ActivePlayerRoles}" ItemTapped="ListView_ActivePlayerRole_ItemTapped" SelectionMode="None" >
                         <ListView.ItemTemplate>
@@ -97,10 +97,10 @@
                                 <ViewCell>
                                     <VerticalStackLayout Padding="0,5,0,5">
                                         <Grid ColumnDefinitions="*,Auto">
-                                            <Label Grid.Column="0"              
-                                                       Style="{StaticResource Infoline}" 
+                                            <Label Grid.Column="0"                                                                      
                                                     Text="{Binding RoleName}"
-                                                    TextColor="{Binding RoleColor}" />
+                                                    TextColor="{Binding RoleColor}"
+                                                   Style="{StaticResource InfoLine}" />
 
                                             <CheckBox Grid.Column="1"
                                                     IsEnabled="{Binding IsEnabled}"
