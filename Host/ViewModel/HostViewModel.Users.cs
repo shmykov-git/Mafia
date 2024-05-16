@@ -63,8 +63,8 @@ public partial class HostViewModel
 
         if (name == nameof(ActiveUser.IsSelected))
         {
-            Changed(nameof(PlayerInfo));
-            Runs.FirstInTime(Changed_FilteredActiveUsers, TimeSpan.FromMilliseconds(1000));
+            Changed(nameof(PlayerInfo), nameof(PlayerRoleInfo));
+            Runs.FirstInTime(Changed_FilteredActiveUsers, TimeSpan.FromMilliseconds(500));
         }                
     }
 

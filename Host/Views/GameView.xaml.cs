@@ -1,4 +1,5 @@
 ﻿using Host.Model;
+using Mafia.Extensions;
 
 namespace Host.Views;
 
@@ -6,7 +7,13 @@ public partial class GameView : ContentPage
 {
     public GameView()
     {
-        InitializeComponent();
+        try
+        {
+            InitializeComponent();
+        }
+        catch (FileNotFoundException e) when (!e.Message.HasText())
+        {
+        }
     }
 
     private void ListView_ActivePlayer_ItemTapped(object sender, ItemTappedEventArgs e)

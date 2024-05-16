@@ -1,6 +1,7 @@
 ﻿using Host.Model;
 using Host.Views;
 using Microsoft.Extensions.Options;
+using Mafia.Extensions;
 
 namespace Host;
 
@@ -10,7 +11,13 @@ public partial class App : Application
 
     public App(IOptions<HostOptions> options, AppShell shell)
     {
-        InitializeComponent();
+        try
+        {
+            InitializeComponent();
+        }
+        catch (FileNotFoundException e) when (!e.Message.HasText())
+        {
+        }
         MainPage = shell;
         this.options = options.Value;
     }

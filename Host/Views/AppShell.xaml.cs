@@ -1,4 +1,5 @@
 ﻿using Host.ViewModel;
+using Mafia.Extensions;
 
 namespace Host.Views;
 
@@ -6,7 +7,13 @@ public partial class AppShell : Shell
 {
     public AppShell()
     {
-        InitializeComponent();
+        try
+        {
+            InitializeComponent();
+        }
+        catch(FileNotFoundException e) when (!e.Message.HasText())
+        {
+        }
     }
 
     private void Shell_Navigated(object sender, ShellNavigatedEventArgs e)
@@ -15,6 +22,6 @@ public partial class AppShell : Shell
         {
             if (hostViewModel.NavigatedCommand.CanExecute(e.Current.Location.ToString()))
                 hostViewModel.NavigatedCommand.Execute(e.Current.Location.ToString());
-        }
+        }        
     }
 }

@@ -12,7 +12,7 @@
                 TextColor="{Binding HintColor}"
                 IsVisible="{Binding IsHostHintVisible}"
                 Text="{Binding HostHint}"
-                Style="{StaticResource HostHintline}"
+                Style="{StaticResource InfoLine}"
                 HorizontalOptions="Start" 
                 VerticalOptions="Center" />
             
@@ -20,7 +20,7 @@
                 TextColor="{Binding HintColor}"
                 IsVisible="{Binding IsSubHostHintVisible}"
                 Text="{Binding SubHostHint}"
-                Style="{StaticResource HostHintline}"
+                Style="{StaticResource InfoLine}"
                 HorizontalOptions="Start" 
                 VerticalOptions="Center" />
 
