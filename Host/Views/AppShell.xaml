@@ -9,7 +9,7 @@
     Navigated="Shell_Navigated" >
 
     <Shell.FlyoutHeader>
-        <VerticalStackLayout Padding="10,10" >
+        <VerticalStackLayout>
             <Image
             Source="mafia.jpg"
             HeightRequest="185"
@@ -18,7 +18,7 @@
     </Shell.FlyoutHeader>
     
     <FlyoutItem Route="users" 
-                Icon="mafia1.jpg"
+                Icon="users_icon.png"
                 Title="{Binding Messages[Players]}">
 
         <ShellContent
@@ -28,7 +28,7 @@
     </FlyoutItem>
 
     <FlyoutItem Route="roles"                
-                Icon="mafia1.jpg"
+                Icon="roles_icon.png"
                 IsEnabled="{Binding IsStartGameTabAvailable}"
                 Title="{Binding Messages[Roles]}">
 
@@ -39,7 +39,7 @@
     </FlyoutItem>
 
     <FlyoutItem Route="games"                
-                Icon="mafia1.jpg"
+                Icon="game_icon.png"
                 IsEnabled="{Binding IsGameTabAvailable}"
                 Title="{Binding Messages[Game]}" >
 

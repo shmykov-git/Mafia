@@ -87,32 +87,34 @@
 
                 <VerticalStackLayout Spacing="25">
                     <Label                                             
-                            Text="{Binding SelectedPlayerRoleMessage}"
-                            TextColor="{Binding SelectedPlayerRoleMessageColor}"
-                            Style="{StaticResource InfoLine}" />
-
-                    <ListView ItemsSource="{Binding ActivePlayerRoles}" ItemTapped="ListView_ActivePlayerRole_ItemTapped" SelectionMode="None" >
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <ViewCell>
-                                    <VerticalStackLayout Padding="0,5,0,5">
-                                        <Grid ColumnDefinitions="*,Auto">
-                                            <Label Grid.Column="0"                                                                      
+                        Text="{Binding SelectedPlayerRoleMessage}"
+                        TextColor="{Binding SelectedPlayerRoleMessageColor}"
+                        Style="{StaticResource InfoLine}" />
+                    
+                    <ScrollView>
+                        <ListView ItemsSource="{Binding ActivePlayerRoles}" ItemTapped="ListView_ActivePlayerRole_ItemTapped" SelectionMode="None" >
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <ViewCell>
+                                        <VerticalStackLayout Padding="0,5,0,5">
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <Label Grid.Column="0"                                                                      
                                                     Text="{Binding RoleName}"
                                                     TextColor="{Binding RoleColor}"
                                                    Style="{StaticResource InfoLine}" />
 
-                                            <CheckBox Grid.Column="1"
+                                                <CheckBox Grid.Column="1"
                                                     IsEnabled="{Binding IsEnabled}"
                                                     IsChecked="{Binding IsSelected}"                                           
                                                     VerticalOptions="Center"
                                                     HorizontalOptions="End" />
-                                        </Grid>
-                                    </VerticalStackLayout>
-                                </ViewCell>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
+                                            </Grid>
+                                        </VerticalStackLayout>
+                                    </ViewCell>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </ScrollView>
                 </VerticalStackLayout>
             </Border>
         </Grid>
