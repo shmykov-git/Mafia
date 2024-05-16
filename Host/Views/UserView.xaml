@@ -1,64 +1,64 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Host.Views.UserView">
-   
-    <ScrollView>
-        <VerticalStackLayout
-            Padding="30,0"
-            Spacing="25">
-            
-            <Image
-                Source="mafia.jpg"
-                HeightRequest="185"
-                Aspect="AspectFit" />
+             x:Class="Host.Views.UserView"
+             Padding="30,0" >
 
-            <Label
-                Text="{Binding PlayerInfo}"
-                Style="{StaticResource Headline}"
-                HorizontalOptions="Start"
-                SemanticProperties.HeadingLevel="Level1" />
+    <Grid RowDefinitions="Auto,*,Auto" >
+        <VerticalStackLayout Grid.Row="0">
+            <Label Text="{Binding PlayerInfo}"
+                    HorizontalOptions="Start" />
+        </VerticalStackLayout>
 
-            <ListView ItemsSource="{Binding FilteredActiveUsers}" ItemTapped="ListView_ItemTapped">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <ViewCell>
-                            <Grid ColumnDefinitions="*,*,*">
-                                <Editor Grid.Column="0"
-                                       TextColor="{Binding NickColor}"
-                                       Text="{Binding Nick}"     
-                                       VerticalOptions="Center"
-                                       VerticalTextAlignment="Center"
-                                       HorizontalOptions="Fill"                                            
-                                       FontAttributes="Bold" />
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout>
+                <Grid ColumnDefinitions="*,*,*">
+                    <Button Grid.Column="2"
+                        Text="{Binding Messages[AddUser]}" 
+                        Command="{Binding AddUserCommand}"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Fill" />
+                </Grid>
 
-                                <CheckBox Grid.Column="2"
-                                          VerticalOptions="Center"
-                                          IsChecked="{Binding IsSelected}"                                           
-                                          HorizontalOptions="End" />
-                            </Grid>
-                        </ViewCell>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                <ListView ItemsSource="{Binding FilteredActiveUsers}" ItemTapped="ListView_ItemTapped" SelectionMode="None" >
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                                <Grid ColumnDefinitions="*,*,Auto" Padding="0,25,0,0">
+                                    <Editor Grid.Column="0"
+                                           TextColor="{Binding NickColor}"
+                                           Text="{Binding Nick}"     
+                                           VerticalOptions="Center"
+                                           VerticalTextAlignment="Center"
+                                           HorizontalOptions="Fill"                                            
+                                           FontAttributes="Bold" />
 
-            <Grid ColumnDefinitions="*,*,*">
-                <Button Grid.Column="0"
-                    Text="{Binding Messages[AddUser]}" 
-                    Command="{Binding AddUserCommand}"
-                    VerticalOptions="Center"
-                    HorizontalOptions="Fill" />
+                                    <CheckBox Grid.Column="2"
+                                              VerticalOptions="Center"
+                                              IsChecked="{Binding IsSelected}"                                           
+                                              HorizontalOptions="End" />
+                                </Grid>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </VerticalStackLayout>
+        </ScrollView>
 
-                <CheckBox Grid.Column="2"
-                    IsChecked="{Binding AreSelectedOnly}"
-                    HorizontalOptions="End"
-                    VerticalOptions="Center" />
-            </Grid>
-            
-            <Button Text="{Binding Messages[SelectRoles]}" 
+        <VerticalStackLayout Grid.Row="2">
+            <Grid ColumnDefinitions="*,Auto" Padding="0,0,0,25">
+
+                <Button Text="{Binding Messages[SelectRoles]}" 
                     Command="{Binding SelectRolesCommand}"
                     HorizontalOptions="Fill" />
-        </VerticalStackLayout>
-    </ScrollView>
 
+                <VerticalStackLayout Grid.Column="1" Padding="25,0,0,0">
+                    <CheckBox
+                        IsChecked="{Binding AreSelectedOnly}"
+                        HorizontalOptions="End"
+                        VerticalOptions="Center" />
+                </VerticalStackLayout>
+            </Grid>
+        </VerticalStackLayout>
+    </Grid>
 </ContentPage>

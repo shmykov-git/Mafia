@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Windows.Input;
 using Host.Extensions;
+using Host.Libraries;
 using Host.Model;
 using Mafia.Extensions;
 using Mafia.Libraries;
@@ -26,11 +27,6 @@ public partial class HostViewModel
 
     public string PlayerInfo => Messages["PlayerCountInfo"].With(ActiveUsers.Where(r => r.IsSelected).Count());
 
-    private void OnTabUsersNavigated()
-    {
-
-    }
-    
     public ICommand AddUserCommand => new Command(() =>
     {
         var user = new User { Nick = $"Nick{ActiveUsers.Count + 1}", LastPlay = DateTime.Today };
@@ -49,7 +45,7 @@ public partial class HostViewModel
     {
         await StopCurrentGame();
         InitActiveRoles();
-        await Shell.Current.GoToAsync("//pages/StartGameView");
+        await Shell.Current.GoToAsync(Routes.RolesView);
     });
 
     private ActiveUser GetActiveUser(User user, int i) => new ActiveUser(user, OnActiveUserChange, nameof(ActiveUsers)) 

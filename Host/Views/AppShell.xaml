@@ -4,32 +4,49 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:Host.Views"
-    Shell.FlyoutBehavior="Disabled"
-    Title="Mafia Host" Navigated="Shell_Navigated" >
+    Title="{Binding Messages[MafiaHost]}" 
+    FlyoutHeaderBehavior="CollapseOnScroll"        
+    Navigated="Shell_Navigated" >
 
-    <FlyoutItem Route="pages"                
-                FlyoutDisplayOptions="AsMultipleItems">
+    <Shell.FlyoutHeader>
+        <VerticalStackLayout Padding="10,10" >
+            <Image
+            Source="mafia.jpg"
+            HeightRequest="185"
+            Aspect="AspectFit" />
+        </VerticalStackLayout>
+    </Shell.FlyoutHeader>
+    
+    <FlyoutItem Route="users" 
+                Icon="mafia1.jpg"
+                Title="{Binding Messages[Players]}">
 
         <ShellContent
-            Icon="appicon.svg"
             Title="{Binding Messages[Players]}"
             ContentTemplate="{DataTemplate local:UserView}"
             Route="UserView" />
+    </FlyoutItem>
+
+    <FlyoutItem Route="roles"                
+                Icon="mafia1.jpg"
+                IsEnabled="{Binding IsStartGameTabAvailable}"
+                Title="{Binding Messages[NewGame]}">
 
         <ShellContent
-            Icon="start.jpg"            
-            IsVisible="{Binding IsStartGameTabAvailable}"
-            Title="{Binding Messages[NewGame]}"            
+            Title="{Binding Messages[NewGame]}"
             ContentTemplate="{DataTemplate local:StartGameView}"
             Route="StartGameView" />
+    </FlyoutItem>
+
+    <FlyoutItem Route="games"                
+                Icon="mafia1.jpg"
+                IsEnabled="{Binding IsGameTabAvailable}"
+                Title="{Binding Messages[Game]}" >
 
         <ShellContent
-            Icon="game.png"
-            IsVisible="{Binding IsGameTabAvailable}"
             Title="{Binding Messages[Game]}"
             ContentTemplate="{DataTemplate local:GameView}"
             Route="GameView" />
-        
     </FlyoutItem>
 
     <ShellContent Route="UserView" />

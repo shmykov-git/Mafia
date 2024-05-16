@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Windows.Input;
+using Host.Libraries;
 using Host.Model;
 using Mafia.Extensions;
 using Mafia.Libraries;
@@ -26,11 +27,6 @@ public partial class HostViewModel
     private Role[] GetSelectedMultipliedRoles() => ActiveRoles.Where(r => r.IsSelected).SelectMany(r => Enumerable.Range(0, r.Count).Select(_ => r.Role)).ToArray();
     private Role[] GetSelectedRoles() => ActiveRoles.Where(r => r.IsSelected).Select(r => r.Role).ToArray();
 
-    private void OnTabStartGameNavigated()
-    {
-
-    }
-
     private void InitActiveRoles()
     {
         var n = ActiveUsers.Count(u => u.IsSelected);
@@ -46,7 +42,7 @@ public partial class HostViewModel
             }).ToArray();
     }
     
-    public bool AreRolesValid() => ActiveRoles.Where(a => a.IsCounter).Min(a => a.Count) >= 0;
+    public bool AreRolesValid() => ActiveRoles.Where(a => a.IsCounter).MinBy(a => a.Count)?.Count >= 0;
 
     private void OnActiveRoleChange(string name, ActiveRole activeRole)
     {
@@ -77,7 +73,7 @@ public partial class HostViewModel
                 break;
         }
 
-        await Shell.Current.GoToAsync("//pages/GameView");
+        await Shell.Current.GoToAsync(Routes.GameView);
     }, AreRolesValid);
 
     // todo: ask user to restart the game

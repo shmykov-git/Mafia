@@ -63,11 +63,6 @@ public partial class HostViewModel
             Interaction.State.Players.Count,
             Interaction.State.Players0.Length);
 
-    private void OnTabGameNavigated()
-    {
-
-    }
-
     private bool IsContinueAvailable()
     {
         if (!game.IsActive || Interaction == null)
@@ -114,7 +109,7 @@ public partial class HostViewModel
 
         // todo: rule show card
         if (interaction.State.IsDay && interaction.State.DayNumber == 1)
-            await AttachPlayerRoles(result.Selected, GetSelectedRoles());
+            await AttachPlayerRoles(Interaction.State, result.Selected, GetSelectedRoles());
 
         CleanUpInteraction();
 
@@ -189,7 +184,7 @@ public partial class HostViewModel
         ContinueMode = ContinueGameMode.RolesSelections;
 
         var selectedPlayers = ActivePlayers.Where(p => p.IsSelected).ToArray();
-        await AttachPlayerRoles(selectedPlayers, detachedGroupRoles.ToArray());
+        await AttachPlayerRoles(Interaction.State, selectedPlayers, detachedGroupRoles.ToArray());
 
         var lastUniqueRoles = GetDetachedUniqueRoles();
 
@@ -324,7 +319,7 @@ public partial class HostViewModel
         activePlayer.RoleColor = activePlayer.NickColor = options.CityColor;
     }
 
-    private async Task AttachPlayerRoles(ActivePlayer[] activePlayers, Role[] roles)
+    private async Task AttachPlayerRoles(State state, ActivePlayer[] activePlayers, Role[] roles)
     {
         var roleList = roles.ToList();
 
@@ -341,6 +336,10 @@ public partial class HostViewModel
                 await PrepareActivePlayerRoles(roleList.Distinct().ToArray());
                 IsActivePlayerRoleVisible = true;
                 await WaitForHostInteraction();
+
+                if (state.Stopping || state.RollingBack)
+                    return;
+
                 IsActivePlayerRoleVisible = false;
                 var selectedRole = ActivePlayerRoles.Single(r => r.IsSelected);                
                 AttachRole(activePlayer, selectedRole.Role);

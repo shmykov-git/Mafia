@@ -5,6 +5,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Host.Extensions;
+using Host.Libraries;
 using Host.Model;
 using Host.Views;
 using Mafia;
@@ -62,22 +63,8 @@ public partial class HostViewModel : NotifyPropertyChanged
 
     private void Shell_Navigated(object path)
     {
-        navigationPath = path.ToString()!;
-
-        switch (navigationPath)
-        {
-            case "//pages/UserView":
-                OnTabUsersNavigated();
-                break;
-
-            case "//pages/StartGameView":
-                OnTabStartGameNavigated();
-                break;
-
-            case "//pages/GameView":
-                OnTabGameNavigated();
-                break;
-        }
+        navigationPath = path.ToString();
+        Debug.WriteLine($"Navigated: {navigationPath}");
     }
 
     private void RefreshCommands() => GetType().GetProperties().Where(p => p.PropertyType == typeof(ICommand)).ForEach(p => Changed(p.Name));

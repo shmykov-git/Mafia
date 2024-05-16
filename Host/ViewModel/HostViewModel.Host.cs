@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Diagnostics;
 using System.Linq;
+using Host.Libraries;
 using Host.Model;
 using Mafia.Extensions;
 using Mafia.Libraries;
@@ -69,8 +70,8 @@ public partial class HostViewModel : IHost
             State = state
         });
 
-        if (navigationPath == "//pages/GameView")
-            await Shell.Current.GoToAsync("//pages/StartGameView");
+        if (navigationPath == Routes.GameView)
+            await Shell.Current.GoToAsync(Routes.RolesView);
     }
 
     public async Task NotifyCityAfterNight(State state)
