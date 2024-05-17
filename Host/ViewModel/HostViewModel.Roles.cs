@@ -80,7 +80,7 @@ public partial class HostViewModel
                 break;
         }
 
-        await Shell.Current.GoToAsync(Routes.GameView);
+        await Shell.Current.GoToAsync(HostValues.GameView);
     }, AreRolesValid);
 
     // todo: ask user to restart the game

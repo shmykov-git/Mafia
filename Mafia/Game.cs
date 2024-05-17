@@ -12,20 +12,19 @@ namespace Mafia;
 
 public class Game 
 {
-    private readonly City city;
-
+    private readonly Func<ICity> mapFactory;
     private readonly Func<IHost> hostFactory;
-    private IHost _host;
-    private IHost host => _host ??= hostFactory();
-
+    
+    private City city;
+    private IHost host;
     private State state;
+    
     public bool IsActive => state?.IsActive ?? false;
 
-    public Game(City city, Func<IHost> hostFactory)
+    public Game(Func<ICity> mapFactory, Func<IHost> hostFactory)
     {
-        this.city = city;
+        this.mapFactory = mapFactory;
         this.hostFactory = hostFactory;
-        InitCity();
     }
 
     private void InitCity()
@@ -204,6 +203,13 @@ public class Game
 
     public async Task Start()
     {
+        if (IsActive)
+            throw new AlreadyRunException();
+
+        this.host = hostFactory();
+        this.city = mapFactory().City;
+        InitCity();
+
         var players0 = host.GetGameRoles().Select((role, i) => city.CreatePlayer(city.GetRole(role), $"P{(i + 1).ToString().PadLeft(2, '0')}")).ToArray();
 
         state = new State 

@@ -16,9 +16,9 @@ public class TestHost : IHost
     private readonly TestOptions options;
     private int eventIndex = 0;
 
-    public TestHost(City city, IOptions<TestOptions> options)
+    public TestHost(ICity city, IOptions<TestOptions> options)
     {
-        this.city = city;
+        this.city = city.City;
         this.options = options.Value;
     }
 

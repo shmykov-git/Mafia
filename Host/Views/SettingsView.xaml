@@ -1,10 +1,47 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Host.Views.SettingsView" >
+             x:Class="Host.Views.SettingsView" 
+             Padding="30,0" >
+    
     <ScrollView>
         <VerticalStackLayout>
-            <Label Text="Настройки"></Label>
+            <VerticalStackLayout 
+                RadioButtonGroup.GroupName="language" 
+                RadioButtonGroup.SelectedValue="{Binding Settings.SelectedLanguage}">
+                <Label Text="Languages" Style="{StaticResource InfoLine}" />
+                
+                <ListView ItemsSource="{Binding Settings.Languages}" SelectionMode="None" ItemTapped="ListView_Lang_ItemTapped" >
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                                <VerticalStackLayout Padding="0,5,0,5">
+                                    <RadioButton Content="{Binding FullName}" Value="{Binding Name}" IsChecked="{Binding IsChecked}" GroupName="language" />
+                                </VerticalStackLayout>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </VerticalStackLayout>
+
+
+            <VerticalStackLayout 
+                RadioButtonGroup.GroupName="club" 
+                RadioButtonGroup.SelectedValue="{Binding Settings.SelectedClub}">
+                <Label Text="{Binding Messages[Club]}" Style="{StaticResource InfoLine}" />
+
+                <ListView ItemsSource="{Binding Settings.Clubs}" SelectionMode="None" ItemTapped="ListView_Club_ItemTapped" >
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                                <VerticalStackLayout Padding="0,5,0,5">
+                                    <RadioButton Content="{Binding Name}" Value="{Binding Name}" IsChecked="{Binding IsChecked}" GroupName="club" />
+                                </VerticalStackLayout>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </VerticalStackLayout>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

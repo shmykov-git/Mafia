@@ -45,7 +45,7 @@ public partial class HostViewModel
     {
         await StopCurrentGame();
         InitActiveRoles();
-        await Shell.Current.GoToAsync(Routes.RolesView);
+        await Shell.Current.GoToAsync(HostValues.RolesView);
     });
 
     private ActiveUser GetActiveUser(User user, int i) => new ActiveUser(user, OnActiveUserChange, nameof(ActiveUsers)) 

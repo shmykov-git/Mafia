@@ -10,3 +10,7 @@ public class UnknownUsersException : Exception
 public class AvoidInteractionException : Exception
 {
 }
+
+public class AlreadyRunException: Exception
+{
+}

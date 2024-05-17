@@ -15,10 +15,10 @@ public class TestDebugHost : IHost
     private readonly City city;
     private TestDebugOptions options;
 
-    public TestDebugHost(City city, IOptions<TestDebugOptions> options)
+    public TestDebugHost(ICity city, IOptions<TestDebugOptions> options)
     {
         rnd = new Random(options.Value.Seed);
-        this.city = city;
+        this.city = city.City;
         this.options = options.Value;
     }
 

@@ -14,20 +14,19 @@ public partial class HostViewModel : NotifyPropertyChanged
     private const string ReplaySecureKey = "Mafia_Host_Replays";
 
     private Random rnd;
-    private readonly City city;
+    private City city;
     private HostOptions options;
     private LanguageOption language;
     private string navigationPath;
     private List<Replay> replays;
     
     public Dictionary<KnownRoleKey, string> KnownRoles { get; }
-    public Dictionary<string, string> Messages { get; }
+    public Dictionary<string, string> Messages { get; private set; }
 
-    public HostViewModel(Game game, City city, IOptions<HostOptions> options)
+    public HostViewModel(Game game, IOptions<HostOptions> options)
     {
         rnd = new Random();
         this.game = game;
-        this.city = city;
         this.options = options.Value;
         HintColor = this.options.Theme.CityColor;
         SelectedPlayerRoleMessageColor = this.options.Theme.CityColor;
@@ -42,6 +41,9 @@ public partial class HostViewModel : NotifyPropertyChanged
 
     private async Task Init()
     {
+        await LoadCityMaps();
+        InitSettings();
+
         replays = await ReadReplays();
         users = await ReadUsers();
 

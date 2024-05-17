@@ -2,7 +2,6 @@
 
 namespace Mafia.Model;
 
-
 public interface IHost
 {
     void ChangeSeed(int seed);

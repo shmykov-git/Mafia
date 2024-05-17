@@ -69,7 +69,7 @@ public class MafiaDebugTests : MafiaTestsBase
         var provider = CreateTestDebug(map, setOptions);
         var host = provider.GetRequiredService<IHost>();
         var game = provider.GetRequiredService<Game>();
-        var city = provider.GetRequiredService<City>();
+        var city = provider.GetRequiredService<ICity>().City;
 
         for (var k = 0; k < n; k++)
         {

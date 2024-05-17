@@ -71,12 +71,24 @@
 	  <None Remove="Resources\AppIcon\mafia1.jpg" />
 	  <None Remove="Resources\AppIcon\mafia_icon.png" />
 	  <None Remove="Resources\Images\mafia.jpg" />
+	  <None Remove="Resources\Maps\mafia-drive.json" />
+	  <None Remove="Resources\Maps\mafia-vicino-ru.json" />
+	  <None Remove="Resources\Maps\mafia-vicino.json" />
 	  <None Remove="Resources\Splash\mafia.jpg" />
 	  <None Remove="Resources\Splash\mafia_splash.jpg" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <MauiAsset Include="appsettings.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </MauiAsset>
+	  <MauiAsset Include="Resources\Maps\mafia-drive.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </MauiAsset>
+	  <MauiAsset Include="Resources\Maps\mafia-vicino-ru.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </MauiAsset>
+	  <MauiAsset Include="Resources\Maps\mafia-vicino.json">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </MauiAsset>
 	</ItemGroup>
@@ -126,7 +138,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="Resources\Maps\mafia-vicino-ru.json">
+	  <None Update="Resources\Maps\mafia-drive-ru.json">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>

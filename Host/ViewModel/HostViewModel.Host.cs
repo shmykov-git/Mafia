@@ -70,8 +70,8 @@ public partial class HostViewModel : IHost
             State = state
         });
 
-        if (navigationPath == Routes.GameView)
-            await Shell.Current.GoToAsync(Routes.RolesView);
+        if (navigationPath == HostValues.GameView)
+            await Shell.Current.GoToAsync(HostValues.RolesView);
     }
 
     public async Task NotifyCityAfterNight(State state)
