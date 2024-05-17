@@ -24,7 +24,7 @@ public class ActiveSettings : NotifyPropertyChanged
 
     public ActiveLang[] Languages { get => _langs; set { _langs = value; Changed(); } }
     public ActiveClub[] Clubs { get => _clubs; set { _clubs = value; Changed(); } }
-    public string GameCommonRules { get => _gameCommonRules; set { _gameCommonRules = value; Changed(); } }
+    public string GameCommonRulesDescription { get => _gameCommonRules; set { _gameCommonRules = value; Changed(); } }
     public string GameClubRules { get => _gameClubRules; set { _gameClubRules = value; Changed(); } }
     public string GameClubRuleDetails { get => _gameClubRuleDetails; set { _gameClubRuleDetails = value; Changed(); } }
 }

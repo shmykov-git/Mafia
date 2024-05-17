@@ -5,11 +5,11 @@
              Padding="30,0" >
     
     <ScrollView>
-        <VerticalStackLayout>
+        <VerticalStackLayout Spacing="25">
             <VerticalStackLayout 
                 RadioButtonGroup.GroupName="language" 
                 RadioButtonGroup.SelectedValue="{Binding Settings.SelectedLanguage}">
-                <Label Text="Languages" Style="{StaticResource InfoLine}" />
+                <Label Text="Languages" Style="{StaticResource SettingCaption}" />
                 
                 <ListView ItemsSource="{Binding Settings.Languages}" SelectionMode="None" ItemTapped="ListView_Lang_ItemTapped" >
                     <ListView.ItemTemplate>
@@ -28,7 +28,7 @@
             <VerticalStackLayout 
                 RadioButtonGroup.GroupName="club" 
                 RadioButtonGroup.SelectedValue="{Binding Settings.SelectedClub}">
-                <Label Text="{Binding Messages[Club]}" Style="{StaticResource InfoLine}" />
+                <Label Text="{Binding Messages[Club]}" Style="{StaticResource SettingCaption}" />
 
                 <ListView ItemsSource="{Binding Settings.Clubs}" SelectionMode="None" ItemTapped="ListView_Club_ItemTapped" >
                     <ListView.ItemTemplate>
@@ -41,6 +41,21 @@
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
+            </VerticalStackLayout>
+
+            <VerticalStackLayout>
+                <Label Text="{Binding Messages[GameCommonRules]}" Style="{StaticResource SettingCaption}" />
+                <Label Text="{Binding Settings.GameCommonRulesDescription}" Style="{StaticResource SettingLine}" />
+            </VerticalStackLayout>
+            
+            <VerticalStackLayout>
+                <Label Text="{Binding GameClubRules}" Style="{StaticResource SettingCaption}" />
+                <Label Text="{Binding Settings.GameClubRules}" Style="{StaticResource SettingLine}" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout>
+                <Label Text="{Binding GameClubRuleDetails}" Style="{StaticResource SettingCaption}" />
+                <Label Text="{Binding Settings.GameClubRuleDetails}" Style="{StaticResource SettingLine}" />
             </VerticalStackLayout>
         </VerticalStackLayout>
     </ScrollView>

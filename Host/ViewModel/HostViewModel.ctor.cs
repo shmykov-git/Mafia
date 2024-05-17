@@ -42,7 +42,7 @@ public partial class HostViewModel : NotifyPropertyChanged
     private async Task Init()
     {
         await LoadCityMaps();
-        InitSettings();
+        await InitSettings();
 
         replays = await ReadReplays();
         users = await ReadUsers();

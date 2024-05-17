@@ -7,10 +7,16 @@ namespace Host.ViewModel;
 
 public partial class HostViewModel : ICity
 {
+    private const string PersistSettingsSecureKey = "Mafia_Host_PersistSettings";
+
     private City[] cityMaps;
     public City City => city;
+    private PersistSettings persistSettings;
 
     public ActiveSettings Settings { get; private set; }
+
+    public string GameClubRules => Messages["GameClubRules"].With($"'{Settings.SelectedClub}'");
+    public string GameClubRuleDetails => Messages["GameClubRuleDetails"].With($"'{Settings.SelectedClub}'");
 
     string GetLangFullName(string name) => name switch
     {
@@ -31,8 +37,8 @@ public partial class HostViewModel : ICity
             language = options.Languages.Single(l => l.Name == Settings.SelectedLanguage);
             Messages = language.Messages.ToDictionary(v => v.Name, v => v.Text);
             Settings.Clubs = GetClubs(Settings.SelectedLanguage);
-            Settings.GameCommonRules = Messages["GameCommonRules"];
-            Settings.SelectedClub = Settings.Clubs[0].Name;
+            Settings.GameCommonRulesDescription = Messages["GameCommonRulesDescription"];
+            Settings.SelectedClub = persistSettings.Club ?? Settings.Clubs[0].Name;
         }
 
         if (name == nameof(ActiveSettings.SelectedClub))
@@ -40,20 +46,28 @@ public partial class HostViewModel : ICity
             city = cityMaps.Single(m => m.Name == Settings.SelectedClub && m.Language == Settings.SelectedLanguage);
             Settings.GameClubRules = city.Description.SJoin(" ");
             Settings.GameClubRuleDetails = city.Rules.Where(r => r.Accepted).Select(r => r.Description).SJoin("\r\n");
+
+            Changed(nameof(GameClubRules), nameof(GameClubRuleDetails));
+
+            persistSettings.Lang = Settings.SelectedLanguage;
+            persistSettings.Club = Settings.SelectedClub;
+            Task.Run(async () => await WritePersistSettings(persistSettings)).Wait();
         }
     }
 
     ActiveLang[] GetLanguages() => cityMaps.Select(m => m.Language).Distinct()
         .OrderBy(v => v).Select(name => new ActiveLang { Name = name, FullName = GetLangFullName(name) }).ToArray();
 
-    private void InitSettings()
+    private async Task InitSettings()
     {
+        persistSettings = await ReadPersistSettings();
+
         Settings = new ActiveSettings(OnSettingsChange)
         {
             Languages = GetLanguages(),
         };
 
-        Settings.SelectedLanguage = "ru";
+        Settings.SelectedLanguage = persistSettings.Lang ?? "ru";
     }
 
     private async Task LoadCityMaps()
@@ -71,5 +85,20 @@ public partial class HostViewModel : ICity
         }
 
         cityMaps = maps.ToArray();
+    }
+
+    private async Task<PersistSettings> ReadPersistSettings()
+    {
+        var json = await SecureStorage.Default.GetAsync(PersistSettingsSecureKey);
+
+        if (!json.HasText())
+            return new PersistSettings();
+
+        return json.FromJson<PersistSettings>();
+    }
+
+    private async Task WritePersistSettings(PersistSettings persistSettings)
+    {
+        await SecureStorage.Default.SetAsync(PersistSettingsSecureKey, persistSettings.ToJson());
     }
 }
