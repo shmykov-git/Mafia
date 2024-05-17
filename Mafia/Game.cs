@@ -267,7 +267,7 @@ public class Game
 
         void UpdateStateReplay()
         {
-            if (state.IsFirstDay)
+            if (state.IsFirstDay || state.Stopping || state.RollingBack)
                 return;
 
             if (state.Replay.Players.Length == 0)

@@ -20,6 +20,7 @@ public class ActivePlayer : NotifyPropertyChanged
     }
 
     public bool IsKnown => Player != null;
+    public bool IsUnknown => Player == null;
 
     public User User { get; }
     public Player? PlayerSilent { get; set; }

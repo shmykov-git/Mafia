@@ -399,7 +399,7 @@ public partial class HostViewModel
     {
         UpdateActivePlayers(p =>
         {
-            var isEnabled = p.Player == null && p.IsAlive;
+            var isEnabled = p.IsUnknown && p.IsAlive;
 
             p.Operation = p.IsKilled ? killed : arrow;
             p.OperationColor = p.IsKilled ? options.KilledColor : (isEnabled ? options.WakeupColor : options.NoOperationColor);
@@ -417,7 +417,7 @@ public partial class HostViewModel
 
         UpdateActivePlayers(p =>
         {
-            p.IsEnabled = !areSelected;
+            p.IsEnabled = p.IsUnknown && !areSelected;
         }, p=> p.IsAlive && !p.IsSelected);
     }
 
