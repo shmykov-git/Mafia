@@ -6,16 +6,20 @@
     xmlns:local="clr-namespace:Host.Views"
     Title="{Binding Messages[MafiaHost]}" 
     FlyoutHeaderBehavior="CollapseOnScroll"        
-    Navigated="Shell_Navigated" >
+    Navigated="Shell_Navigated" FlyoutWidth="{Binding Source={RelativeSource Self}, Path=WidthRequest}" >
 
     <Shell.FlyoutHeader>
         <VerticalStackLayout>
-            <Image
-            Source="mafia.jpg"
-            HeightRequest="185"
-            Aspect="AspectFit" />
+            <Image 
+                Source="mafia.jpg"
+                HeightRequest="185"
+                Aspect="AspectFit" />
         </VerticalStackLayout>
     </Shell.FlyoutHeader>
+
+    <Shell.FlyoutFooter>
+        <Label Text="footer"></Label>
+    </Shell.FlyoutFooter>
     
     <FlyoutItem Route="users" 
                 Icon="users_icon.png"
@@ -49,6 +53,16 @@
             Route="GameView" />
     </FlyoutItem>
 
+    <FlyoutItem Route="settings"    
+                 Icon="settings_icon.png"
+                Title="{Binding Messages[Settings]}" >
+
+        <ShellContent
+            Title="{Binding Messages[Settings]}"
+            ContentTemplate="{DataTemplate local:SettingsView}"
+            Route="SettingsView" />
+    </FlyoutItem>
+    
     <ShellContent Route="UserView" />
 
 </Shell>
