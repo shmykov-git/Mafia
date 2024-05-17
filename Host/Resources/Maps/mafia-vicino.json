@@ -1,5 +1,7 @@
 ﻿{
   "name": "Mafia Vicino",
+  "version": "1.0",
+  "language": "en",
   "groups": [
     {
       "name": "Mafia",

@@ -13,7 +13,7 @@ public partial class HostViewModel
 
     private (string name, int count)[] GetRolesPreset(int n)
     {
-        return RoleValues.GetRolePreset(options.RolePreset, n);
+        return RoleValues.GetRolePreset(language.RolePreset, n);
     }
 
     public bool IsStartGameTabAvailable => ActiveRoles.Length > 0;
@@ -30,7 +30,7 @@ public partial class HostViewModel
     private void InitActiveRoles()
     {
         var n = ActiveUsers.Count(u => u.IsSelected);
-        var preset = RoleValues.GetRolePreset(options.RolePreset, n);
+        var preset = RoleValues.GetRolePreset(language.RolePreset, n);
 
         ActiveRoles = city.AllRoles()
             .Select(r => (role: r, preset: preset.FirstOrDefault(rr => rr.name == r.Name)))

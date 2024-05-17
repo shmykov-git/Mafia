@@ -8,22 +8,42 @@ using Host.Views;
 using Host.ViewModel;
 using Host.Model;
 using System.Diagnostics;
+using Microsoft.Maui.ApplicationModel;
 
 namespace Host;
 
 public static class MauiProgram
 {
+    private const string settingsFileName = "appsettings.json";
+    private const string mapFolder = "Resources/Maps";
+
+    private static City GetCity()
+    {
+        var builder = new ConfigurationBuilder();
+        using Stream settingsStream = FileSystem.Current.OpenAppPackageFileAsync(settingsFileName).Result;
+        builder.AddJsonStream(settingsStream);
+        var configuration = builder.Build();
+        
+        var options = configuration.GetSection("options").Get<HostMapOptions>();
+
+        var cities = options.Maps.Select(map =>
+        {
+            using Stream mafiaStream = FileSystem.Current.OpenAppPackageFileAsync(Path.Combine(mapFolder, map)).Result;
+            using TextReader textReader = new StreamReader(mafiaStream);
+            var json = textReader.ReadToEnd();
+            var city = json.FromJson<City>()!;
+            return city;
+        }).ToArray();
+
+        return cities.Single(c => c.Name == options.DefaultMapName);
+    }
+
+
     public static MauiApp CreateMauiApp()
     {
-        var mafiaFileName = "Resources/Maps/mafia-vicino-ru.json";
-        var settingsFileName = "appsettings.json";
+        var city = GetCity();
 
-        using Stream mafiaStream = FileSystem.Current.OpenAppPackageFileAsync(mafiaFileName).Result;
         using Stream settingsStream = FileSystem.Current.OpenAppPackageFileAsync(settingsFileName).Result;
-
-        using TextReader textReader = new StreamReader(mafiaStream);
-        var json = textReader.ReadToEnd();
-        var city = json.FromJson<City>();
 
         var builder = MauiApp.CreateBuilder();
         builder.Configuration.AddJsonStream(settingsStream);

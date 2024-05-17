@@ -1,16 +1,9 @@
-﻿using System.ComponentModel;
-using System.Data;
+﻿using System.Data;
 using System.Diagnostics;
-using System.Numerics;
-using System.Runtime.CompilerServices;
 using System.Windows.Input;
-using Host.Extensions;
-using Host.Libraries;
 using Host.Model;
-using Host.Views;
 using Mafia;
 using Mafia.Extensions;
-using Mafia.Libraries;
 using Mafia.Model;
 using Microsoft.Extensions.Options;
 
@@ -23,6 +16,7 @@ public partial class HostViewModel : NotifyPropertyChanged
     private Random rnd;
     private readonly City city;
     private HostOptions options;
+    private LanguageOption language;
     private string navigationPath;
     private List<Replay> replays;
     
@@ -35,10 +29,11 @@ public partial class HostViewModel : NotifyPropertyChanged
         this.game = game;
         this.city = city;
         this.options = options.Value;
-        HintColor = this.options.CityColor;
-        SelectedPlayerRoleMessageColor = this.options.CityColor;
-        Messages = this.options.Messages.ToDictionary(v => v.Name, v => v.Text);
-        KnownRoles = this.options.KnownRoles.ToDictionary(v => v.Key, v => v.Name);
+        HintColor = this.options.Theme.CityColor;
+        SelectedPlayerRoleMessageColor = this.options.Theme.CityColor;
+        language = this.options.Languages.Single(l => l.Name == this.options.DefaultLanguage);
+        Messages = language.Messages.ToDictionary(v => v.Name, v => v.Text);
+        KnownRoles = language.KnownRoles.ToDictionary(v => v.Key, v => v.Name);
 
         Task.Run(Init).Wait();
     }
@@ -70,8 +65,8 @@ public partial class HostViewModel : NotifyPropertyChanged
     private void RefreshCommands() => GetType().GetProperties().Where(p => p.PropertyType == typeof(ICommand)).ForEach(p => Changed(p.Name));
 
     private Color GetOperationColor(string? operation) =>
-        options.OperationColors.FirstOrDefault(v => v.Operation == operation)?.Color ??
-        options.OperationColors.Single(v => v.Operation == "Unknown").Color;
+        options.Theme.OperationColors.FirstOrDefault(v => v.Operation == operation)?.Color ??
+        options.Theme.OperationColors.Single(v => v.Operation == "Unknown").Color;
 
     private void Log(string text)
     {

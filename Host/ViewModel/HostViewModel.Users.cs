@@ -34,7 +34,7 @@ public partial class HostViewModel
 
         ActiveUsers.Add(new ActiveUser(user, OnActiveUserChange, nameof(ActiveUsers))
         {
-            NickColorSilent = options.CityColor,
+            NickColorSilent = options.Theme.CityColor,
             IsSelectedSilent = true,
         });
 
@@ -50,7 +50,7 @@ public partial class HostViewModel
 
     private ActiveUser GetActiveUser(User user, int i) => new ActiveUser(user, OnActiveUserChange, nameof(ActiveUsers)) 
     {
-        NickColorSilent = options.CityColor,
+        NickColorSilent = options.Theme.CityColor,
         IsSelectedSilent = i < options.PresetPlayerSelectedCount
     };
 

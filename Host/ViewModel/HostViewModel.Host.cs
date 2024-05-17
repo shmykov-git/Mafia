@@ -28,13 +28,13 @@ public partial class HostViewModel : IHost
     private Color GetRoleColor(string roleName) => 
         GetGroupColor(city.GetGroupByRoleName(roleName)) ?? 
         GetGroupColor(city.GetTopGroupByRoleName(roleName)) ?? 
-        options.CityColor;
+        options.Theme.CityColor;
 
-    private Color? GetGroupColor(Group group) => options.GroupColors.FirstOrDefault(gc => gc.Group == group.Name)?.Color;
-    private Color GetPlayerRoleColor(Player p) => GetGroupColor(p.Group) ?? GetGroupColor(p.TopGroup) ?? options.CityColor;
+    private Color? GetGroupColor(Group group) => language.GroupColors.FirstOrDefault(gc => gc.Group == group.Name)?.Color;
+    private Color GetPlayerRoleColor(Player p) => GetGroupColor(p.Group) ?? GetGroupColor(p.TopGroup) ?? options.Theme.CityColor;
 
     private Color GetUserColor(Player p) => p.User == null 
-        ? options.CityColor
+        ? options.Theme.CityColor
         : GetPlayerRoleColor(p);
 
     public async Task StartGame(State state)
@@ -46,8 +46,8 @@ public partial class HostViewModel : IHost
         await Task.Delay(options.SkipAnimationDelay);
         ActivePlayers = ActiveUsers.Where(u => u.IsSelected).Select(u => new ActivePlayer(Messages, u.User, OnActivePlayerChange, nameof(ActivePlayers))
         {
-            NickColor = options.CityColor,
-            RoleColor = options.CityColor
+            NickColor = options.Theme.CityColor,
+            RoleColor = options.Theme.CityColor
         }).OrderBy(p => p.Nick).ToArray();
         //.OrderBy(p => p.Player.Group.Name).ThenBy(p => p.Player.Role.Rank).ToArray();
 

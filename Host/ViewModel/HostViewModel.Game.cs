@@ -242,7 +242,7 @@ public partial class HostViewModel
             : Messages["GroupFallAsleep"].With(prevNightInteraction.Player.Group.Name);
 
         ContinueMode = ContinueGameMode.PreviousGroupFallAsleep;        
-        HintColor = options.FallAsleepColor;
+        HintColor = options.Theme.FallAsleepColor;
         HostHint = fallAsleepMessage;
         SubHostHint = "";
         PrepareActivePlayers_PreviousGroupFallAsleep();
@@ -268,7 +268,7 @@ public partial class HostViewModel
 
         HintColor = Interaction.Player != null
             ? GetRoleColor(Interaction.Player.Role.Name)
-            : options.CityColor;
+            : options.Theme.CityColor;
 
         if (Interaction.SubName.HasText())
         {
@@ -317,7 +317,7 @@ public partial class HostViewModel
     {
         activePlayer.Player.User = null;
         activePlayer.Player = null;
-        activePlayer.RoleColor = activePlayer.NickColor = options.CityColor;
+        activePlayer.RoleColor = activePlayer.NickColor = options.Theme.CityColor;
     }
 
     private async Task AttachPlayerRoles(State state, ActivePlayer[] activePlayers, Role[] roles)
@@ -354,7 +354,7 @@ public partial class HostViewModel
     {
         HostHint = "";
         SubHostHint = "";
-        HintColor = options.CityColor;
+        HintColor = options.Theme.CityColor;
     }
 
     private async Task PrepareActivePlayerRoles(Role[] roles)
@@ -386,8 +386,8 @@ public partial class HostViewModel
         UpdateActivePlayers(p =>
         {
             p.Operation = p.IsKilled ? killed : arrow;
-            p.OperationColor = p.IsKilled ? options.KilledColor : options.NoOperationColor;
-            p.CheckboxColor = options.NoOperationColor;
+            p.OperationColor = p.IsKilled ? options.Theme.KilledColor : options.Theme.NoOperationColor;
+            p.CheckboxColor = options.Theme.NoOperationColor;
             p.IsEnabled = false;
             p.IsSelected = false;
         });
@@ -402,8 +402,8 @@ public partial class HostViewModel
             var isEnabled = p.IsUnknown && p.IsAlive;
 
             p.Operation = p.IsKilled ? killed : arrow;
-            p.OperationColor = p.IsKilled ? options.KilledColor : (isEnabled ? options.WakeupColor : options.NoOperationColor);
-            p.CheckboxColor = isEnabled ? options.WakeupColor : options.NoOperationColor;
+            p.OperationColor = p.IsKilled ? options.Theme.KilledColor : (isEnabled ? options.Theme.WakeupColor : options.Theme.NoOperationColor);
+            p.CheckboxColor = isEnabled ? options.Theme.WakeupColor : options.Theme.NoOperationColor;
             p.IsEnabled = isEnabled;
             p.IsSelected = false;
         });
@@ -423,8 +423,8 @@ public partial class HostViewModel
 
     private void PrepareActivePlayers_RolesSelections()
     {
-        var staticOperationColor = Interaction.NeedSelection ? GetOperationColor(Interaction.Operation) : options.NoOperationColor;
-        var color = Interaction.NeedSelection ? GetOperationColor(Interaction.Operation) : options.CityColor;
+        var staticOperationColor = Interaction.NeedSelection ? GetOperationColor(Interaction.Operation) : options.Theme.NoOperationColor;
+        var color = Interaction.NeedSelection ? GetOperationColor(Interaction.Operation) : options.Theme.CityColor;
         var staticOperation = Interaction.NeedSelection ? arrow : empty;
 
         UpdateActivePlayers(p =>
@@ -432,11 +432,11 @@ public partial class HostViewModel
             var isKilled = Interaction.Killed.Contains(p.Player) || !p.IsAlive;
             var isEnabled = !Interaction.Except.Contains(p.Player) && !isKilled;
             var operation = isKilled ? killed : staticOperation;
-            var color = Interaction.Unwanted.Contains(p.Player) ? options.UnwantedColor : staticOperationColor;
+            var color = Interaction.Unwanted.Contains(p.Player) ? options.Theme.UnwantedColor : staticOperationColor;
 
             p.Operation = operation;
-            p.OperationColor = isKilled ? options.KilledColor : (isEnabled ? color : options.NoOperationColor);
-            p.CheckboxColor = isEnabled ? color : options.NoOperationColor;
+            p.OperationColor = isKilled ? options.Theme.KilledColor : (isEnabled ? color : options.Theme.NoOperationColor);
+            p.CheckboxColor = isEnabled ? color : options.Theme.NoOperationColor;
             p.IsEnabled = isEnabled;
             p.IsSelected = false;
         });
@@ -448,18 +448,18 @@ public partial class HostViewModel
 
     private void UpdateActivePlayers_RolesSelections(Interaction interaction)
     {
-        var staticOperationColor = Interaction.NeedSelection ? GetOperationColor(Interaction.Operation) : options.NoOperationColor;
-        var color = Interaction.NeedSelection ? GetOperationColor(Interaction.Operation) : options.CityColor;
+        var staticOperationColor = Interaction.NeedSelection ? GetOperationColor(Interaction.Operation) : options.Theme.NoOperationColor;
+        var color = Interaction.NeedSelection ? GetOperationColor(Interaction.Operation) : options.Theme.CityColor;
         var staticIsEnabled = ActivePlayers.Count(a => a.IsSelected).Between(0, interaction.Selection.to - 1);
 
         UpdateActivePlayers(p =>
         {
             var isKilled = !p.IsAlive;
             var isEnabled = staticIsEnabled && !interaction.Except.Contains(p.Player);
-            var color = Interaction.Unwanted.Contains(p.Player) ? options.UnwantedColor : staticOperationColor;
+            var color = Interaction.Unwanted.Contains(p.Player) ? options.Theme.UnwantedColor : staticOperationColor;
 
-            p.OperationColor = isKilled ? options.KilledColor : (isEnabled ? color : options.NoOperationColor);
-            p.CheckboxColor = isEnabled ? color : options.NoOperationColor;
+            p.OperationColor = isKilled ? options.Theme.KilledColor : (isEnabled ? color : options.Theme.NoOperationColor);
+            p.CheckboxColor = isEnabled ? color : options.Theme.NoOperationColor;
             p.IsEnabled = isEnabled;
         }, p => p.IsAlive && !p.IsSelected);
     }
