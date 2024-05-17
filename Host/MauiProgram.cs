@@ -35,7 +35,7 @@ public static class MauiProgram
             return city;
         }).ToArray();
 
-        return cities.Single(c => c.Name == options.DefaultMapName);
+        return cities.Single(c => c.Name == options.DefaultMapName && c.Language == options.DefaultLanguage);
     }
 
 

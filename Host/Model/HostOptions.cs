@@ -26,6 +26,7 @@ public class HostMapOptions
 {
     public required string[] Maps {  get; set; }
     public required string DefaultMapName { get; set; }
+    public required string DefaultLanguage { get; set; }
 }
 
 public class HostOptions : HostMapOptions
@@ -37,7 +38,6 @@ public class HostOptions : HostMapOptions
     public required TimeSpan SkipAnimationDelay { get; set; }    
     public required int PresetPlayerCount { get; set; }
     public required int PresetPlayerSelectedCount { get; set; }
-    public required string DefaultLanguage { get; set; }
     public required ThemeOption Theme { get; set; }
     public required LanguageOption[] Languages { get; set; }
 }
