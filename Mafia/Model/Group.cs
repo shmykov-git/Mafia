@@ -11,6 +11,8 @@ public class Group
 
     public bool HasAnyOperation(string[] operations) => AllRoles().Any(r => r.AllActions().Any(a => a.Operations.Intersect(operations).Any()));
 
+    public bool HasRanks() => AllRoles().Select(r => r.Rank).Distinct().Count() > 1;
+
     public IEnumerable<Role> AllRoles() => Roles ?? [];
     public IEnumerable<Group> AllGroups() => this.IterateLazyDeepLeft<Group>();
     public IEnumerable<Group> AllLeafGroups() => AllGroups().Where(group => group.Groups == null);

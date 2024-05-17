@@ -8,6 +8,7 @@ namespace Mafia.Model;
 public class Action
 {
     public required string Name { get; set; }
+    public bool ByGroup { get; set; }
     public string[]? Conditions { get; set; }
     public required string[] Operations { get; set; }
 

@@ -4,5 +4,6 @@ public enum KnownRoleKey
 {
     Doctor,
     Commissar,
-    Maniac
+    Maniac,
+    Putana
 }

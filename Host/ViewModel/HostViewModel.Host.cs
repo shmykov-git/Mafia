@@ -220,17 +220,18 @@ public partial class HostViewModel : IHost
             (KnownRoles[KnownRoleKey.Doctor], "DoctorHealPlayer", "DoctorHealPlayerOrSkip"),
             (KnownRoles[KnownRoleKey.Commissar], "CommissarCheckPlayer", "CommissarCheckPlayerOrSkip"),
             (KnownRoles[KnownRoleKey.Maniac], "ManiacKillPlayer", "ManiacKillPlayerOrSkip"),
+            (KnownRoles[KnownRoleKey.Putana], "PutanaVisitPlayer", "PutanaVisitPlayerOrSkip"),
             ("kill", "PlayerKill", "PlayerKillOrSkip"),
             ("_", "PlayerSelect", "PlayerSelectOrSkip")
         ];
 
         var isKill = Values.KillOperations.Contains(operation);
         var line = data.First(v => v.role == player.Role.Name || (isKill ? v.role == "kill" : v.role == "_"));
-
+        
         var result = await Interact(new Interaction
         {
             Name = action.IsSkippable() ? line.nameOrSkip : line.name,
-            Args = [player.Group.Name],
+            Args = [action.ByGroup ? player.Group.Name : player.Role.Name],
             Selection = (action.IsSkippable() ? 0 : 1, 1),
             Except = state.GetExceptPlayers(player),
             Unwanted = Values.UnwantedOperations.Contains(operation) ? state.GetTeam(player) : [],

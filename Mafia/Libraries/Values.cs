@@ -13,6 +13,7 @@ public static class Values
     public static string[] OnDeathConditions = [nameof(Conditions.Killed)];
 
     public static string[] NotLockedConditions = [nameof(Conditions.NotLocked)];
+    public static string[] RankConditions = [nameof(Conditions.SeniorRank)];
 
     /// <summary>
     /// Can be checked during current night (or day). Example: Prostitute (Putana) visited Maniac, Maniac cannot kill same night right after the visit
