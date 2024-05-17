@@ -18,6 +18,6 @@ public class ActiveUser : NotifyPropertyChanged
     public string Nick { get => User.Nick; set { User.Nick = value; Changed(); } }
 
     public bool IsSelectedSilent;
-    public bool IsSelected { get => IsSelectedSilent; set => IfChanged(ref IsSelectedSilent, value); }
+    public bool IsSelected { get => IsSelectedSilent; set => IfChanged(v => IsSelectedSilent = v, IsSelectedSilent, value); }
     
 }

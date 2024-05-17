@@ -34,31 +34,38 @@ public partial class HostViewModel
 
         ActiveRoles = city.AllRoles()
             .Select(r => (role: r, preset: preset.FirstOrDefault(rr => rr.name == r.Name)))
-            .Select(v => new ActiveRole(v.role, OnActiveRoleChange, nameof(ActiveRoles)) 
-            { 
+            .Select(v => new ActiveRole(v.role, OnActiveRoleChange, nameof(ActiveRoles))
+            {
                 RoleColorSilent = GetRoleColor(v.role.Name),
-                IsSelectedSilent = v.preset.count > 0, 
-                CountSilent = v.preset.count > 0 ? v.preset.count : 1 
+                IsSelectedSilent = v.preset.count > 0,
+                CountSilent = v.preset.count > 0 ? v.preset.count : 1
             }).ToArray();
     }
-    
-    public bool AreRolesValid() => ActiveRoles.Where(a => a.IsCounter).MinBy(a => a.Count)?.Count >= 0;
+
+    public bool AreRolesValid() => ActiveUsers.Count(u => u.IsSelected) == ActiveRoles.Where(r => r.IsSelected).Sum(r => r.Count) && ActiveRoles.Where(a => a.IsSelected).All(a => a.Count >= 0);
 
     private void OnActiveRoleChange(string name, ActiveRole activeRole)
     {
+        if (name == nameof(ActiveRole.IsSelected) && activeRole.IsSelected && activeRole.Count < 0)
+            activeRole.Count = 0;
+
+        Changed(nameof(StartNewGameCommand));
+
+        if (!ActiveRoles.Any(a => (name != nameof(ActiveRole.Count) || a != activeRole) && a.IsCounter && a.IsSelected))
+            return;
+
         var n = ActiveUsers.Count(u => u.IsSelected);
         var k = ActiveRoles.Where(r => r.IsSelected).Sum(r => r.Count);
 
         if (n == k)
             return;
 
-        var update = AreRolesValid()
-            ? ActiveRoles.Where(a => a != activeRole).Where(a => a.IsCounter).MaxBy(a => a.Count)
-            : ActiveRoles.Where(a => a != activeRole).Where(a => a.IsCounter).MinBy(a => a.Count);
+        var update = ActiveRoles.Where(a => (name != nameof(ActiveRole.Count) || a != activeRole) && a.IsCounter).MaxBy(a => a.Count);
 
-        update!.Count += (n - k);
+        if (update == null)
+            return;
 
-        Changed(nameof(StartNewGameCommand));
+        update.Count += (n - k);
     }
 
     public ICommand StartNewGameCommand => new Command(async () =>
