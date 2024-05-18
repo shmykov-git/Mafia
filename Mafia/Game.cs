@@ -87,7 +87,7 @@ public class Game
         var news = new DailyNews();
         state.News.Add(news); // new latest news
 
-        CalcsBeforeNight();
+        CalcBeforeNight();
 
         foreach (var group in city.NightEvents.Select(city.GetGroup))
         {
@@ -113,6 +113,9 @@ public class Game
         state.LatestNews.FactKills.ForEach(stack.Push);
         state.LatestNews.FactKills.ForEach(k => set.Add(k));
 
+        if (city.GetRule(RuleName.ApplyFactKillsOnEachKillOnDeath).Accepted)
+            ApplyFactKills();
+
         while (stack.TryPop(out var kill))
         {
             var dailyNews = new DailyNews();
@@ -130,6 +133,9 @@ public class Game
 
             state.LatestNews.Collect(dailyNews);
             CalcOnDeathKills(dailyNews);
+
+            if (city.GetRule(RuleName.ApplyFactKillsOnEachKillOnDeath).Accepted)
+                ApplyFactKills();
         }
     }
 
@@ -153,12 +159,12 @@ public class Game
         }
     }
 
-    private void CalcsBeforeNight()
+    private void CalcBeforeNight()
     {
         state.LatestNews.KillGroups = state.GetKillerGroups();
     }
 
-    private void ApplyKills()
+    private void ApplyFactKills()
     {
         foreach(var player in state.LatestNews.FactKills)
             state.Players.Remove(player);
@@ -242,7 +248,7 @@ public class Game
             }
             await PlayDay();            
             await PlayOnDeathKills();
-            ApplyKills();
+            ApplyFactKills();
             state.IsEvening = true;
             await host.NotifyCityAfterDay(state);
 
@@ -262,7 +268,7 @@ public class Game
             state.IsNight = true;
             await PlayNight();
             await PlayOnDeathKills();
-            ApplyKills();
+            ApplyFactKills();
         }
 
         void Rollback()

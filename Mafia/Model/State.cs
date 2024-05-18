@@ -145,7 +145,7 @@ public class State
             ? kills.Where(k => heals.FirstOrDefault(h => h.p == k.p).c < k.c).Select(k => k.p).ToArray()
             : kills.Where(k => heals.FirstOrDefault(h => h.p == k.p).c == 0).Select(k => k.p).ToArray();
 
-        return factKills;
+        return City.NightEvents.Select(name => factKills.SingleOrDefault(k => k.Group.Name == name)).Where(k => k != null).ToArray();
     }
 
     public void DoKnowAllLatestWhom() => LatestNews.DoKnowAllWhom(this);

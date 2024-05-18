@@ -8,4 +8,5 @@ public enum RuleName
     KillOnDeathNoHeal,
     MafiaWin,
     ManiacWin,
+    ApplyFactKillsOnEachKillOnDeath
 }

@@ -176,6 +176,11 @@
   ],
   "rules": [
     {
+      "name": "ApplyFactKillsOnEachKillOnDeath",
+      "description": "Apply fact kills after each shot for roles Kamikaze and Sapper",
+      "accepted": true
+    },
+    {
       "name": "HealSingleKill",
       "description": "Если в игрока стреляли два и более раза, то он умирает даже если его лечили один раз",
       "accepted": false
