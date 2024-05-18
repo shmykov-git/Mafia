@@ -6,19 +6,20 @@
     xmlns:local="clr-namespace:Host.Views"
     Title="{Binding Messages[MafiaHost]}" 
     FlyoutHeaderBehavior="CollapseOnScroll"        
-    Navigated="Shell_Navigated" FlyoutWidth="{Binding Source={RelativeSource Self}, Path=WidthRequest}" >
+    Navigated="Shell_Navigated" >
 
     <Shell.FlyoutHeader>
         <VerticalStackLayout>
             <Image 
-                Source="mafia.jpg"
-                HeightRequest="185"
+                Source="{Binding City.Pic}"
                 Aspect="AspectFit" />
         </VerticalStackLayout>
     </Shell.FlyoutHeader>
 
     <Shell.FlyoutFooter>
-        <Label Text="footer"></Label>
+        <VerticalStackLayout Padding="30">
+            <Label Text="shmykov.dev@gmail.com" HorizontalOptions="Center"/>
+        </VerticalStackLayout>
     </Shell.FlyoutFooter>
     
     <FlyoutItem Route="users" 

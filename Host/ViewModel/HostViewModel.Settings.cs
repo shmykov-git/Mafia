@@ -5,16 +5,14 @@ using Mafia.Model;
 
 namespace Host.ViewModel;
 
-public partial class HostViewModel : ICity
+public partial class HostViewModel
 {
     private const string PersistSettingsSecureKey = "Mafia_Host_PersistSettings";
 
     private City[] cityMaps;
-    public City City => city;
     private PersistSettings persistSettings;
 
     public ActiveSettings Settings { get; private set; }
-
     public string GameClubRules => Messages["GameClubRules"].With($"'{Settings.SelectedClub}'");
     public string GameClubRuleDetails => Messages["GameClubRuleDetails"].With($"'{Settings.SelectedClub}'");
 
@@ -47,7 +45,7 @@ public partial class HostViewModel : ICity
             Settings.GameClubRules = city.Description.SJoin(" ");
             Settings.GameClubRuleDetails = city.Rules.Where(r => r.Accepted).Select(r => r.Description).SJoin("\r\n");
 
-            Changed(nameof(GameClubRules), nameof(GameClubRuleDetails));
+            Changed(nameof(GameClubRules), nameof(GameClubRuleDetails), nameof(City));
 
             persistSettings.Lang = Settings.SelectedLanguage;
             persistSettings.Club = Settings.SelectedClub;
@@ -74,12 +72,13 @@ public partial class HostViewModel : ICity
     {
         List<City> maps = new();
 
-        foreach(var mapFile in options.Maps)
+        foreach(var map in options.Maps)
         {
-            using Stream mafiaStream = await FileSystem.Current.OpenAppPackageFileAsync(Path.Combine(HostValues.MapFolder, mapFile));
+            using Stream mafiaStream = await FileSystem.Current.OpenAppPackageFileAsync(Path.Combine(HostValues.MapFolder, map.File));
             using TextReader textReader = new StreamReader(mafiaStream);
             var json = textReader.ReadToEnd();
             var city = json.FromJson<City>();
+            city.Pic = map.Pic;
 
             maps.Add(city!);
         }

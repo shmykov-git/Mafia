@@ -22,9 +22,15 @@ public class LanguageOption
     public required Message[] Messages { get; set; }
 }
 
+public class HostMapOption
+{
+    public required string File { get; set; }
+    public required string Pic { get; set; }
+}
+
 public class HostMapOptions
 {
-    public required string[] Maps {  get; set; }
+    public required HostMapOption[] Maps {  get; set; }
     public required string DefaultMapName { get; set; }
     public required string DefaultLanguage { get; set; }
 }

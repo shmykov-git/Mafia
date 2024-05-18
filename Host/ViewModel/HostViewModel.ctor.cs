@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 
 namespace Host.ViewModel;
 
-public partial class HostViewModel : NotifyPropertyChanged
+public partial class HostViewModel : NotifyPropertyChanged, ICity
 {
     private const string ReplaySecureKey = "Mafia_Host_Replays";
 
@@ -19,7 +19,8 @@ public partial class HostViewModel : NotifyPropertyChanged
     private LanguageOption language;
     private string navigationPath;
     private List<Replay> replays;
-    
+
+    public City City => city;
     public Dictionary<KnownRoleKey, string> KnownRoles { get; }
     public Dictionary<string, string> Messages { get; private set; }
 
