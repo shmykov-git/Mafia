@@ -22,13 +22,25 @@ public class MafiaDebugTests : MafiaTestsBase
 
 
     [Fact]
-    public async Task Debug_Drive_FullDifficult20_100()
+    public async Task Debug_Drive_ru_FullDifficult20_100()
     {
         async void SetOptions(TestDebugOptions options)
         {
             options.Shaffle = true;
             options.CitySelections = true;
             options.RolesPreset = [("Дон", 1), ("Путана", 1), ("Маньяк", 1), ("Комиссар", 1), ("Доктор", 1), ("Камикадзе", 1), ("Сапер", 1), ("Мафия", 4), ("Мирный", 9)];
+        }
+
+        await RunDebugGames("mafia-drive-ru.json", 100, 777, SetOptions);
+    }
+
+    public async Task Debug_Drive_en_FullDifficult20_100()
+    {
+        async void SetOptions(TestDebugOptions options)
+        {
+            options.Shaffle = true;
+            options.CitySelections = true;
+            options.RolesPreset = [("Don", 1), ("Путана", 1), ("Маньяк", 1), ("Комиссар", 1), ("Доктор", 1), ("Камикадзе", 1), ("Сапер", 1), ("Мафия", 4), ("Мирный", 9)];
         }
 
         await RunDebugGames("mafia-drive-ru.json", 100, 777, SetOptions);
@@ -75,7 +87,7 @@ public class MafiaDebugTests : MafiaTestsBase
 
 
     [Fact]
-    public async Task Debug_Vicino_FullDifficult20_100()
+    public async Task Debug_Vicino_ru_FullDifficult20_100()
     {
         async void SetOptions(TestDebugOptions options)
         {
@@ -86,6 +98,20 @@ public class MafiaDebugTests : MafiaTestsBase
         }
 
         await RunDebugGames("mafia-vicino-ru.json", 100, 777, SetOptions);
+    }
+
+    [Fact]
+    public async Task Debug_Vicino_FullDifficult20_100()
+    {
+        async void SetOptions(TestDebugOptions options)
+        {
+            options.Shaffle = true;
+            options.HostInstructions = false;
+            options.CitySelections = true;
+            options.RolesPreset = [("Don", 1), ("Bum", 1), ("Prostitute", 1), ("Maniac", 1), ("Commissar", 1), ("Sergeant", 1), ("Doctor", 1), ("Kamikaze", 1), ("Shahid", 1), ("Mafia", 3), ("Civilian", 8)];
+        }
+
+        await RunDebugGames("mafia-vicino.json", 100, 777, SetOptions);
     }
 
 

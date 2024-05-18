@@ -28,6 +28,10 @@ public class City
         return rule.Accepted && rule.GetListValues(0).Contains(role.Name);
     }
 
+    public int NightPlayerOrder(Player player) => GroupsOrder.TryGetValue(player.Group, out var value) ? value : 10000;
+
+    private Dictionary<Group, int> _groupsOrder;
+    private Dictionary<Group, int> GroupsOrder => _groupsOrder ??= NightEvents.Select((name, i) => (name, i)).ToDictionary(v => GetGroup(v.name), v => v.i);
     public Group GetTopGroupByRoleName(string roleName) => Groups.Single(g => g.AllGroups().Any(g => g.AllRoles().Any(r => r.Name == roleName)));
     public Group GetGroupByRoleName(string roleName) => AllGroups().Single(g => g.AllRoles().Any(r => r.Name == roleName));
     public Rule GetRule(RuleName name) => Rules.Single(r => r.Name == name);
