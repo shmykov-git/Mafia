@@ -226,6 +226,7 @@ public class Game
         };
 
         await host.StartGame(state);
+        state.Users0 = host.GetGameUsers();
 
         async Task<bool> Day()
         {

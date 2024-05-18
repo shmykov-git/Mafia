@@ -17,4 +17,17 @@ public static class CityOperations
 
         return dailyNews;
     }
+
+    public static async Task<DailyNews> CityImmunity(State state, CityAction action)
+    {
+        var dailyNews = new DailyNews
+        {
+            Selects = [new Select { Operation = nameof(CityImmunity), Who = null!, UserWhom = await state.Host.AskCityToSelect(state, action, nameof(CityImmunity)) }]
+        };
+
+        dailyNews.DoKnowAllWhom(state);
+
+        return dailyNews;
+    }
+    
 }

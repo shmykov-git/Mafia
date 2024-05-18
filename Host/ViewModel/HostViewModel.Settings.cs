@@ -1,5 +1,4 @@
-﻿using CoreData;
-using Host.Libraries;
+﻿using Host.Libraries;
 using Host.Model;
 using Mafia.Extensions;
 using Mafia.Model;

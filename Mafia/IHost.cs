@@ -5,6 +5,7 @@ namespace Mafia.Model;
 public interface IHost
 {
     void ChangeSeed(int seed);
+    User[] GetGameUsers();
     string[] GetGameRoles();
     Task StartGame(State state);
     void RolledBack(State state);

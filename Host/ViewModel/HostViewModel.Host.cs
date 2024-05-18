@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using Host.Libraries;
 using Host.Model;
+using Mafia.Executions;
 using Mafia.Extensions;
 using Mafia.Libraries;
 using Mafia.Model;
@@ -16,6 +17,7 @@ public partial class HostViewModel : IHost
     {
     }
 
+    public User[] GetGameUsers() => ActiveUsers.Where(u => u.IsSelected).Select(u => u.User).ToArray();
     public string[] GetGameRoles()
     {
         return GetSelectedMultipliedRoles().Select(r=>r.Name).ToArray();
@@ -164,15 +166,35 @@ public partial class HostViewModel : IHost
 
     public async Task<User[]> AskCityToSelect(State state, CityAction action, string operation)
     {
-        var result = await Interact(new Interaction
+        if (operation == nameof(CityOperations.CityKill))
         {
-            Name = action.IsSkippable() ? "CitySelectCanSkip" : "CitySelectNoSkip",
-            Selection = (action.IsSkippable() ? 0 : 1, 1),
-            Operation = operation,
-            State = state
-        });
+            var result = await Interact(new Interaction
+            {
+                Name = action.IsSkippable() ? "CitySelectCanSkip" : "CitySelectNoSkip",
+                Selection = (action.IsSkippable() ? 0 : 1, 1),
+                Except = state.GetExceptUsers(operation),
+                Operation = operation,
+                State = state
+            });
 
-        return result.SelectedUsers;
+            return result.SelectedUsers;
+        }
+
+        if (operation == nameof(CityOperations.CityImmunity))
+        {
+            var result = await Interact(new Interaction
+            {
+                Name = "CityImmunity",
+                SkipRoleSelection = true,
+                Selection = (0, 5), // todo: options
+                Operation = operation,
+                State = state
+            });
+
+            return result.SelectedUsers;
+        }
+
+        throw new NotImplementedException(operation);
     }
 
     public async Task<User[]> GetNeighbors(State state, Player player, Action action, string operation)
@@ -183,7 +205,7 @@ public partial class HostViewModel : IHost
             Name = action.IsSkippable() ? "RoundKilled" : "RoundKilled",
             Args = [player.ToString()],
             Selection = (action.IsSkippable() ? 0 : 2, 2),
-            Except = state.GetExceptPlayers(player),
+            Except = state.GetExceptUsers(player, operation),
             Unwanted = Values.UnwantedOperations.Contains(operation) ? state.GetTeam(player) : [],
             Player = player,
             Operation = operation,
@@ -214,7 +236,7 @@ public partial class HostViewModel : IHost
             Name = action.IsSkippable() ? line.nameOrSkip : line.name,
             Args = [action.ByGroup ? player.Group.Name : player.Role.Name],
             Selection = (action.IsSkippable() ? 0 : 1, 1),
-            Except = state.GetExceptPlayers(player),
+            Except = state.GetExceptUsers(player, operation),
             Unwanted = Values.UnwantedOperations.Contains(operation) ? state.GetTeam(player) : [],
             Player = player,
             Operation = operation,

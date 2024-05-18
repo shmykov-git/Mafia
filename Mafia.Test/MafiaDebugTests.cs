@@ -9,7 +9,33 @@ namespace Mafia.Test;
 public class MafiaDebugTests : MafiaTestsBase
 {
     [Fact]
-    public async Task Debug_Classic12_100()
+    public async Task Debug_Drive_Classic12_100()
+    {
+        void SetOptions(TestDebugOptions options)
+        {
+            options.CitySelections = true;
+            options.RolesPreset = [("Дон", 1), ("Маньяк", 1), ("Комиссар", 1), ("Доктор", 1), ("Мафия", 2), ("Мирный", 6)];
+        }
+
+        await RunDebugGames("mafia-drive-ru.json", 100, 0, SetOptions);
+    }
+
+
+    [Fact]
+    public async Task Debug_Drive_FullDifficult20_100()
+    {
+        async void SetOptions(TestDebugOptions options)
+        {
+            options.Shaffle = true;
+            options.CitySelections = true;
+            options.RolesPreset = [("Дон", 1), ("Путана", 1), ("Маньяк", 1), ("Комиссар", 1), ("Доктор", 1), ("Камикадзе", 1), ("Сапер", 1), ("Мафия", 4), ("Мирный", 9)];
+        }
+
+        await RunDebugGames("mafia-drive-ru.json", 100, 777, SetOptions);
+    }
+
+    [Fact]
+    public async Task Debug_Vicino_Classic12_100()
     {
         void SetOptions(TestDebugOptions options)
         {
@@ -22,7 +48,7 @@ public class MafiaDebugTests : MafiaTestsBase
     }
 
     [Fact]
-    public async Task Debug_Classic15_100()
+    public async Task Debug_Vicino_Classic15_100()
     {
         void SetOptions(TestDebugOptions options)
         {
@@ -35,7 +61,7 @@ public class MafiaDebugTests : MafiaTestsBase
     }
 
     [Fact]
-    public async Task Debug_Difficult15_100()
+    public async Task Debug_Vicino_Difficult15_100()
     {
         void SetOptions(TestDebugOptions options)
         {
@@ -49,7 +75,7 @@ public class MafiaDebugTests : MafiaTestsBase
 
 
     [Fact]
-    public async Task Debug_FullDifficult20_100()
+    public async Task Debug_Vicino_FullDifficult20_100()
     {
         async void SetOptions(TestDebugOptions options)
         {

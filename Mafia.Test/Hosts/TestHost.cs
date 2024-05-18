@@ -15,7 +15,7 @@ public class TestHost : IHost
     private readonly City city;
     private readonly TestOptions options;
     private int eventIndex = 0;
-
+    private User[] users;
     public TestHost(ICity city, IOptions<TestOptions> options)
     {
         this.city = city.City;
@@ -25,11 +25,11 @@ public class TestHost : IHost
     public void ChangeSeed(int seed)
     {
     }
-
+    public User[] GetGameUsers() => users;
     public async Task StartGame(State state)
     {
         var n = state.Players0.Length;
-        var users = Enumerable.Range(0, n).Select(i => new User { Nick = $"U{(i).ToString().PadLeft(2, '0')}", LastPlay = DateTime.Now }).ToArray();
+        users = Enumerable.Range(0, n).Select(i => new User { Nick = $"U{(i).ToString().PadLeft(2, '0')}", LastPlay = DateTime.Now }).ToArray();
         state.Players0.ForEach((p, i) => p.User = users[i]);
     }
 

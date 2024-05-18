@@ -109,7 +109,7 @@ public partial class HostViewModel
         };
 
         // todo: rule show card
-        if (interaction.State.IsDay && interaction.State.DayNumber == 1)
+        if (interaction.State.IsDay && interaction.State.DayNumber == 1 && !interaction.SkipRoleSelection)
             await AttachPlayerRoles(Interaction.State, result.Selected, GetSelectedRoles());
 
         CleanUpInteraction();
@@ -423,7 +423,7 @@ public partial class HostViewModel
         UpdateActivePlayers(p =>
         {
             var isKilled = Interaction.Killed.Contains(p.Player) || !p.IsAlive;
-            var isEnabled = !Interaction.Except.Contains(p.Player) && !isKilled;
+            var isEnabled = !Interaction.Except.Contains(p.User) && !isKilled;
             var operation = isKilled ? killed : staticOperation;
             var color = Interaction.Unwanted.Contains(p.Player) ? options.Theme.UnwantedColor : staticOperationColor;
 
@@ -448,7 +448,7 @@ public partial class HostViewModel
         UpdateActivePlayers(p =>
         {
             var isKilled = !p.IsAlive;
-            var isEnabled = staticIsEnabled && !interaction.Except.Contains(p.Player);
+            var isEnabled = staticIsEnabled && !interaction.Except.Contains(p.User);
             var color = Interaction.Unwanted.Contains(p.Player) ? options.Theme.UnwantedColor : staticOperationColor;
 
             p.OperationColor = isKilled ? options.Theme.KilledColor : (isEnabled ? color : options.Theme.NoOperationColor);

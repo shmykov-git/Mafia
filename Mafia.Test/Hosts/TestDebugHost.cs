@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Diagnostics;
+using Mafia.Executions;
 using Mafia.Extensions;
 using Mafia.Libraries;
 using Mafia.Model;
@@ -14,6 +15,7 @@ public class TestDebugHost : IHost
     private Random rnd;
     private readonly City city;
     private TestDebugOptions options;
+    private User[] users;
 
     public TestDebugHost(ICity city, IOptions<TestDebugOptions> options)
     {
@@ -27,10 +29,12 @@ public class TestDebugHost : IHost
         rnd = new Random(seed);
     }
 
+    public User[] GetGameUsers() => users;
+
     public async Task StartGame(State state)
     {
         var n = state.Players0.Length;
-        var users = Enumerable.Range(0, n).Select(i => new User { Nick = $"U{(i).ToString().PadLeft(2, '0')}", LastPlay = DateTime.Today }).ToArray();
+        users = Enumerable.Range(0, n).Select(i => new User { Nick = $"U{(i).ToString().PadLeft(2, '0')}", LastPlay = DateTime.Today }).ToArray();
         state.Players0.ForEach((p, i) => p.User = users[i]);
         
         if (options.Shaffle)
@@ -120,7 +124,7 @@ public class TestDebugHost : IHost
     public async Task Hello(State state, Player player) 
     {
         if (options.HostInstructions)
-            Debug.WriteLine($"{player} --> hello!");
+            Debug.WriteLine($"{player} hello");
     }
 
     public async Task<User[]> AskCityToSelect(State state, CityAction action, string operation)
@@ -128,16 +132,32 @@ public class TestDebugHost : IHost
         if (options.HostInstructions)
             Debug.WriteLine($"City select somebody to kill{(action.IsSkippable() ? " or skip" : "")}");
 
-        var skip = action.IsSkippable() && rnd.NextDouble() < 0.1;
+        if (operation == nameof(CityOperations.CityKill))
+        {
+            var skip = action.IsSkippable() && rnd.NextDouble() < 0.1;
 
-        Player[] selected = skip
-            ? []
-            : [state.Players[rnd.Next(state.Players.Count)]];
+            Player[] selected = skip
+                ? []
+                : [state.Players[rnd.Next(state.Players.Count)]];
 
-        if (options.CitySelections)
-            Debug.WriteLine($"City --> {(selected is [] ? "nobody" : selected.SJoin(", "))}");
+            if (options.CitySelections)
+                Debug.WriteLine($"City {operation} --> {(selected is [] ? "nobody" : selected.SJoin(", "))}");
 
-        return selected.Select(p => p.User).ToArray();
+            return selected.Select(p => p.User).ToArray();
+        }
+
+        if (operation == nameof(CityOperations.CityImmunity))
+        {
+            var k = rnd.Next(3);
+            Player[] selected = Enumerable.Range(0, k).Select(_=>state.Players[rnd.Next(state.Players.Count)]).Distinct().ToArray();
+
+            if (options.CitySelections)
+                Debug.WriteLine($"City {operation} --> {(selected is [] ? "nobody" : selected.SJoin(", "))}");
+
+            return selected.Select(p => p.User).ToArray();
+        }
+
+        throw new NotImplementedException(operation);
     }
 
     public async Task<User[]> GetNeighbors(State state, Player player, Action action, string operation)
@@ -145,7 +165,7 @@ public class TestDebugHost : IHost
         var selected = state.GetNeighborPlayers(player);
 
         if (options.CitySelections)
-            Debug.WriteLine($"{player} --> {selected.SJoin(", ")}");
+            Debug.WriteLine($"{player} {operation} --> {selected.SJoin(", ")}");
 
         return selected.Select(p => p.User).ToArray();
     }
@@ -160,7 +180,8 @@ public class TestDebugHost : IHost
         Player[] selected;
 
         var skip = action.IsSkippable() && rnd.NextDouble() < 0.1;
-        var except = state.GetExceptPlayers(player);
+        var exceptUsers = state.GetExceptUsers(player, operation);
+        var except = exceptUsers.Select(u => state.Players.SingleOrDefault(p => p.User == u)).Where(p => p != null).ToArray();
 
         if (skip)
         {
@@ -180,7 +201,7 @@ public class TestDebugHost : IHost
         }
 
         if (options.CitySelections)
-            Debug.WriteLine($"{player} --> {(selected is [] ? "nobody" : selected.SJoin(", "))}");
+            Debug.WriteLine($"{player} {operation} --> {(selected is [] ? "nobody" : selected.SJoin(", "))}");
 
         AskToFallAsleep(state, player);
 

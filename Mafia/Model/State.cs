@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Diagnostics;
+using Mafia.Executions;
 using Mafia.Extensions;
 using Mafia.Libraries;
 
@@ -29,6 +30,7 @@ public class State
     public bool IsMorning { get; set; }
     public bool IsEvening { get => !IsMorning; set => IsMorning = !value; }
 
+    public User[] Users0 { get; set; }
     public required Player[] Players0 { get; set; }
     public required List<Player> Players { get; set; }
 
@@ -45,13 +47,13 @@ public class State
     /// Не используется для вычисления незаблокированных людей в группе, т.к. на карте есть NoLocked condition, который это сделает (и запишет новость)
     /// Должно быть использовано только для расчета условий или в операциях
     /// </summary>
-    public bool IsCurrentlyAllowed(Player player) => player.Role.AllActions()
-        .Select(a => (a, intersection: a.AllConditions().Intersect(Values.ActiveConditions).ToArray()))
-        .Any(v => v.intersection.Length == 0 || v.intersection.All(name => v.a.CheckCondition(name, this, player).NoInteractionResult()));
+    public bool IsActiveAllowed(Player player) => player.Role.AllActions()
+        .Select(a => (a, needCheck: a.AllConditions().Intersect(Values.ActiveConditions).ToArray()))
+        .Any(v => v.needCheck.Length == 0 || v.needCheck.All(name => v.a.CheckCondition(name, this, player).NoInteractionResult()));
 
     public bool IsAlive(Player player) => Players.Contains(player);
     public bool IsAliveRole(Role role) => Players.Any(p => p.Role == role);
-
+    public bool HasImmunity(User user) => News.SelectMany(n => n.AllSelects()).Any(s => Values.ImmunityConditions.Contains(s.Operation) && s.UserWhom.Contains(user));
     public bool DoesDoctorHaveThanks() => LatestNews.FactHeals.Length > 0;
 
     // todo: прояснить действия путаны в разных ситуациях
@@ -68,11 +70,11 @@ public class State
 
     public bool IsSelfSelected(Player player) => News.Select(ps => ps).Any(ops => ops.Selects?.Any(s => s.Who == player && s.Whom.Contains(player)) ?? false);
     // 
-    public Player[] GetGroupActivePlayers(Group group) => Players.Where(p => p.Group == group)/*.Where(IsCurrentlyAllowed)*/.GroupBy(p=>p.Role).Select(gr=>gr.MinBy(p=>p.Id)!).OrderBy(p=>p.Role.Rank).ToArray();
+    public Player[] GetGroupActivePlayers(Group group) => Players.Where(p => p.Group == group).GroupBy(p=>p.Role).Select(gr=>gr.MinBy(p=>p.Id)!).OrderBy(p=>p.Role.Rank).ToArray();
     public Player[] GetTeam(Player player) => Players.Where(p => player.Group.Roles!.Contains(p.Role)).ToArray();
     public Player[] GetTeamOthers(Player player) => Players.Where(p => p != player && player.Group.Roles!.Contains(p.Role)).ToArray();
     public Player[] GetOtherTeams(Player player) => Players.Where(p => p.Group != player.Group).ToArray();
-    public int GetTeamSeniorRank(Player player) => GetTeam(player).Where(IsCurrentlyAllowed).MinBy(p => p.Role.Rank)?.Role.Rank ?? -1;
+    public int GetTeamSeniorRank(Player player) => GetTeam(player).Where(IsActiveAllowed).MinBy(p => p.Role.Rank)?.Role.Rank ?? -1;
     public Player[] GetNeighborPlayers(Player player)
     {
         var n = Players.Count;
@@ -84,25 +86,46 @@ public class State
 
     }
 
-    public Player[] GetExceptPlayers(Player player)
+    public User[] GetExceptUsers(string operation)
     {
-        List<Player> except = new();
-
-        if (City.IsRuleForRoleAccepted(RuleName.EvenDoctorDays, player.Role))
+        if (Values.KillOperations.Contains(operation))
         {
-            var select = YesterdayNews.AllSelects().SingleOrDefault(s => s.Who == player);
-            
-            if (select?.Whom.Length > 0)
-                except.AddRange(select.Whom.Intersect(Players));
+            if (IsFirstDay)
+            {
+                return Users0.Where(HasImmunity).ToArray();
+            }
         }
 
-        if (City.IsRuleForRoleAccepted(RuleName.DoctorOnceSelfHeal, player.Role))
+        return [];
+    }
+
+    public User[] GetExceptUsers(Player player, string operation)
+    {
+        if (Values.HealOperations.Contains(operation))
         {
-            if (AllSelects().Where(s=>s.Who == player).Any(s => s.Whom.Contains(player)))
-                except.Add(player);
+            if (IsFirstDay)
+                return [];
+
+            List<Player> except = new();
+
+            if (City.IsRuleForRoleAccepted(RuleName.EvenDoctorDays, player.Role))
+            {
+                var select = YesterdayNews.AllSelects().SingleOrDefault(s => s.Who == player);
+
+                if (select?.Whom.Length > 0)
+                    except.AddRange(select.Whom.Intersect(Players));
+            }
+
+            if (City.IsRuleForRoleAccepted(RuleName.DoctorOnceSelfHeal, player.Role))
+            {
+                if (AllSelects().Where(s => s.Who == player).Any(s => s.Whom.Contains(player)))
+                    except.Add(player);
+            }
+
+            return except.Select(p => p.User).ToArray();
         }
 
-        return except.ToArray();
+        return GetExceptUsers(operation);
     }
 
     public Player[] GetLatestFactKills()

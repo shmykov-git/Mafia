@@ -14,7 +14,8 @@ public static class Values
 
     public static string[] NotLockedConditions = [nameof(Conditions.NotLocked)];
     public static string[] RankConditions = [nameof(Conditions.SeniorRank)];
-
+    public static string[] ImmunityConditions = [nameof(CityOperations.CityImmunity)];
+    
     /// <summary>
     /// Can be checked during current night (or day). Example: Prostitute (Putana) visited Maniac, Maniac cannot kill same night right after the visit
     /// </summary>
