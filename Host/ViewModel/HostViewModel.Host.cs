@@ -225,11 +225,15 @@ public partial class HostViewModel : IHost
             (KnownRoles[KnownRoleKey.Putana], "PutanaVisitPlayer", "PutanaVisitPlayerOrSkip"),
             (KnownRoles[KnownRoleKey.Prostitute], "ProstituteVisitPlayer", "ProstituteVisitPlayerOrSkip"),
             ("kill", "PlayerKill", "PlayerKillOrSkip"),
+            ("check", "PlayerCheck", "PlayerCheckOrSkip"),
             ("_", "PlayerSelect", "PlayerSelectOrSkip")
         ];
 
+        var isCheck = Values.CheckOperations.Contains(operation);
         var isKill = Values.KillOperations.Contains(operation);
-        var line = data.First(v => v.role == player.Role.Name || (isKill ? v.role == "kill" : v.role == "_"));
+        var dataRole = isKill ? "kill" : (isCheck ? "check" : "_");
+
+        var line = data.First(v => v.role == player.Role.Name || v.role == dataRole);
         
         var result = await Interact(new Interaction
         {

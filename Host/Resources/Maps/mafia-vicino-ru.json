@@ -184,6 +184,11 @@
   ],
   "rules": [
     {
+      "name": "ApplyFactKillsOnEachKillOnDeath",
+      "description": "Выполнять пересчет килов после каждого выстрела для персонажей Камикадзе и Шахида",
+      "accepted": false
+    },
+    {
       "name": "HealSingleKill",
       "description": "Если в игрока стреляли два и более раза, то он умирает даже если его лечили один раз",
       "accepted": true

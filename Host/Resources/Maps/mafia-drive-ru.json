@@ -163,6 +163,11 @@
   ],
   "rules": [
     {
+      "name": "ApplyFactKillsOnEachKillOnDeath",
+      "description": "Выполнять пересчет килов после каждого выстрела для персонажей Камикадзе и Сапер",
+      "accepted": true
+    },
+    {
       "name": "HealSingleKill",
       "description": "Если в игрока стреляли два и более раза, то он умирает даже если его лечили один раз",
       "accepted": false

@@ -184,6 +184,11 @@
   ],
   "rules": [
     {
+      "name": "ApplyFactKillsOnEachKillOnDeath",
+      "description": "Apply fact kills after each shot for roles Kamikaze and Shahid",
+      "accepted": false
+    },
+    {
       "name": "HealSingleKill",
       "description": "If a player is shot two or more times, he dies even if he was treated once",
       "accepted": true
