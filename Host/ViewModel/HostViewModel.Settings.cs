@@ -36,7 +36,11 @@ public partial class HostViewModel
             Messages = language.Messages.ToDictionary(v => v.Name, v => v.Text);
             Settings.Clubs = GetClubs(Settings.SelectedLanguage);
             Settings.GameCommonRulesDescription = Messages["GameCommonRulesDescription"];
-            Settings.SelectedClub = persistSettings.Club ?? Settings.Clubs[0].Name;
+
+            if (Settings.Clubs.Any(c=>c.Name == persistSettings.Club))
+                Settings.SelectedClub = persistSettings.Club;
+            else
+                Settings.SelectedClub = options.DefaultClub;
         }
 
         if (name == nameof(ActiveSettings.SelectedClub))
@@ -65,7 +69,10 @@ public partial class HostViewModel
             Languages = GetLanguages(),
         };
 
-        Settings.SelectedLanguage = persistSettings.Lang ?? "ru";
+        if (Settings.Languages.Any(l=>l.Name == persistSettings.Lang))
+            Settings.SelectedLanguage = persistSettings.Lang;
+        else
+            Settings.SelectedLanguage = options.DefaultLanguage;
     }
 
     private async Task LoadCityMaps()

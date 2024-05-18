@@ -31,7 +31,7 @@ public class HostMapOption
 public class HostMapOptions
 {
     public required HostMapOption[] Maps {  get; set; }
-    public required string DefaultMapName { get; set; }
+    public required string DefaultClub { get; set; }
     public required string DefaultLanguage { get; set; }
 }
 

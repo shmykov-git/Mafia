@@ -166,8 +166,8 @@ public partial class HostViewModel
             return;
 
         SubHostHint = detachedGroupRoles.Length == 1
-            ? Messages["SelectWakedupPlayer"]
-            : Messages["SelectAllWakedupPlayers"].With(detachedGroupRoles.Length);
+            ? Messages["SelectWokeupPlayer"]
+            : Messages["SelectAllWokeupPlayers"].With(detachedGroupRoles.Length);
 
         ContinueMode = ContinueGameMode.WakeupOnFirstDay;
         

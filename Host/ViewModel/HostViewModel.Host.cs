@@ -201,6 +201,7 @@ public partial class HostViewModel : IHost
             (KnownRoles[KnownRoleKey.Commissar], "CommissarCheckPlayer", "CommissarCheckPlayerOrSkip"),
             (KnownRoles[KnownRoleKey.Maniac], "ManiacKillPlayer", "ManiacKillPlayerOrSkip"),
             (KnownRoles[KnownRoleKey.Putana], "PutanaVisitPlayer", "PutanaVisitPlayerOrSkip"),
+            (KnownRoles[KnownRoleKey.Prostitute], "ProstituteVisitPlayer", "ProstituteVisitPlayerOrSkip"),
             ("kill", "PlayerKill", "PlayerKillOrSkip"),
             ("_", "PlayerSelect", "PlayerSelectOrSkip")
         ];

@@ -71,6 +71,7 @@
 	  <None Remove="Resources\AppIcon\mafia1.jpg" />
 	  <None Remove="Resources\AppIcon\mafia_icon.png" />
 	  <None Remove="Resources\Images\mafia.jpg" />
+	  <None Remove="Resources\Maps\mafia-drive-ru.json" />
 	  <None Remove="Resources\Maps\mafia-drive.json" />
 	  <None Remove="Resources\Maps\mafia-vicino-ru.json" />
 	  <None Remove="Resources\Maps\mafia-vicino.json" />
@@ -80,6 +81,9 @@
 
 	<ItemGroup>
 	  <MauiAsset Include="appsettings.json">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </MauiAsset>
+	  <MauiAsset Include="Resources\Maps\mafia-drive-ru.json">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </MauiAsset>
 	  <MauiAsset Include="Resources\Maps\mafia-drive.json">
@@ -135,12 +139,6 @@
 	  <MauiXaml Update="Views\UserView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Update="Resources\Maps\mafia-drive-ru.json">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
 	</ItemGroup>
 
 

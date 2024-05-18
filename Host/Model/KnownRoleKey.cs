@@ -5,5 +5,6 @@ public enum KnownRoleKey
     Doctor,
     Commissar,
     Maniac,
-    Putana
+    Putana,
+    Prostitute,
 }
