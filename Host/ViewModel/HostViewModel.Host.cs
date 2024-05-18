@@ -12,12 +12,8 @@ namespace Host.ViewModel;
 
 public partial class HostViewModel : IHost
 {
-    private int? seed = null;
-
     public void ChangeSeed(int seed)
     {
-        this.seed = seed;
-        rnd = new Random(seed);
     }
 
     public string[] GetGameRoles()
@@ -56,9 +52,6 @@ public partial class HostViewModel : IHost
 
     public async Task NotifyGameEnd(State state, Group winnerGroup)
     {
-        Log($"GameEnd, the winner is {winnerGroup.Name}");
-        Log($"===== </day {state.DayNumber}> =====");
-
         await SaveGameReplay(state);
 
         ActivePlayerFilter.Killed = true;
@@ -86,14 +79,6 @@ public partial class HostViewModel : IHost
 
     public async Task NotifyDayStart(State state)
     {
-        if (state.DayNumber > 1)
-        {
-            //await AskCityToWakeUp(state);
-
-            Log($"===== </night {state.DayNumber}> =====");
-        }
-
-        Log($"===== <day {state.DayNumber}> =====");
     }
 
     public async Task NotifyNightStart(State state)
@@ -103,9 +88,6 @@ public partial class HostViewModel : IHost
             Name = "FallAsleepCity",
             State = state
         });
-
-        Log($"===== </day {state.DayNumber}> =====");
-        Log($"===== <night {state.DayNumber}> =====");
     }
 
     public async Task<bool> IsGameEnd(State state)
@@ -177,8 +159,6 @@ public partial class HostViewModel : IHost
 
             state.LatestNews.FactKills.ForEach(p => ActivePlayers.First(a => a.Player == p).IsAlive = false);
             Changed(nameof(FilteredActivePlayers));
-
-            Log($"Alive players: {state.Players.SJoin(", ")}");
         }
     }
 

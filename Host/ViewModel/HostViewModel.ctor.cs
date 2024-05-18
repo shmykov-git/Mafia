@@ -13,7 +13,6 @@ public partial class HostViewModel : NotifyPropertyChanged, ICity
 {
     private const string ReplaySecureKey = "Mafia_Host_Replays";
 
-    private Random rnd;
     private City city;
     private HostOptions options;
     private LanguageOption language;
@@ -26,7 +25,6 @@ public partial class HostViewModel : NotifyPropertyChanged, ICity
 
     public HostViewModel(Game game, IOptions<HostOptions> options)
     {
-        rnd = new Random();
         this.game = game;
         this.options = options.Value;
         HintColor = this.options.Theme.CityColor;
@@ -70,11 +68,6 @@ public partial class HostViewModel : NotifyPropertyChanged, ICity
     private Color GetOperationColor(string? operation) =>
         options.Theme.OperationColors.FirstOrDefault(v => v.Operation == operation)?.Color ??
         options.Theme.OperationColors.Single(v => v.Operation == "Unknown").Color;
-
-    private void Log(string text)
-    {
-        Debug.WriteLine(text);
-    }
 
     private async Task SaveGameReplay(State state)
     {

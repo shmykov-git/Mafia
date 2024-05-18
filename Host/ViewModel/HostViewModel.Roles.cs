@@ -83,7 +83,6 @@ public partial class HostViewModel
         await Shell.Current.GoToAsync(HostValues.GameView);
     }, AreRolesValid);
 
-    // todo: ask user to restart the game
     private async Task StopCurrentGame()
     {
         if (IsGameOn)
@@ -100,13 +99,6 @@ public partial class HostViewModel
     private async Task StartNewGame()
     {
         await StopCurrentGame();
-
-        // setup game variant
-        var seed = this.seed.HasValue ? this.seed.Value + 1 : options.FirstSeed;
-        ChangeSeed(seed);
-
-        Log("");
-        Log($"'{city.Name}' game {seed}");
 
         // start new game execution task line
         game.Start().ContinueWith(_ => RefreshCommands()).NoWait();

@@ -114,11 +114,6 @@ public partial class HostViewModel
 
         CleanUpInteraction();
 
-        if (result.IsSkipped)
-            Log($"{(interaction.WithCity ? "City" : interaction.Player)}, skip selection");
-        else
-            Log($"{(interaction.WithCity ? "City" : interaction.Player)} --> {result.Selected.SJoin(", ")}");
-
         prevNightInteraction = interaction;
         Interaction = null;
 
@@ -283,8 +278,6 @@ public partial class HostViewModel
 
         PrepareActivePlayers_RolesSelections();
         await WaitForHostInteraction();
-
-        Log(message);
     }
 
     private async Task WaitForHostInteraction()
