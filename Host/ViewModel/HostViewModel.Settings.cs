@@ -1,4 +1,5 @@
-﻿using Host.Libraries;
+﻿using CoreData;
+using Host.Libraries;
 using Host.Model;
 using Mafia.Extensions;
 using Mafia.Model;
@@ -25,6 +26,9 @@ public partial class HostViewModel
 
     ActiveClub[] GetClubs(string lang) => cityMaps.Where(m => m.Language == lang).Select(m => new ActiveClub() { Name = m.Name }).ToArray();
 
+    private string[] refreshList = [nameof(Messages), nameof(KnownRoles), nameof(GameClubRules), 
+        nameof(GameClubRuleDetails), nameof(City), nameof(GameInfo), nameof(PlayerRoleInfo), nameof(PlayerInfo)];
+
     private void OnSettingsChange(string name)
     {
         if (Settings == null)
@@ -41,6 +45,8 @@ public partial class HostViewModel
                 Settings.SelectedClub = persistSettings.Club;
             else
                 Settings.SelectedClub = options.DefaultClub;
+
+            refreshList.ForEach(Changed);
         }
 
         if (name == nameof(ActiveSettings.SelectedClub))
@@ -49,7 +55,7 @@ public partial class HostViewModel
             Settings.GameClubRules = city.Description.SJoin(" ");
             Settings.GameClubRuleDetails = city.Rules.Where(r => r.Accepted).Select(r => r.Description).SJoin("\r\n");
 
-            Changed(nameof(GameClubRules), nameof(GameClubRuleDetails), nameof(City));
+            refreshList.ForEach(Changed);
 
             persistSettings.Lang = Settings.SelectedLanguage;
             persistSettings.Club = Settings.SelectedClub;
