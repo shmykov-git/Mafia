@@ -155,6 +155,11 @@
       ]
     }
   ],
+  "preset": {
+    "singleRoles": [ "Don", "Bum", "Maniac", "Commissar", "Doctor" ],
+    "multipleRoles": [ "Mafia", "Civilian" ],
+    "ratios": [ 1, 3.5 ]
+  },
   "dayActions": [
     {
       "operations": [ "CityKill" ],

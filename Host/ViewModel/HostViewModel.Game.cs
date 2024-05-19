@@ -71,7 +71,7 @@ public partial class HostViewModel
 
         return ContinueMode switch
         {
-            ContinueGameMode.RolesSelections => ActivePlayers.Count(p => p.IsSelected).Between(Interaction.Selection),
+            ContinueGameMode.RolesSelections => ActivePlayers.Count(p => p.IsSelected).Between(Interaction.Selection) || ActivePlayers.All(p => p.IsSelected || p.IsDisabled),
             ContinueGameMode.WakeupOnFirstDay => ActivePlayers.Count(p => p.IsSelected) == Interaction.WakeupRoles.Length,
             ContinueGameMode.PreviousGroupFallAsleep => false,
             _ => false,

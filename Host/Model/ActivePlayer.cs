@@ -54,4 +54,5 @@ public class ActivePlayer : NotifyPropertyChanged
     public bool IsAlive { get => IsAliveSilent; set { IsAliveSilent = value; Changed(); } }
 
     public bool IsKilled => !IsAlive;
+    public bool IsDisabled => !IsEnabled;
 }
