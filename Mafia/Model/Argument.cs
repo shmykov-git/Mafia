@@ -4,5 +4,6 @@ public enum Argument
 {
     Skippable,
     NotSelfTopGroup,
-    NotSelfGroup
+    NotSelfGroup,
+    NoTeam
 }

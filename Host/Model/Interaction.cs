@@ -10,8 +10,11 @@ public class Interaction
     public Role[] WakeupRoles { get; set; } = [];
     public required State State { get; set; }
     public Player? Player { get; set; }
+
+    public Func<User[]>? GetExceptFn { get; set; }
+    public Func<User[]>? GetUnwantedFn { get; set; }
     public User[] Except { get; set; } = [];
-    public Player[] Unwanted { get; set; } = [];
+    public User[] Unwanted { get; set; } = [];
     public Player[] Killed { get; set; } = [];
     public HostTail[] Tails { get; set; } = [];
     public (int from, int to) Selection { get; set; } = (0, 0);

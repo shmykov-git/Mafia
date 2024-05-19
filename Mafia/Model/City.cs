@@ -34,6 +34,7 @@ public class City
     private Dictionary<Group, int> _groupsOrder;
     private Dictionary<Group, int> GroupsOrder => _groupsOrder ??= NightEvents.Select((name, i) => (name, i)).ToDictionary(v => GetGroup(v.name), v => v.i);
     public Group GetTopGroupByRoleName(string roleName) => Groups.Single(g => g.AllGroups().Any(g => g.AllRoles().Any(r => r.Name == roleName)));
+    public IEnumerable<Group> GetGroupsByRoleName(string roleName) => AllGroups().Where(g => g.AllGroups().Any(gg => gg.AllRoles().Any(r => r.Name == roleName)));
     public Group GetGroupByRoleName(string roleName) => AllGroups().Single(g => g.AllRoles().Any(r => r.Name == roleName));
     public Rule GetRule(RuleName name) => Rules.Single(r => r.Name == name);
     public Group GetTopGroup(Role role) => Groups.Single(g => g.AllGroups().Any(gg => gg.AllRoles().Any(r => r == role)));

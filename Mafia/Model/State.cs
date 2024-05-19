@@ -88,6 +88,15 @@ public class State
 
     }
 
+    public User[] GetUnwantedUsers(Player player, string operation, Argument[]? arguments)
+    {
+        if ((arguments ?? []).Contains(Argument.NoTeam))
+            return Values.UnwantedOperations.Contains(operation) ? [GetUser(player)] : [];
+        else
+            return Values.UnwantedOperations.Contains(operation) ? GetTeam(player).Select(GetUser).ToArray() : [];
+
+    }
+
     public User[] GetCityExceptUsers(string operation) => 
         Values.KillOperations.Contains(operation) ? Users0.Where(HasFirstDayImmunity).ToArray() : [];
 

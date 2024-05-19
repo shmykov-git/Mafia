@@ -101,6 +101,12 @@ public partial class HostViewModel
         if (interaction.NeedFirstDayWakeup)
             await FirstDayWakeup();
 
+        if (interaction.GetExceptFn != null)
+            interaction.Except = interaction.GetExceptFn();
+
+        if (interaction.GetUnwantedFn != null)
+            interaction.Unwanted = interaction.GetUnwantedFn();
+
         await ShowHostMainMessage();
 
         var result = new InteractionResult()
@@ -425,7 +431,7 @@ public partial class HostViewModel
             var isKilled = Interaction.Killed.Contains(p.Player) || !p.IsAlive;
             var isEnabled = !Interaction.Except.Contains(p.User) && !isKilled;
             var operation = isKilled ? killed : staticOperation;
-            var color = Interaction.Unwanted.Contains(p.Player) ? options.Theme.UnwantedColor : staticOperationColor;
+            var color = Interaction.Unwanted.Contains(p.User) ? options.Theme.UnwantedColor : staticOperationColor;
 
             p.Operation = operation;
             p.OperationColor = isKilled ? options.Theme.KilledColor : (isEnabled ? color : options.Theme.NoOperationColor);
@@ -449,7 +455,7 @@ public partial class HostViewModel
         {
             var isKilled = !p.IsAlive;
             var isEnabled = staticIsEnabled && !interaction.Except.Contains(p.User);
-            var color = Interaction.Unwanted.Contains(p.Player) ? options.Theme.UnwantedColor : staticOperationColor;
+            var color = Interaction.Unwanted.Contains(p.User) ? options.Theme.UnwantedColor : staticOperationColor;
 
             p.OperationColor = isKilled ? options.Theme.KilledColor : (isEnabled ? color : options.Theme.NoOperationColor);
             p.CheckboxColor = isEnabled ? color : options.Theme.NoOperationColor;

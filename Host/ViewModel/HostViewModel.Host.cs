@@ -23,12 +23,9 @@ public partial class HostViewModel : IHost
         return GetSelectedMultipliedRoles().Select(r=>r.Name).ToArray();
     }
 
-    private Color GetRoleColor(string roleName) => 
-        GetGroupColor(city.GetGroupByRoleName(roleName)) ?? 
-        GetGroupColor(city.GetTopGroupByRoleName(roleName)) ?? 
-        options.Theme.CityColor;
+    private Color GetRoleColor(string roleName) => GetGroupColor(city.GetGroupsByRoleName(roleName).FirstOrDefault()) ?? options.Theme.CityColor;
 
-    private Color? GetGroupColor(Group group) => language.GroupColors.FirstOrDefault(gc => gc.Group == group.Name)?.Color;
+    private Color? GetGroupColor(Group? group) => group == null ? null : language.GroupColors.FirstOrDefault(gc => gc.Group == group.Name)?.Color;
     private Color GetPlayerRoleColor(Player p) => GetGroupColor(p.Group) ?? GetGroupColor(p.TopGroup) ?? options.Theme.CityColor;
 
     private Color GetUserColor(Player p) => p.User == null 
@@ -172,7 +169,7 @@ public partial class HostViewModel : IHost
             {
                 Name = action.IsSkippable() ? "CitySelectCanSkip" : "CitySelectNoSkip",
                 Selection = (action.IsSkippable() ? 0 : 1, 1),
-                Except = state.GetCityExceptUsers(operation),
+                GetExceptFn = () => state.GetCityExceptUsers(operation),
                 Operation = operation,
                 State = state
             });
@@ -205,8 +202,8 @@ public partial class HostViewModel : IHost
             Name = action.IsSkippable() ? "RoundKilled" : "RoundKilled",
             Args = [player.ToString()],
             Selection = (action.IsSkippable() ? 0 : 2, 2),
-            Except = state.GetExceptUsers(player, operation, action.Arguments),
-            Unwanted = Values.UnwantedOperations.Contains(operation) ? state.GetTeam(player) : [],
+            GetExceptFn = () => state.GetExceptUsers(player, operation, action.Arguments),
+            GetUnwantedFn = () => state.GetUnwantedUsers(player, operation, action.Arguments),
             Player = player,
             Operation = operation,
             State = state
@@ -234,14 +231,14 @@ public partial class HostViewModel : IHost
         var dataRole = isKill ? "kill" : (isCheck ? "check" : "_");
 
         var line = data.First(v => v.role == player.Role.Name || v.role == dataRole);
-        
+
         var result = await Interact(new Interaction
         {
             Name = action.IsSkippable() ? line.nameOrSkip : line.name,
             Args = [action.ByGroup ? player.Group.Name : player.Role.Name],
             Selection = (action.IsSkippable() ? 0 : 1, 1),
-            Except = state.GetExceptUsers(player, operation, action.Arguments),
-            Unwanted = Values.UnwantedOperations.Contains(operation) ? state.GetTeam(player) : [],
+            GetExceptFn = () => state.GetExceptUsers(player, operation, action.Arguments),
+            GetUnwantedFn = () => state.GetUnwantedUsers(player, operation, action.Arguments),
             Player = player,
             Operation = operation,
             State = state
