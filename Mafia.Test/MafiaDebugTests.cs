@@ -114,6 +114,18 @@ public class MafiaDebugTests : MafiaTestsBase
         await RunDebugGames("mafia-vicino.json", 100, 777, SetOptions);
     }
 
+    [Fact]
+    public async Task Debug_Vicino_ManiacParty_ru_FullDifficult20_100()
+    {
+        async void SetOptions(TestDebugOptions options)
+        {
+            options.Shaffle = true;
+            options.CitySelections = true;
+            options.RolesPreset = [("Дон", 1), ("Бомж", 1), ("Проститутка", 1), ("Маньяк", 1), ("Фанат", 2), ("Комиссар", 1), ("Сержант", 1), ("Доктор", 1), ("Камикадзе", 1), ("Шахид", 1), ("Мафия", 1), ("Мирный", 8)];
+        }
+
+        await RunDebugGames("mafia-vicino-maniac-party-ru.json", 100, 777, SetOptions);
+    }
 
 
     private async Task RunDebugGames(string map, int n, int startSeed, Action<TestDebugOptions> setOptions)

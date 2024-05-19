@@ -9,6 +9,8 @@ public class Player
     public required Group TopGroup { get; set; }
 
     public bool Is(string role) => Role.Name == role;
+    public bool IsKnown => User != null;
+    public bool IsUnknown => User == null;
 
     public override string ToString() => $"{User?.Nick??"Unknown"}-{Role}";
 }

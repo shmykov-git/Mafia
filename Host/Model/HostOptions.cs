@@ -17,7 +17,6 @@ public class LanguageOption
 {
     public required string Name { get; set; }
     public required GroupColor[] GroupColors { get; set; }
-    public required RolePreset RolePreset { get; set; }
     public required KnownRole[] KnownRoles { get; set; }
     public required Message[] Messages { get; set; }
 }

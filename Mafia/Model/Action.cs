@@ -8,6 +8,7 @@ public class Action
     public bool ByGroup { get; set; }
     public string[]? Conditions { get; set; }
     public required string[] Operations { get; set; }
+    public Argument[]? Arguments { get; set; }
 
     public async Task<DailyNews> GetFailedActionNews(State state, Player player)
     {
@@ -38,10 +39,11 @@ public class Action
         return result;
     }
 
-    public bool IsSkippable() => AllConditions().Intersect(Values.SkippableConditions).Any();
+    public bool IsSkippable() => AllArguments().Contains(Argument.Skippable) || AllConditions().Intersect(Values.SkippableConditions).Any();
 
     public Task<DailyNews> DoOperation(string operation, State state, Player player) => Execution.Operations[operation](state, player, this);
 
+    public IEnumerable<Argument> AllArguments() => Arguments ?? [];
     public IEnumerable<string> AllConditions() => Conditions ?? [];
     public required Execution Execution { get; set; }
 }

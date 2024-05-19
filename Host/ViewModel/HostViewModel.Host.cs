@@ -172,7 +172,7 @@ public partial class HostViewModel : IHost
             {
                 Name = action.IsSkippable() ? "CitySelectCanSkip" : "CitySelectNoSkip",
                 Selection = (action.IsSkippable() ? 0 : 1, 1),
-                Except = state.GetExceptUsers(operation),
+                Except = state.GetCityExceptUsers(operation),
                 Operation = operation,
                 State = state
             });
@@ -205,7 +205,7 @@ public partial class HostViewModel : IHost
             Name = action.IsSkippable() ? "RoundKilled" : "RoundKilled",
             Args = [player.ToString()],
             Selection = (action.IsSkippable() ? 0 : 2, 2),
-            Except = state.GetExceptUsers(player, operation),
+            Except = state.GetExceptUsers(player, operation, action.Arguments),
             Unwanted = Values.UnwantedOperations.Contains(operation) ? state.GetTeam(player) : [],
             Player = player,
             Operation = operation,
@@ -240,7 +240,7 @@ public partial class HostViewModel : IHost
             Name = action.IsSkippable() ? line.nameOrSkip : line.name,
             Args = [action.ByGroup ? player.Group.Name : player.Role.Name],
             Selection = (action.IsSkippable() ? 0 : 1, 1),
-            Except = state.GetExceptUsers(player, operation),
+            Except = state.GetExceptUsers(player, operation, action.Arguments),
             Unwanted = Values.UnwantedOperations.Contains(operation) ? state.GetTeam(player) : [],
             Player = player,
             Operation = operation,

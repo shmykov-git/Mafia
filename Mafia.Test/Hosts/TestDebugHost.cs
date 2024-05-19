@@ -180,7 +180,7 @@ public class TestDebugHost : IHost
         Player[] selected;
 
         var skip = action.IsSkippable() && rnd.NextDouble() < 0.1;
-        var exceptUsers = state.GetExceptUsers(player, operation);
+        var exceptUsers = state.GetExceptUsers(player, operation, action.Arguments);
         var except = exceptUsers.Select(u => state.Players.SingleOrDefault(p => p.User == u)).Where(p => p != null).ToArray();
 
         if (skip)

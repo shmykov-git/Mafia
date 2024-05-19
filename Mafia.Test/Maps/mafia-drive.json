@@ -7,45 +7,30 @@
       "name": "Mafia",
       "roles": [
         {
-          "name": "DonMafia",
+          "name": "Don",
           "rank": 1,
           "actions": [
             {
-              "name": "Kill",
-              "operations": [ "Kill" ],
-              "conditions": [ "SeniorRank", "NotLocked" ]
-            }
-          ]
-        },
-        {
-          "name": "BumMafia",
-          "rank": 2,
-          "actions": [
+              "conditions": [ "NotLocked" ],
+              "operations": [ "Check" ]
+            },
             {
-              "name": "Kill",
-              "operations": [ "Kill" ],
-              "conditions": [ "SeniorRank", "NotLocked" ]
+              "byGroup": true,
+              "conditions": [ "SeniorRank", "NotLocked" ],
+              "operations": [ "Kill" ]
             }
           ]
         },
         {
           "name": "Mafia",
-          "rank": 3,
+          "rank": 2,
           "isMultiple": true,
           "actions": [
             {
               "name": "Kill",
-              "operations": [ "Kill" ],
-              "conditions": [ "SeniorRank", "NotLocked" ]
-            }
-          ]
-        },
-        {
-          "name": "Putana",
-          "actions": [
-            {
-              "name": "Lock",
-              "operations": [ "Lock" ]
+              "byGroup": true,
+              "conditions": [ "SeniorRank", "NotLocked" ],
+              "operations": [ "Kill" ]
             }
           ]
         }
@@ -58,9 +43,8 @@
           "name": "Maniac",
           "actions": [
             {
-              "name": "Kill",
-              "operations": [ "Kill" ],
-              "conditions": [ "NotLocked" ]
+              "conditions": [ "NotLocked" ],
+              "operations": [ "Kill" ]
             }
           ]
         }
@@ -76,27 +60,27 @@
       ],
       "groups": [
         {
+          "name": "Putana",
+          "roles": [
+            {
+              "name": "Putana",
+              "actions": [
+                {
+                  "operations": [ "Lock" ]
+                }
+              ]
+            }
+          ]
+        },
+        {
           "name": "Commissar",
           "roles": [
             {
               "name": "Commissar",
-              "rank": 1,
               "actions": [
                 {
-                  "name": "Check",
-                  "operations": [ "Check" ],
-                  "conditions": [ "SeniorRank", "NotLocked" ]
-                }
-              ]
-            },
-            {
-              "name": "Sergeant",
-              "rank": 2,
-              "actions": [
-                {
-                  "name": "Check",
-                  "operations": [ "Check" ],
-                  "conditions": [ "SeniorRank", "NotLocked" ]
+                  "conditions": [ "NotLocked" ],
+                  "operations": [ "Check" ]
                 }
               ]
             }
@@ -109,9 +93,8 @@
               "name": "Doctor",
               "actions": [
                 {
-                  "name": "Heal",
-                  "operations": [ "Heal" ],
-                  "conditions": [ "NotLocked" ]
+                  "conditions": [ "NotLocked" ],
+                  "operations": [ "Heal" ]
                 }
               ]
             }
@@ -124,34 +107,30 @@
               "name": "Kamikaze",
               "actions": [
                 {
-                  "name": "Hello",
-                  "operations": [ "Hello" ],
-                  "conditions": [ "FirstDay" ]
+                  "conditions": [ "FirstDay" ],
+                  "operations": [ "Hello" ]
                 },
                 {
-                  "name": "KillOnDeath",
-                  "operations": [ "Kill" ],
-                  "conditions": [ "Killed", "Skippable" ]
+                  "conditions": [ "Killed" ],
+                  "operations": [ "Kill" ]
                 }
               ]
             }
           ]
         },
         {
-          "name": "Shahid",
+          "name": "Sapper",
           "roles": [
             {
-              "name": "Shahid",
+              "name": "Sapper",
               "actions": [
                 {
-                  "name": "Hello",
-                  "operations": [ "Hello" ],
-                  "conditions": [ "FirstDay" ]
+                  "conditions": [ "FirstDay" ],
+                  "operations": [ "Hello" ]
                 },
                 {
-                  "name": "RoundKillOnDeath",
-                  "operations": [ "RoundKill" ],
-                  "conditions": [ "Killed" ]
+                  "conditions": [ "Killed" ],
+                  "operations": [ "RoundKill" ]
                 }
               ]
             }
@@ -160,58 +139,71 @@
       ]
     }
   ],
+  "preset": {
+    "singleRoles": [ "Don", "Maniac", "Commissar", "Doctor" ],
+    "multipleRoles": [ "Mafia", "Civilian" ],
+    "ratios": [ 1, 3.5 ]
+  },
   "dayActions": [
     {
-      "operations": [ "CityKill" ],
-      "conditions": [ "CitySkippable" ]
+      "conditions": [ "FirstDay" ],
+      "operations": [ "CityImmunity" ]
+    },
+    {
+      "conditions": [ "CitySkippable" ],
+      "operations": [ "CityKill" ]
     }
   ],
   "nightEvents": [
+    "Putana",
     "Mafia",
     "Maniac",
     "Doctor",
     "Commissar",
     "Kamikaze",
-    "Shahid"
+    "Sapper"
+  ],
+  "description": [
+    "https://mafdrive.ru/mafia_drive_rules/"
   ],
   "rules": [
     {
       "name": "ApplyFactKillsOnEachKillOnDeath",
-      "description": "Apply fact kills after each shot for roles Kamikaze and Sapper",
+      "description": "Apply fact kills after each shot for roles Kamikaze and Shahid",
       "accepted": true
     },
     {
       "name": "HealSingleKill",
-      "description": "Если в игрока стреляли два и более раза, то он умирает даже если его лечили один раз",
+      "description": "If a player is shot two or more times, he dies even if he was treated once",
       "accepted": false
     },
     {
       "name": "EvenDoctorDays",
-      "description": "Доктор лечит одного и того же игрока только через раз",
+      "description": "The doctor treats the same player only every other time",
       "values": [ "Doctor" ],
       "accepted": true
     },
     {
       "name": "DoctorOnceSelfHeal",
-      "description": "Доктор лечит себя один раз за игру",
+      "description": "The doctor heals himself only once per game",
       "values": [ "Doctor" ],
       "accepted": true
     },
     {
       "name": "KillOnDeathNoHeal",
-      "description": "Смерти от камикадзе и шахида не лечатся",
+      "description": "Cannot heal after night kills, so Kamikaze and Shahid ignore the doctor",
       "accepted": true
     },
     {
       "name": "MafiaWin",
-      "description": "Мафия побеждает, если живы только игроки группы Mafia и игроки с перечисленными ролями Civilian и количество мафиози больше или равно количеству мирных",
-      "values": [ "Mafia", "Commissar, Sergeant, Civilian" ],
+      "description": "The Mafia wins if only Mafia group players and players with roles Commissar, Civilian are alive and the number of Mafiosi is greater than or equal to the number of civilians",
+      "values": [ "Mafia", "Commissar, Civilian" ],
       "accepted": true
     },
     {
       "name": "ManiacWin",
-      "description": "Маньяк побеждает, если живы только игроки группы Maniac и игроки с перечисленными ролями Civilian и количество маньяков больше или равно количеству мирных",
-      "values": [ "Maniac", "Commissar, Sergeant, Civilian" ],
+      "description": "The Maniac wins if only players from the Maniac group and players with roles Commissar, Civilian are alive and the number of Maniacs is greater than or equal to the number of civilians",
+      "values": [ "Maniac", "Commissar, Civilian" ],
       "accepted": true
     }
   ]

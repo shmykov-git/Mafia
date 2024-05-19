@@ -12,6 +12,7 @@ public class City
     public required string[] NightEvents { get; set; }
     public required CityAction[] DayActions { get; set; }
     public required Rule[] Rules { get; set; }
+    public required RolePreset Preset { get; set; }
     public required string[] Description { get; set; }
 
     public Player CreatePlayer(Role role, string id) => new Player

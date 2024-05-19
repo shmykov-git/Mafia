@@ -11,4 +11,6 @@ public static class ArrayExtensions
             (values[i], values[j]) = (values[j], values[i]);
         }
     }
+
+    public static TItem[] ToSingleArray<TItem>(this IEnumerable<IEnumerable<TItem>> values) => values.SelectMany(v=>v).ToArray();
 }

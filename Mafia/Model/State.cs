@@ -54,6 +54,7 @@ public class State
     public bool IsAlive(Player player) => Players.Contains(player);
     public bool IsAliveRole(Role role) => Players.Any(p => p.Role == role);
     public bool HasImmunity(User user) => News.SelectMany(n => n.AllSelects()).Any(s => Values.ImmunityConditions.Contains(s.Operation) && s.UserWhom.Contains(user));
+    public bool HasFirstDayImmunity(User user) => IsFirstDay && HasImmunity(user);
     public bool DoesDoctorHaveThanks() => LatestNews.FactHeals.Length > 0;
 
     // todo: прояснить действия путаны в разных ситуациях
@@ -71,8 +72,9 @@ public class State
     public bool IsSelfSelected(Player player) => News.Select(ps => ps).Any(ops => ops.Selects?.Any(s => s.Who == player && s.Whom.Contains(player)) ?? false);
     // 
     public Player[] GetGroupActivePlayers(Group group) => Players.Where(p => p.Group == group).GroupBy(p=>p.Role).Select(gr=>gr.MinBy(p=>p.Id)!).OrderBy(p=>p.Role.Rank).ToArray();
-    public Player[] GetTeam(Player player) => Players.Where(p => player.Group.Roles!.Contains(p.Role)).ToArray();
-    public Player[] GetTeamOthers(Player player) => Players.Where(p => p != player && player.Group.Roles!.Contains(p.Role)).ToArray();
+    public Player[] GetTopTeam(Player player) => Players.Where(p => player.TopGroup.AllDeepRoles().Contains(p.Role)).ToArray();
+    public Player[] GetTeam(Player player) => Players.Where(p => player.Group.AllRoles().Contains(p.Role)).ToArray();
+    public Player[] GetTeamOthers(Player player) => Players.Where(p => p != player && player.Group.AllRoles().Contains(p.Role)).ToArray();
     public Player[] GetOtherTeams(Player player) => Players.Where(p => p.Group != player.Group).ToArray();
     public int GetTeamSeniorRank(Player player) => GetTeam(player).Where(IsActiveAllowed).MinBy(p => p.Role.Rank)?.Role.Rank ?? -1;
     public Player[] GetNeighborPlayers(Player player)
@@ -86,20 +88,10 @@ public class State
 
     }
 
-    public User[] GetExceptUsers(string operation)
-    {
-        if (Values.KillOperations.Contains(operation))
-        {
-            if (IsFirstDay)
-            {
-                return Users0.Where(HasImmunity).ToArray();
-            }
-        }
+    public User[] GetCityExceptUsers(string operation) => 
+        Values.KillOperations.Contains(operation) ? Users0.Where(HasFirstDayImmunity).ToArray() : [];
 
-        return [];
-    }
-
-    public User[] GetExceptUsers(Player player, string operation)
+    public User[] GetExceptUsers(Player player, string operation, Argument[]? arguments)
     {
         if (Values.HealOperations.Contains(operation))
         {
@@ -122,11 +114,27 @@ public class State
                     except.Add(player);
             }
 
-            return except.Select(p => p.User).ToArray();
+            return except.Select(GetUser).ToArray();
         }
 
-        return GetExceptUsers(operation);
+        if (Values.KillOperations.Contains(operation))
+        {
+            var users = Users0.Where(HasFirstDayImmunity).ToHashSet();
+
+            if ((arguments ?? []).Contains(Argument.NotSelfTopGroup))
+                GetTopTeam(player).Where(IsKnown).Select(GetUser).ForEach(u => users.Add(u));
+
+            if ((arguments ?? []).Contains(Argument.NotSelfGroup))
+                GetTeam(player).Where(IsKnown).Select(GetUser).ForEach(u => users.Add(u));
+
+            return users.ToArray();
+        }
+
+        return [];
     }
+
+    private bool IsKnown(Player p) => p.IsKnown;
+    private User GetUser(Player p) => p.User;
 
     public Player[] GetLatestFactKills()
     {
