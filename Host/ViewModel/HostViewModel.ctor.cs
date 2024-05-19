@@ -48,8 +48,7 @@ public partial class HostViewModel : NotifyPropertyChanged, ICity
 
         if (users.Count < options.PresetPlayerCount)
         {
-            var lastPlay = DateTime.Now.Date;
-            var newUsers = Enumerable.Range(users.Count + 1, options.PresetPlayerCount - users.Count + 1).Select(i => new User { Nick = $"Nick{i}", LastPlay = lastPlay }).ToArray();
+            var newUsers = Enumerable.Range(users.Count + 1, options.PresetPlayerCount - users.Count + 1).Select(i => new User { Nick = $"Nick{i}" }).ToArray();
             users.AddRange(newUsers);
             await WriteUsers(users);
         }

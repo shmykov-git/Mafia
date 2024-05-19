@@ -221,7 +221,7 @@ public class Game
         state = new State 
         { 
             Host = host, 
-            Replay = new Replay() { MapName = city.Name, MapVersion = city.Version, StartTime = DateTime.Now, EndTime = DateTime.Now },
+            Replay = new Replay() { MapName = city.Name, MapVersion = city.Version, Language = city.Language, StartTime = DateTime.Now, EndTime = DateTime.Now },
             City = city,
             Players0 = players0, 
             Players = players0.ToList(), 

@@ -34,7 +34,7 @@ public class TestDebugHost : IHost
     public async Task StartGame(State state)
     {
         var n = state.Players0.Length;
-        users = Enumerable.Range(0, n).Select(i => new User { Nick = $"U{(i).ToString().PadLeft(2, '0')}", LastPlay = DateTime.Today }).ToArray();
+        users = Enumerable.Range(0, n).Select(i => new User { Nick = $"U{(i).ToString().PadLeft(2, '0')}" }).ToArray();
         state.Players0.ForEach((p, i) => p.User = users[i]);
         
         if (options.Shaffle)
@@ -108,23 +108,34 @@ public class TestDebugHost : IHost
     }
     public void RolledBack(State state) { }
 
-    public async Task NotifyGameEnd(State state, Group winnerGroup)
-    {
-        var players = state.Players0.ToList();
-        int[] GetWhom(Select s) => s.Whom.Select(p=>players.IndexOf(p)).ToArray();
-        int GetWho(Select s) => s.IsCity ? -1 : players.IndexOf(s.Who);
-
-        var items = state.News.SelectMany(n=>n.AllSelects().Select(s=> $"({GetWho(s)}, [{GetWhom(s).SJoin(", ")}])")).SJoin(", ");
-
-        Debug.WriteLine($"GameEnd, the winner is {winnerGroup.Name}");
-        Debug.WriteLine($"[{items}]");
-        Debug.WriteLine($"===== </day {state.DayNumber}> =====");
-    }
-
     public async Task Hello(State state, Player player) 
     {
         if (options.HostInstructions)
             Debug.WriteLine($"{player} hello");
+    }
+
+    private void AskCityToWakeUp()
+    {
+        if (options.HostInstructions)
+            Debug.WriteLine($"City, wake up please");
+    }
+
+    private void AskCityToFallAsleep()
+    {
+        if (options.HostInstructions)
+            Debug.WriteLine($"City, fall asleep please");
+    }
+
+    private void AskToWakeUp(State state, Player player)
+    {
+        if (state.IsNight && options.HostInstructions)
+            Debug.WriteLine($"{player}, wake up please");
+    }
+
+    private void AskToFallAsleep(State state, Player player)
+    {
+        if (state.IsNight && options.HostInstructions)
+            Debug.WriteLine($"{player}, fall asleep please");
     }
 
     public async Task<User[]> AskCityToSelect(State state, CityAction action, string operation)
@@ -208,28 +219,22 @@ public class TestDebugHost : IHost
         return selected.Select(p => p.User).ToArray();
     }
 
-    private void AskCityToWakeUp()
+    public async Task NotifyGameEnd(State state, Group winnerGroup)
     {
-        if (options.HostInstructions)
-            Debug.WriteLine($"City, wake up please");
-    }
+        var players = state.Players0.ToList();
+        int[] GetWhom(Select s) => s.Whom.Select(p => players.IndexOf(p)).ToArray();
+        int GetWho(Select s) => s.IsCity ? -1 : players.IndexOf(s.Who);
 
-    private void AskCityToFallAsleep()
-    {
-        if (options.HostInstructions)
-            Debug.WriteLine($"City, fall asleep please");
-    }
+        var playerStr = players.Select(p => $@"(""{p.User.Nick}"", ""{p.Role.Name}"")").SJoin(", ");
 
-    private void AskToWakeUp(State state, Player player)
-    {
-        if (state.IsNight && options.HostInstructions)
-            Debug.WriteLine($"{player}, wake up please");
-    }
+        string NewsItem(DailyNews n) => n.AllSelects().Select(s => $"({GetWho(s)}, [{GetWhom(s).SJoin(", ")}])").SJoin(", ");
 
-    private void AskToFallAsleep(State state, Player player)
-    {
-        if (state.IsNight && options.HostInstructions)
-            Debug.WriteLine($"{player}, fall asleep please");
+        var selectionsStr = state.News.Select(NewsItem).Select(v=>$"[{v}]").SJoin(", ");
+
+        Debug.WriteLine($"GameEnd, the winner is {winnerGroup.Name}");
+        Debug.WriteLine($"Players: [{playerStr}]");
+        Debug.WriteLine($"Selections: [{selectionsStr}]");
+        Debug.WriteLine($"===== </day {state.DayNumber}> =====");
     }
 
 }

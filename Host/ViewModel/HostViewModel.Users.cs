@@ -29,7 +29,7 @@ public partial class HostViewModel
 
     public ICommand AddUserCommand => new Command(() =>
     {
-        var user = new User { Nick = $"Nick{ActiveUsers.Count + 1}", LastPlay = DateTime.Today };
+        var user = new User { Nick = $"Nick{ActiveUsers.Count + 1}" };
         users.Add(user);
 
         ActiveUsers.Add(new ActiveUser(user, OnActiveUserChange, nameof(ActiveUsers))

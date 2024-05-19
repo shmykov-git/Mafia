@@ -10,7 +10,7 @@ namespace Mafia.Test.Base;
 public class MafiaTestsBase
 {
 
-    protected IServiceProvider CreateTest(string mapFileName, Action<TestOptions> configureOptions)
+    protected IServiceProvider CreateReplayTest(string mapFileName, Replay replay)
     {
         var mafiaFileName = $"Maps/{mapFileName}";
 
@@ -19,10 +19,19 @@ public class MafiaTestsBase
 
         var services = new ServiceCollection();
 
+        void Configure(TestDebugReplayOptions options)
+        {
+            options.Replay = replay;
+            replay.MapName = city.Name;
+            replay.MapVersion = city.Version;
+            replay.Language = city.Language;
+        }
+
         services
-            .Configure<TestOptions>(configureOptions)
+            .Configure<TestDebugReplayOptions>(Configure)
             .AddMafia(city)
-            .AddSingleton<IHost, TestHost>();
+            .AddSingleton<IHost, TestDebugReplayHost>()
+            ;
 
         return services.BuildServiceProvider();
     }

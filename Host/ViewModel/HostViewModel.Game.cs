@@ -221,6 +221,8 @@ public partial class HostViewModel
         
         var count = Interaction.WakeupRoles.Length;
 
+        // todo: Fan wake up, Fans wake up. Ведущий показывает Маньяка фанатам.
+
         var wakeUpMessage = count == 1
             ? Messages["PlayerWakeUp"].With(Interaction.Player.Role.Name)
             : Messages["GroupWakeUp"].With(Interaction.Player.Group.Name, count, Interaction.State.GetGroupActivePlayers(Interaction.Player.Group).Select(p => p.Role.Name).SJoin(", "));
