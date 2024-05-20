@@ -164,7 +164,20 @@
     "Sapper"
   ],
   "description": [
-    "https://mafdrive.ru/mafia_drive_rules/"
+    "Putana: plays for a team of civilians. She wakes up first and chooses the one to whom she will go. After this, the player does not wake up if he is the active card and does not die if he was shot at.",
+    "During the day, the host informs the city that 'The Doctor has nothing to do with it' if Putana saved the player from death. Usually does not participate in all games, because it complicates the gameplay.",
+    "Mafia: a team consisting of Don and other members of the mafia. When night falls and the mafia wakes up, Don makes a check in search of a commissioner, then the mafia selects the shooter after a meeting with the team,",
+    "the shooter performs one kill for the mafia team.",
+    "Maniac: plays for himself and can win on his own, wakes up at night and chooses his victim.",
+    "Doctor: plays for a team of civilians. Wake up at night and heal one of the players. Can heal himself once in the entire game. Cannot heal one player two nights in a row.",
+    "Commissar: plays for a team of civilians, his task is to find the mafia. He wakes up at night and makes one check.",
+    "The presenter tells the commissioner which character is hiding behind the player being checked: Don, mafia, maniac, doctor, civilian.",
+    "Kamikaze: plays for a team of civilians, if he is killed during the day or at night, then he must take someone with him.",
+    "Mineweeper: plays for a team of civilians. If a sapper is killed, then his neighbors leave with him. Usually the card is used if there are too many people 20+ in the company, so as not to prolong the game.",
+    "The game ends when members of one of the teams remain alive: Mafia, Maniac, Peaceful. Moreover, if victory can be 'obviously calculated' mathematically due to the dominance of the shooting team,",
+    "- mafia or maniac, for example 2 mafia and 2 civilians or a maniac and a civilian, then victory is awarded to the shooting team, for example Mafia. In this case, the presence of active cards from the Peaceful team,",
+    "can continue the game, because for example, the doctor can save the city from death, which means it is no longer obvious who will win.",
+    "(https://mafdrive.ru/mafia_drive_rules/)"
   ],
   "rules": [
     {
