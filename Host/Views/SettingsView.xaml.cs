@@ -16,11 +16,20 @@ public partial class SettingsView : ContentPage
             activeLang.IsChecked = !activeLang.IsChecked;
         }
     }
+
     private void ListView_Club_ItemTapped(object sender, ItemTappedEventArgs e)
     {
         if (e.Item is ActiveClub activeClub)
         {
             activeClub.IsChecked = !activeClub.IsChecked;
+        }
+    }
+
+    private void ListView_Rule_ItemTapped(object sender, ItemTappedEventArgs e)
+    {
+        if (e.Item is ActiveRule activeRule)
+        {
+            activeRule.IsAccepted = !activeRule.IsAccepted;
         }
     }
 }

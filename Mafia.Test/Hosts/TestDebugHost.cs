@@ -62,7 +62,9 @@ public class TestDebugHost : IHost
             {
                 var d1 = state.DoesDoctorHaveThanks();
                 var d2 = state.DoesSomebodyExceptDoctorSkipKills();
-                Debug.WriteLine($"Where killed (d1={d1} d2={d2}): {state.LatestNews.FactKills.SJoin(", ")}");
+                string?[] tails = [d1 ? "ThanksDoctor!" : null, d2 ? "DoctorHasNoDeal" : null];
+
+                Debug.WriteLine($"Where killed ({tails.Where(v => v != null).SJoin(", ")}): {state.LatestNews.FactKills.SJoin(", ")}");
             }
             else
             {

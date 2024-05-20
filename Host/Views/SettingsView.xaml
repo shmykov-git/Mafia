@@ -55,7 +55,27 @@
 
             <VerticalStackLayout>
                 <Label Text="{Binding GameClubRuleDetails}" Style="{StaticResource SettingCaption}" />
-                <Label Text="{Binding Settings.GameClubRuleDetails}" Style="{StaticResource SettingLine}" />
+
+                <ListView ItemsSource="{Binding Settings.Rules}" SelectionMode="None" ItemTapped="ListView_Rule_ItemTapped" >
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                                <VerticalStackLayout Padding="0,5,0,5">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <Label Grid.Column="0" 
+                                               Text="{Binding Description}" 
+                                               Style="{StaticResource SettingLine}" />
+                                        
+                                        <CheckBox Grid.Column="1" 
+                                                  IsChecked="{Binding IsAccepted}" 
+                                                  VerticalOptions="Center" 
+                                                  HorizontalOptions="End" />
+                                    </Grid>
+                                </VerticalStackLayout>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
             </VerticalStackLayout>
         </VerticalStackLayout>
     </ScrollView>

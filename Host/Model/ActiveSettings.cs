@@ -7,9 +7,9 @@ public class ActiveSettings : NotifyPropertyChanged
 
     private string _gameCommonRules;
     private string _gameClubRules;
-    private string _gameClubRuleDetails;
     private ActiveLang[] _langs;
     private ActiveClub[] _clubs;
+    private ActiveRule[] _rules;
 
     public ActiveSettings(Action<string> onChange)
     {
@@ -26,5 +26,6 @@ public class ActiveSettings : NotifyPropertyChanged
     public ActiveClub[] Clubs { get => _clubs; set { _clubs = value; Changed(); } }
     public string GameCommonRulesDescription { get => _gameCommonRules; set { _gameCommonRules = value; Changed(); } }
     public string GameClubRules { get => _gameClubRules; set { _gameClubRules = value; Changed(); } }
-    public string GameClubRuleDetails { get => _gameClubRuleDetails; set { _gameClubRuleDetails = value; Changed(); } }
+
+    public ActiveRule[] Rules { get => _rules; set { _rules = value; Changed(); } }
 }

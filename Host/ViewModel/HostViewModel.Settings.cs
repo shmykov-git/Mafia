@@ -52,8 +52,7 @@ public partial class HostViewModel
         {
             city = cityMaps.Single(m => m.Name == Settings.SelectedClub && m.Language == Settings.SelectedLanguage);
             Settings.GameClubRules = city.Description.SJoin(" ");
-            Settings.GameClubRuleDetails = city.Rules.Where(r => r.Accepted).Select(r => r.Description).SJoin("\r\n");
-
+            Settings.Rules = city.Rules.Select(r => new ActiveRule(r)).ToArray();
             refreshList.ForEach(Changed);
 
             persistSettings.Lang = Settings.SelectedLanguage;
