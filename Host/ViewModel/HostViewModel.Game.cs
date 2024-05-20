@@ -29,7 +29,10 @@ public partial class HostViewModel
     private ActivePlayerFilter _activePlayerFilter;
     private Interaction? _interaction = null;
 
-    private string arrow = "⮕";
+    private string arrowRight = "⮕";
+    private string arrowRightDashed = "⇢";
+    private string arrowRightStroked = "⇸";
+    private string arrowUp = "⇪";
     private string empty = "";
     private string killed = "💀";
     private int wakeupRolesCount = 0;
@@ -386,7 +389,7 @@ public partial class HostViewModel
     {
         UpdateActivePlayers(p =>
         {
-            p.Operation = p.IsKilled ? killed : arrow;
+            p.Operation = p.IsKilled ? killed : arrowRight;
             p.OperationColor = p.IsKilled ? options.Theme.KilledColor : options.Theme.NoOperationColor;
             p.CheckboxColor = options.Theme.NoOperationColor;
             p.IsEnabled = false;
@@ -402,7 +405,7 @@ public partial class HostViewModel
         {
             var isEnabled = p.IsUnknown && p.IsAlive;
 
-            p.Operation = p.IsKilled ? killed : arrow;
+            p.Operation = p.IsKilled ? killed : arrowUp;
             p.OperationColor = p.IsKilled ? options.Theme.KilledColor : (isEnabled ? options.Theme.WakeupColor : options.Theme.NoOperationColor);
             p.CheckboxColor = isEnabled ? options.Theme.WakeupColor : options.Theme.NoOperationColor;
             p.IsEnabled = isEnabled;
@@ -424,6 +427,15 @@ public partial class HostViewModel
 
     private void PrepareActivePlayers_RolesSelections()
     {
+        var arrow = Interaction.Operation switch
+        {
+            "CityImmunity" => arrowRightStroked,
+            "Check" => arrowRightDashed,
+            "Heal" => arrowRightStroked,
+            "Kill" => arrowRight,
+            _ => arrowRight
+        };
+
         var staticOperationColor = Interaction.NeedSelection ? GetOperationColor(Interaction.Operation) : options.Theme.NoOperationColor;
         var color = Interaction.NeedSelection ? GetOperationColor(Interaction.Operation) : options.Theme.CityColor;
         var staticOperation = Interaction.NeedSelection ? arrow : empty;
