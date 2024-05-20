@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Diagnostics;
 using System.Windows.Input;
+using Host.Libraries;
 using Host.Model;
 using Host.Permission;
 using Mafia;
@@ -13,6 +14,10 @@ namespace Host.ViewModel;
 
 public partial class HostViewModel : NotifyPropertyChanged, ICity
 {
+    private const string UsersStoreKey = "Mafia_Host_Users";
+    private const string PersistSettingsStoreKey = "Mafia_Host_Settings";
+    private const string ReplayStoreKey = "Mafia_Host_Replays";
+
     private readonly PermissionFather panhandler;
     private City city;
     private HostOptions options;
@@ -45,7 +50,7 @@ public partial class HostViewModel : NotifyPropertyChanged, ICity
         await LoadCityMaps();
         await InitSettings();
 
-        //replays = await ReadReplays();
+        replays = await ReadReplays();
         users = await ReadUsers();
         await CreatePresetUsers();
         CreateActiveUsers();
@@ -66,28 +71,14 @@ public partial class HostViewModel : NotifyPropertyChanged, ICity
     private async Task SaveGameReplay(State state)
     {
         replays.Add(state.Replay);
-        //await WriteReplace(replays);
+        await WriteReplace(replays);
         Debug.WriteLine($"[{state.Replay}]");
     }
 
-
-    //private const string ReplaySecureKey = "Mafia_Host_Replays";
-
-    //private Task<List<Replay>> ReadReplays() => Runs.DoPersist(async () =>
-    //{
-    //    // todo: need file storage or external server, file is too big for SecureStorage
-    //    return new List<Replay>();
-    //    //var json = await SecureStorage.Default.GetAsync(ReplaySecureKey);
-
-    //    //if (!json.HasText())
-    //    //    return [];
-
-    //    //return json.FromJson<List<Replay>>()!;
-    //});
-
-    //private Task WriteReplace(ICollection<Replay> replays) => Runs.DoPersist(async () =>
-    //{
-    //    // todo: need file storage or external server, file is too big for SecureStorage
-    //    //await SecureStorage.Default.SetAsync(ReplaySecureKey, replays.ToJson());
-    //});
+    private Task<List<Replay>> ReadReplays() => Stores.GetDataByKey<List<Replay>>(ReplayStoreKey);
+    private Task WriteReplace(ICollection<Replay> replays) => Stores.SetDataByKey(ReplayStoreKey, replays);
+    private Task<PersistSettings> ReadPersistSettings() => Stores.GetDataByKey<PersistSettings>(PersistSettingsStoreKey);
+    private Task WritePersistSettings(PersistSettings persistSettings) => Stores.SetDataByKey(PersistSettingsStoreKey, persistSettings);
+    private Task<List<User>> ReadUsers() => Stores.GetDataByKey<List<User>>(UsersStoreKey);
+    private Task WriteUsers(ICollection<User> users) => Stores.SetDataByKey(UsersStoreKey, users);
 }

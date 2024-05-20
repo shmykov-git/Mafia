@@ -4,7 +4,7 @@ namespace Mafia.Extensions;
 
 public static class JsonExtensions
 {
-    public static T? FromJson<T>(this string json)
+    public static T? FromJson<T>(this string? json)
     {
         if (json == null)
             return default;

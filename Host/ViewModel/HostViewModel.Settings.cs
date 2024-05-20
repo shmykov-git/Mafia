@@ -8,8 +8,6 @@ namespace Host.ViewModel;
 
 public partial class HostViewModel
 {
-    private const string PersistSettingsSecureKey = "Mafia_Host_Settings";
-
     private City[] cityMaps;
     private PersistSettings persistSettings;
 
@@ -97,19 +95,4 @@ public partial class HostViewModel
 
         cityMaps = maps.ToArray();
     }
-
-    private Task<PersistSettings> ReadPersistSettings() => Runs.DoPersist(async () =>
-    {
-        var json = await SecureStorage.Default.GetAsync(PersistSettingsSecureKey);
-
-        if (!json.HasText())
-            return new PersistSettings();
-
-        return json.FromJson<PersistSettings>()!;
-    });
-
-    private Task WritePersistSettings(PersistSettings persistSettings) => Runs.DoPersist(async () =>
-    {
-        await SecureStorage.Default.SetAsync(PersistSettingsSecureKey, persistSettings.ToJson());
-    });
 }

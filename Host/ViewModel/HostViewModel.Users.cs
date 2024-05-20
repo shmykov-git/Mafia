@@ -12,8 +12,6 @@ namespace Host.ViewModel;
 
 public partial class HostViewModel
 {
-    private const string UsersSecureKey = "Mafia_Host_Users";
-
     private List<User> users;
     private bool _areSelectedOnly = true;
     
@@ -41,9 +39,12 @@ public partial class HostViewModel
     {
         if (users.Count >= options.PresetPlayerCount)
             return;
-
-        var newUsers = Enumerable.Range(users.Count + 1, options.PresetPlayerCount - users.Count + 1).Select(CreateDefaultUser).ToArray();
+        var skipSelectedCount = Math.Max(users.Count, options.PresetPlayerSelectedCount);
+        var newUsers = Enumerable.Range(users.Count + 1, options.PresetPlayerCount - users.Count).Select(CreateDefaultUser).ToArray();
+        
         users.AddRange(newUsers);
+        users.Skip(skipSelectedCount).ForEach(u => u.IsSelected = false);
+
         await WriteUsers(users);
     }
 
@@ -83,19 +84,4 @@ public partial class HostViewModel
             Runs.FirstInTime(Changed_FilteredActiveUsers, TimeSpan.FromMilliseconds(500));
         }                
     }
-
-    private Task<List<User>> ReadUsers() => Runs.DoPersist(async () =>
-    {
-        var json = await SecureStorage.Default.GetAsync(UsersSecureKey);
-
-        if (!json.HasText())
-            return [];
-
-        return json.FromJson<List<User>>()!;
-    });
-
-    private Task WriteUsers(ICollection<User> users) => Runs.DoPersist(async () =>
-    {
-        await SecureStorage.Default.SetAsync(UsersSecureKey, users.ToJson());
-    });
 }
