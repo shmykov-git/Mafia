@@ -126,8 +126,9 @@
                   "operations": [ "Hello" ]
                 },
                 {
-                  "conditions": [ "Killed", "Skippable" ],
-                  "operations": [ "Kill" ]
+                  "conditions": [ "Killed" ],
+                  "operations": [ "Kill" ],
+                  "arguments": [ "Skippable" ]
                 }
               ]
             }
@@ -162,7 +163,7 @@
   "dayActions": [
     {
       "operations": [ "CityKill" ],
-      "conditions": [ "CitySkippable" ]
+      "arguments": [ "Skippable" ]
     }
   ],
   "nightEvents": [

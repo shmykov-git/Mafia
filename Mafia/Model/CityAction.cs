@@ -21,7 +21,7 @@ public class CityAction
 
         return result;
     }
-    public bool IsSkippable() => AllArguments().Contains(Argument.Skippable) || AllConditions().Intersect(Values.SkippableConditions).Any();
+    public bool IsSkippable() => AllArguments().Contains(Argument.Skippable);
 
     public Task<DailyNews> DoOperation(string operation, State state) => Execution.Operations[operation](state, this);
     

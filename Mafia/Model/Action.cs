@@ -39,7 +39,7 @@ public class Action
         return result;
     }
 
-    public bool IsSkippable() => AllArguments().Contains(Argument.Skippable) || AllConditions().Intersect(Values.SkippableConditions).Any();
+    public bool IsSkippable() => AllArguments().Contains(Argument.Skippable);
 
     public Task<DailyNews> DoOperation(string operation, State state, Player player) => Execution.Operations[operation](state, player, this);
 

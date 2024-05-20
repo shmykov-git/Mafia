@@ -150,8 +150,8 @@
       "operations": [ "CityImmunity" ]
     },
     {
-      "conditions": [ "CitySkippable" ],
-      "operations": [ "CityKill" ]
+      "operations": [ "CityKill" ],
+      "arguments": [ "Skippable" ]
     }
   ],
   "nightEvents": [

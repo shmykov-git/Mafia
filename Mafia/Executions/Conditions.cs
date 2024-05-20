@@ -18,7 +18,6 @@ public static class Conditions
     public static bool Killed(State state, Player player) => state.LatestNews.FactKills?.Contains(player) ?? false;
     public static bool FirstDay(State state, Player player) => state.IsFirstDay;
     public static bool NotFirstDay(State state, Player player) => !state.IsFirstDay;
-    public static bool Skippable(State state, Player player) => true;
 
 
     // <Active>
