@@ -14,14 +14,15 @@ public partial class HostViewModel
 {
     private List<User> users;
     private bool _areSelectedOnly = true;
-    
+
     private List<ActiveUser> _activeUsers = [];
     public List<ActiveUser> ActiveUsers { get => _activeUsers; set { _activeUsers = value; ChangedSilently(); Changed(nameof(IsUsersTabAvailable), nameof(PlayerInfo), nameof(PlayerRoleInfo), nameof(FilteredActiveUsers)); } }
     public IEnumerable<ActiveUser> FilteredActiveUsers => ActiveUsers.Where(u => !AreSelectedOnly || u.IsSelected);
 
-    public bool IsUsersTabAvailable => ActiveUsers.Count > 0;
 
-    public bool AreSelectedOnly { get => _areSelectedOnly; set { _areSelectedOnly = value; Changed(); Changed(nameof(FilteredActiveUsers)); } }
+    public bool IsAddUserButtonVisible => !AreSelectedOnly;
+    public bool IsUsersTabAvailable => ActiveUsers.Count > 0;
+    public bool AreSelectedOnly { get => _areSelectedOnly; set { _areSelectedOnly = value; Changed(); ActiveUsers.ForEach(a=>a.RefreshButtons(!value)); Changed(nameof(FilteredActiveUsers), nameof(IsAddUserButtonVisible)); } }
 
     public string PlayerInfo => Messages["PlayerCountInfo"].With(ActiveUsers.Where(r => r.IsSelected).Count());
 
@@ -55,7 +56,7 @@ public partial class HostViewModel
         ActiveUsers.Add(GetActiveUser(user));
 
         WriteUsersInTime();
-        Changed(nameof(FilteredActiveUsers));
+        Changed(nameof(FilteredActiveUsers), nameof(PlayerInfo), nameof(PlayerRoleInfo));
     });
 
     public ICommand SelectRolesCommand => new Command(async () =>
@@ -75,6 +76,25 @@ public partial class HostViewModel
 
     private void OnActiveUserChange(string name, ActiveUser activeUser)
     {
+        if (name == "Up")
+        {
+            var index = ActiveUsers.IndexOf(activeUser);
+
+            (ActiveUsers[index - 1], ActiveUsers[index]) = (ActiveUsers[index], ActiveUsers[index - 1]);
+            (users[index - 1], users[index]) = (users[index], users[index - 1]);
+
+            WriteUsersInTime();
+            Changed(nameof(FilteredActiveUsers));
+            return;
+        }
+
+        if (name == "Down")
+        {
+
+
+            return;
+        }
+
         async Task Changed_FilteredActiveUsers() => Changed(nameof(FilteredActiveUsers));
         WriteUsersInTime();
 
