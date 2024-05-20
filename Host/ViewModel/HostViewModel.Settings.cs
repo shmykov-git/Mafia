@@ -1,13 +1,14 @@
 ﻿using Host.Libraries;
 using Host.Model;
 using Mafia.Extensions;
+using Mafia.Libraries;
 using Mafia.Model;
 
 namespace Host.ViewModel;
 
 public partial class HostViewModel
 {
-    private const string PersistSettingsSecureKey = "Mafia_Host_PersistSettings";
+    private const string PersistSettingsSecureKey = "Mafia_Host_Settings";
 
     private City[] cityMaps;
     private PersistSettings persistSettings;
@@ -97,18 +98,18 @@ public partial class HostViewModel
         cityMaps = maps.ToArray();
     }
 
-    private async Task<PersistSettings> ReadPersistSettings()
+    private Task<PersistSettings> ReadPersistSettings() => Runs.DoPersist(async () =>
     {
         var json = await SecureStorage.Default.GetAsync(PersistSettingsSecureKey);
 
         if (!json.HasText())
             return new PersistSettings();
 
-        return json.FromJson<PersistSettings>();
-    }
+        return json.FromJson<PersistSettings>()!;
+    });
 
-    private async Task WritePersistSettings(PersistSettings persistSettings)
+    private Task WritePersistSettings(PersistSettings persistSettings) => Runs.DoPersist(async () =>
     {
         await SecureStorage.Default.SetAsync(PersistSettingsSecureKey, persistSettings.ToJson());
-    }
+    });
 }

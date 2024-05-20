@@ -2,8 +2,10 @@
 using System.Diagnostics;
 using System.Windows.Input;
 using Host.Model;
+using Host.Permission;
 using Mafia;
 using Mafia.Extensions;
+using Mafia.Libraries;
 using Mafia.Model;
 using Microsoft.Extensions.Options;
 
@@ -11,8 +13,7 @@ namespace Host.ViewModel;
 
 public partial class HostViewModel : NotifyPropertyChanged, ICity
 {
-    private const string ReplaySecureKey = "Mafia_Host_Replays";
-
+    private readonly PermissionFather panhandler;
     private City city;
     private HostOptions options;
     private LanguageOption language;
@@ -23,9 +24,10 @@ public partial class HostViewModel : NotifyPropertyChanged, ICity
     public Dictionary<KnownRoleKey, string> KnownRoles { get; }
     public Dictionary<string, string> Messages { get; private set; }
 
-    public HostViewModel(Game game, IOptions<HostOptions> options)
+    public HostViewModel(Game game, IOptions<HostOptions> options, PermissionFather panhandler)
     {
         this.game = game;
+        this.panhandler = panhandler;
         this.options = options.Value;
         HintColor = this.options.Theme.CityColor;
         SelectedPlayerRoleMessageColor = this.options.Theme.CityColor;
@@ -43,17 +45,10 @@ public partial class HostViewModel : NotifyPropertyChanged, ICity
         await LoadCityMaps();
         await InitSettings();
 
-        replays = await ReadReplays();
+        //replays = await ReadReplays();
         users = await ReadUsers();
-
-        if (users.Count < options.PresetPlayerCount)
-        {
-            var newUsers = Enumerable.Range(users.Count + 1, options.PresetPlayerCount - users.Count + 1).Select(i => new User { Nick = $"Nick{i}" }).ToArray();
-            users.AddRange(newUsers);
-            await WriteUsers(users);
-        }
-
-        ActiveUsers = users.OrderBy(u => u.Nick).Take(options.PresetPlayerCount).Select(GetActiveUser).ToList();
+        await CreatePresetUsers();
+        CreateActiveUsers();
     }
 
     private void Shell_Navigated(object path)
@@ -71,23 +66,28 @@ public partial class HostViewModel : NotifyPropertyChanged, ICity
     private async Task SaveGameReplay(State state)
     {
         replays.Add(state.Replay);
-        await WriteReplace(replays);
+        //await WriteReplace(replays);
         Debug.WriteLine($"[{state.Replay}]");
     }
 
 
-    private async Task<List<Replay>> ReadReplays()
-    {
-        var json = await SecureStorage.Default.GetAsync(ReplaySecureKey);
+    //private const string ReplaySecureKey = "Mafia_Host_Replays";
 
-        if (!json.HasText())
-            return [];
+    //private Task<List<Replay>> ReadReplays() => Runs.DoPersist(async () =>
+    //{
+    //    // todo: need file storage or external server, file is too big for SecureStorage
+    //    return new List<Replay>();
+    //    //var json = await SecureStorage.Default.GetAsync(ReplaySecureKey);
 
-        return json.FromJson<List<Replay>>();
-    }
+    //    //if (!json.HasText())
+    //    //    return [];
 
-    private async Task WriteReplace(ICollection<Replay> replays)
-    {
-        await SecureStorage.Default.SetAsync(ReplaySecureKey, replays.ToJson());
-    }
+    //    //return json.FromJson<List<Replay>>()!;
+    //});
+
+    //private Task WriteReplace(ICollection<Replay> replays) => Runs.DoPersist(async () =>
+    //{
+    //    // todo: need file storage or external server, file is too big for SecureStorage
+    //    //await SecureStorage.Default.SetAsync(ReplaySecureKey, replays.ToJson());
+    //});
 }

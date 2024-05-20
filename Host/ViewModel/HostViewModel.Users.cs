@@ -27,17 +27,33 @@ public partial class HostViewModel
 
     public string PlayerInfo => Messages["PlayerCountInfo"].With(ActiveUsers.Where(r => r.IsSelected).Count());
 
+    private User CreateDefaultUser(int k) => new User
+    {
+        Nick = $"Nick{k.ToString().PadLeft(2, '0')}"
+    };
+
+    private void CreateActiveUsers()
+    {
+        ActiveUsers = users.Select(GetActiveUser).ToList();
+    }
+
+    private async Task CreatePresetUsers()
+    {
+        if (users.Count >= options.PresetPlayerCount)
+            return;
+
+        var newUsers = Enumerable.Range(users.Count + 1, options.PresetPlayerCount - users.Count + 1).Select(CreateDefaultUser).ToArray();
+        users.AddRange(newUsers);
+        await WriteUsers(users);
+    }
+
     public ICommand AddUserCommand => new Command(() =>
     {
-        var user = new User { Nick = $"Nick{ActiveUsers.Count + 1}" };
+        var user = CreateDefaultUser(ActiveUsers.Count + 1);
         users.Add(user);
+        ActiveUsers.Add(GetActiveUser(user));
 
-        ActiveUsers.Add(new ActiveUser(user, OnActiveUserChange, nameof(ActiveUsers))
-        {
-            NickColorSilent = options.Theme.CityColor,
-            IsSelectedSilent = true,
-        });
-
+        WriteUsersInTime();
         Changed(nameof(FilteredActiveUsers));
     });
 
@@ -48,18 +64,18 @@ public partial class HostViewModel
         await Shell.Current.GoToAsync(HostValues.RolesView);
     });
 
-    private ActiveUser GetActiveUser(User user, int i) => new ActiveUser(user, OnActiveUserChange, nameof(ActiveUsers)) 
+    private ActiveUser GetActiveUser(User user) => new ActiveUser(user, OnActiveUserChange, nameof(ActiveUsers)) 
     {
         NickColorSilent = options.Theme.CityColor,
-        IsSelectedSilent = i < options.PresetPlayerSelectedCount
     };
+
+    private Task WriteUsers() => WriteUsers(users);
+    private void WriteUsersInTime() => Runs.FirstInTime(WriteUsers, TimeSpan.FromMilliseconds(500));
 
     private void OnActiveUserChange(string name, ActiveUser activeUser)
     {
         async Task Changed_FilteredActiveUsers() => Changed(nameof(FilteredActiveUsers));
-        Task WriteUsers_users() => WriteUsers(users);
-
-        Runs.FirstInTime(WriteUsers_users, TimeSpan.FromMilliseconds(500));
+        WriteUsersInTime();
 
         if (name == nameof(ActiveUser.IsSelected))
         {
@@ -68,19 +84,18 @@ public partial class HostViewModel
         }                
     }
 
-    private async Task<List<User>> ReadUsers()
+    private Task<List<User>> ReadUsers() => Runs.DoPersist(async () =>
     {
         var json = await SecureStorage.Default.GetAsync(UsersSecureKey);
 
         if (!json.HasText())
             return [];
 
-        return json.FromJson<List<User>>();
-    }
+        return json.FromJson<List<User>>()!;
+    });
 
-    private async Task WriteUsers(ICollection<User> users)
+    private Task WriteUsers(ICollection<User> users) => Runs.DoPersist(async () =>
     {
         await SecureStorage.Default.SetAsync(UsersSecureKey, users.ToJson());
-    }
-
+    });
 }

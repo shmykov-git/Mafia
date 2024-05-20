@@ -6,6 +6,7 @@ using Host.Views;
 using Host.ViewModel;
 using Host.Model;
 using Host.Libraries;
+using Host.Permission;
 
 namespace Host;
 
@@ -22,6 +23,7 @@ public static class MauiProgram
             .Configure<HostOptions>(builder.Configuration.GetSection("options"))
             .AddMafia()
             .AddSingleton<HostViewModel>()
+            .AddTransient<PermissionFather>()
             .AddSingleton<ICity, HostViewModel>(p => p.GetRequiredService<HostViewModel>())
             .AddSingleton<IHost, HostViewModel>(p => p.GetRequiredService<HostViewModel>())
             .AddTransient(p => new AppShell() { BindingContext = p.GetRequiredService<HostViewModel>() })
