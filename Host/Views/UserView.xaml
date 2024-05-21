@@ -30,32 +30,17 @@
                                                            Padding="25,0,0,0"
                                                            IsVisible="{Binding IsButtonsVisible}">
                                         <Button 
-                                            ScaleX="0.8"
-                                            ScaleY="0.73"
+                                            Style="{StaticResource RoundBlackButton}"
                                             IsEnabled="{Binding IsUpEnabled}"
-                                            BackgroundColor="Black"
-                                            BorderColor="Black"
-                                            BorderWidth="2"
-                                            FontAttributes="Bold"
-                                            FontSize="20"
-                                            CornerRadius="50"
-                                            Text="⇧"                         
-                                            VerticalOptions="Center"
+                                            Text="⇪"                         
                                             Command="{Binding CommandUp}"  
                                             CommandParameter="{Binding Self}" />
 
                                         <Button
-                                            ScaleX="0.8"
-                                            ScaleY="0.73"
+                                            Style="{StaticResource RoundBlackButton}"
                                             IsEnabled="{Binding IsDownEnabled}"
-                                            BackgroundColor="Black"
-                                            BorderColor="Black"
-                                            BorderWidth="2"
-                                            FontSize="20"
-                                            CornerRadius="50"
-                                            Text="⇩" 
-                                            FontAttributes="Bold"
-                                            VerticalOptions="Center"
+                                            Text="⇪" 
+                                            Rotation="180"
                                             Command="{Binding CommandDown}" 
                                             CommandParameter="{Binding Self}" />
                                     </HorizontalStackLayout>

@@ -19,6 +19,7 @@ public partial class HostViewModel
     private string _hostWakeUpHint;
     private bool _isActivePlayerRoleVisible;
     private bool _isRollbackAvailable;
+    private bool _isBanAvailable;
     private string _selectedPlayerRoleMessage;
     private string _playerInfo;
     private Color _hintColor;
@@ -46,7 +47,7 @@ public partial class HostViewModel
     public ActivePlayerFilter ActivePlayerFilter => _activePlayerFilter ??= new ActivePlayerFilter(()=>Changed(nameof(FilteredActivePlayers))) { Killed = false };
     public Color HintColor { get => _hintColor; set { _hintColor = value; Changed(); } }
     public bool IsSubHostHintVisible => SubHostHint.HasText();
-    public string SubHostHint { get => _hostWakeUpHint; set { _hostWakeUpHint = value; Changed(); Changed(nameof(IsSubHostHintVisible)); } }
+    public string SubHostHint { get => _hostWakeUpHint; set { _hostWakeUpHint = value; Changed(); Changed(nameof(IsSubHostHintVisible)); } }    
     public bool IsHostHintVisible => HostHint.HasText();
     public string HostHint { get => _hostHint; set { _hostHint = value; Changed(); Changed(nameof(IsHostHintVisible)); } }
 
@@ -56,6 +57,7 @@ public partial class HostViewModel
     public ActiveRole[] ActivePlayerRoles { get => _activePlayerRoles; set { _activePlayerRoles = value; ChangedSilently(); Changed(nameof(ContinueCommand)); } }
     public bool IsActivePlayerRoleVisible { get => _isActivePlayerRoleVisible; set { _isActivePlayerRoleVisible = value; Changed(); Changed(nameof(ContinueCommand)); } }
     public bool IsRollbackAvailable { get => _isRollbackAvailable; set { _isRollbackAvailable = value; Changed(); Changed(nameof(RollbackCommand), nameof(IsRollbackNotAvailable)); } }
+    public bool IsBanAvailable { get => _isBanAvailable; set { _isBanAvailable = value; Changed(); } }
     public bool IsRollbackNotAvailable { get => !IsRollbackAvailable; set { IsRollbackAvailable = !value; Changed(); Changed(nameof(RollbackCommand), nameof(IsRollbackAvailable)); } }
     public string SelectedPlayerRoleMessage { get => _selectedPlayerRoleMessage; set { _selectedPlayerRoleMessage = value; Changed(); } }
     public Color SelectedPlayerRoleMessageColor { get => _selectedPlayerRoleMessageColor; set { _selectedPlayerRoleMessageColor = value; Changed(); } }
@@ -270,6 +272,7 @@ public partial class HostViewModel
         {
             HostTail.ThanksToDoctor => Messages["ThanksToDoctor"],
             HostTail.DoctorHasNoDeal => Messages["DoctorHasNoDeal"],
+            HostTail.CityBansPlayer => Messages["CityBansPlayer"],
         }).SJoin(" ");
 
         HintColor = Interaction.Player != null

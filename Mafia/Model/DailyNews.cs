@@ -53,6 +53,7 @@ public class DailyNews
     public Player[] GetKills() => AllSelects().Where(s => Values.KillOperations.Contains(s.Operation)).SelectMany(s=>s.Whom).ToArray();
     public Player[] GetHeals() => AllSelects().Where(s => Values.HealOperations.Contains(s.Operation)).SelectMany(s => s.Whom).ToArray();
     public Player[] GetLocks() => AllSelects().Where(s => Values.LockOperations.Contains(s.Operation)).SelectMany(s => s.Whom).ToArray();
+    public Player[] GetBans() => AllSelects().Where(s => Values.BanOperations.Contains(s.Operation)).SelectMany(s => s.Whom).ToArray();
 
     public Select[] AllKnownLocks(State state) => GetKnownSelects(state, Values.LockOperations);
     public Select[] AllKnownKills(State state) => GetKnownSelects(state, Values.KillOperations);

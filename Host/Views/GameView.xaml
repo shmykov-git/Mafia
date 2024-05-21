@@ -120,8 +120,21 @@
         </Grid>
         
         <VerticalStackLayout Grid.Row="2" Padding="0,0,0,25" Spacing="25">
+            <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding IsRollbackAvailable}">
+                <Label Grid.Column="0" 
+                       TextColor="{Binding OperationColors[CityBan]}"
+                       Text="{Binding Messages[BanInfo]}" 
+                       Style="{StaticResource InfoLine}" />
+
+                <CheckBox Grid.Column="1" 
+                          Color="{Binding OperationColors[CityBan]}"
+                          IsChecked="{Binding IsBanAvailable}" />
+            </Grid>
+
             <Grid ColumnDefinitions="*,Auto">
                 <Label Grid.Column="0" 
+                       VerticalTextAlignment="Center"
+                       VerticalOptions="Center"
                        Text="{Binding GameInfo}" 
                        Style="{StaticResource InfoLine}" />
                 

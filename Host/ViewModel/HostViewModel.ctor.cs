@@ -25,6 +25,7 @@ public partial class HostViewModel : NotifyPropertyChanged, ICity
     private string navigationPath;
     private List<Replay> replays;
 
+    public Dictionary<string, Color> OperationColors { get; }
     public City City => city;
     public Dictionary<KnownRoleKey, string> KnownRoles { get; }
     public Dictionary<string, string> Messages { get; private set; }
@@ -34,6 +35,7 @@ public partial class HostViewModel : NotifyPropertyChanged, ICity
         this.game = game;
         this.panhandler = panhandler;
         this.options = options.Value;
+        OperationColors = this.options.Theme.OperationColors.ToDictionary(c => c.Operation, c => c.Color);
         HintColor = this.options.Theme.CityColor;
         SelectedPlayerRoleMessageColor = this.options.Theme.CityColor;
         language = this.options.Languages.Single(l => l.Name == this.options.DefaultLanguage);

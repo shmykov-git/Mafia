@@ -24,6 +24,7 @@ public class State
     public bool Stopping { get; set; }
     public bool RollingBack { get; set; }
     public bool IsFirstDay => DayNumber == 1;
+    public bool IsNotFirstDay => !IsFirstDay;
 
     public bool IsDay { get; set; }
     public bool IsNight { get => !IsDay; set => IsDay = !value; }
@@ -67,6 +68,8 @@ public class State
         return LatestNews.GetLockedKillers().Length > 0;
     }
 
+    public bool IsAnybodyBanned() => LatestNews.AllSelects().Any(s => s.Operation == nameof(CityOperations.CityBan));
+
     public Group[] GetKillerGroups() => Players.Select(p => p.Group).Distinct().Where(g => g.HasAnyOperation(Values.KillOperations)).ToArray();
 
     public bool IsSelfSelected(Player player) => News.Select(ps => ps).Any(ops => ops.Selects?.Any(s => s.Who == player && s.Whom.Contains(player)) ?? false);
@@ -97,8 +100,15 @@ public class State
 
     }
 
-    public User[] GetCityExceptUsers(string operation) => 
-        Values.KillOperations.Contains(operation) ? Users0.Where(HasFirstDayImmunity).ToArray() : [];
+    public User[] GetCityExceptUsers(string operation)
+    {
+        HashSet<User> except = Values.KillNoBanOperations.Contains(operation) ? Users0.Where(HasFirstDayImmunity).ToHashSet() : [];
+
+        if (IsNotFirstDay)
+            LatestNews.GetBans().ForEach(p => except.Add(p.User!));
+
+        return except.ToArray();
+    }
 
     public User[] GetExceptUsers(Player player, string operation, Argument[]? arguments)
     {

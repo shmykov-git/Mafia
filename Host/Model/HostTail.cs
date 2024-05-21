@@ -4,5 +4,6 @@ public enum HostTail
 {
     // death but doctor healed ?
     ThanksToDoctor,
-    DoctorHasNoDeal
+    DoctorHasNoDeal,
+    CityBansPlayer
 }

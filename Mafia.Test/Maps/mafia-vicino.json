@@ -163,6 +163,9 @@
   },
   "dayActions": [
     {
+      "operations": [ "CityBan" ]
+    },
+    {
       "operations": [ "CityKill" ],
       "arguments": [ "Skippable" ]
     }

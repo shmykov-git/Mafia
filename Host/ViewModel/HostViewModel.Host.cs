@@ -145,6 +145,9 @@ public partial class HostViewModel : IHost
                 if (state.DoesSomebodyExceptDoctorSkipKills())
                     tails.Add(HostTail.DoctorHasNoDeal);
 
+                if (state.IsAnybodyBanned())
+                    tails.Add(HostTail.CityBansPlayer);
+
                 await Interact(new Interaction
                 {
                     Name = name,
@@ -163,6 +166,22 @@ public partial class HostViewModel : IHost
 
     public async Task<User[]> AskCityToSelect(State state, CityAction action, string operation)
     {
+        if (operation == nameof(CityOperations.CityBan))
+        {
+            if (!IsBanAvailable || state.IsFirstDay)
+                return [];
+
+            var result = await Interact(new Interaction
+            {
+                Name = "CityBan",
+                Selection = (0, 5), // todo: options
+                Operation = operation,
+                State = state
+            });
+
+            return result.SelectedUsers;
+        }
+
         if (operation == nameof(CityOperations.CityKill))
         {
             var result = await Interact(new Interaction
