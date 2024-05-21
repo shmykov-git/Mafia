@@ -24,7 +24,7 @@
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <ViewCell>
-                                <VerticalStackLayout Padding="0,5,0,5">
+                                <VerticalStackLayout>
                                     <Grid ColumnDefinitions="*,*,0.5*,Auto">
                                         <Label Grid.Column="0"                                       
                                             Text="{Binding Nick}"
@@ -96,7 +96,7 @@
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <ViewCell>
-                                        <VerticalStackLayout Padding="0,5,0,5">
+                                        <VerticalStackLayout>
                                             <Grid ColumnDefinitions="*,Auto">
                                                 <Label Grid.Column="0"                                                                      
                                                     Text="{Binding RoleName}"

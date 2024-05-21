@@ -20,9 +20,19 @@ public class ActiveUser : NotifyPropertyChanged
     public bool IsButtonsVisibleSilent;
     public bool IsButtonsVisible { get => IsButtonsVisibleSilent; set { IsButtonsVisibleSilent = value; Changed(); } }
 
-    public void RefreshButtons(bool isVisible) 
+    public bool IsUpEnabledSilent;
+    public bool IsUpEnabled { get => IsUpEnabledSilent; set { IsUpEnabledSilent = value; Changed(); } }
+
+    public bool IsDownEnabledSilent;
+    public bool IsDownEnabled { get => IsDownEnabledSilent; set { IsDownEnabledSilent = value; Changed(); } }
+
+
+    public void RefreshButtons(bool isVisible, List<ActiveUser> users) 
     {
         IsButtonsVisible = isVisible;
+        var index = users.IndexOf(this);
+        IsUpEnabled = index != 0;
+        IsDownEnabled = index != users.Count - 1;
     }
 
     public ICommand CommandUp => new Command(arg => onChange("Up", (ActiveUser)arg));

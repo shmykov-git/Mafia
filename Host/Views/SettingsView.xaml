@@ -15,7 +15,7 @@
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <ViewCell>
-                                <VerticalStackLayout Padding="0,5,0,5">
+                                <VerticalStackLayout>
                                     <RadioButton Content="{Binding FullName}" Value="{Binding Name}" IsChecked="{Binding IsChecked}" GroupName="language" />
                                 </VerticalStackLayout>
                             </ViewCell>
@@ -34,7 +34,7 @@
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <ViewCell>
-                                <VerticalStackLayout Padding="0,5,0,5">
+                                <VerticalStackLayout>
                                     <RadioButton Content="{Binding Name}" Value="{Binding Name}" IsChecked="{Binding IsChecked}" GroupName="club" />
                                 </VerticalStackLayout>
                             </ViewCell>
@@ -60,7 +60,7 @@
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <ViewCell>
-                                <VerticalStackLayout Padding="0,5,0,5">
+                                <VerticalStackLayout>
                                     <Grid ColumnDefinitions="*,Auto">
                                         <Label Grid.Column="0" 
                                                Text="{Binding Description}" 

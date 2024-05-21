@@ -22,7 +22,7 @@ public partial class HostViewModel
 
     public bool IsAddUserButtonVisible => !AreSelectedOnly;
     public bool IsUsersTabAvailable => ActiveUsers.Count > 0;
-    public bool AreSelectedOnly { get => _areSelectedOnly; set { _areSelectedOnly = value; Changed(); ActiveUsers.ForEach(a=>a.RefreshButtons(!value)); Changed(nameof(FilteredActiveUsers), nameof(IsAddUserButtonVisible)); } }
+    public bool AreSelectedOnly { get => _areSelectedOnly; set { _areSelectedOnly = value; Changed(); ActiveUsers.ForEach(a=>a.RefreshButtons(!value, ActiveUsers)); Changed(nameof(FilteredActiveUsers), nameof(IsAddUserButtonVisible)); } }
 
     public string PlayerInfo => Messages["PlayerCountInfo"].With(ActiveUsers.Where(r => r.IsSelected).Count());
 
@@ -53,7 +53,12 @@ public partial class HostViewModel
     {
         var user = CreateDefaultUser(ActiveUsers.Count + 1);
         users.Add(user);
-        ActiveUsers.Add(GetActiveUser(user));
+        var aUser = GetActiveUser(user);
+        ActiveUsers.Add(aUser);
+        aUser.RefreshButtons(!AreSelectedOnly, ActiveUsers);
+
+        if (ActiveUsers.Count > 1)
+            ActiveUsers[^2].RefreshButtons(!AreSelectedOnly, ActiveUsers);
 
         WriteUsersInTime();
         Changed(nameof(FilteredActiveUsers), nameof(PlayerInfo), nameof(PlayerRoleInfo));
@@ -71,6 +76,12 @@ public partial class HostViewModel
         NickColorSilent = options.Theme.CityColor,
     };
 
+    private async Task RefreshFilteredActiveUsers()
+    {
+        ActiveUsers.ForEach(a => a.RefreshButtons(!AreSelectedOnly, ActiveUsers));
+        Changed(nameof(FilteredActiveUsers));
+    }
+
     private Task WriteUsers() => WriteUsers(users);
     private void WriteUsersInTime() => Runs.FirstInTime(WriteUsers, TimeSpan.FromMilliseconds(500));
 
@@ -83,25 +94,27 @@ public partial class HostViewModel
             (ActiveUsers[index - 1], ActiveUsers[index]) = (ActiveUsers[index], ActiveUsers[index - 1]);
             (users[index - 1], users[index]) = (users[index], users[index - 1]);
 
-            WriteUsersInTime();
-            Changed(nameof(FilteredActiveUsers));
-            return;
+            Runs.FirstInTime(RefreshFilteredActiveUsers, TimeSpan.FromMilliseconds(10));
         }
 
         if (name == "Down")
         {
+            var index = ActiveUsers.IndexOf(activeUser);
 
+            (ActiveUsers[index + 1], ActiveUsers[index]) = (ActiveUsers[index], ActiveUsers[index + 1]);
+            (users[index + 1], users[index]) = (users[index], users[index + 1]);
 
-            return;
+            Runs.FirstInTime(RefreshFilteredActiveUsers, TimeSpan.FromMilliseconds(10));
         }
 
-        async Task Changed_FilteredActiveUsers() => Changed(nameof(FilteredActiveUsers));
         WriteUsersInTime();
 
         if (name == nameof(ActiveUser.IsSelected))
         {
             Changed(nameof(PlayerInfo), nameof(PlayerRoleInfo));
-            Runs.FirstInTime(Changed_FilteredActiveUsers, TimeSpan.FromMilliseconds(500));
+            
+            if (AreSelectedOnly)
+                Runs.FirstInTime(RefreshFilteredActiveUsers, TimeSpan.FromMilliseconds(100));
         }                
     }
 }

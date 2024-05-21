@@ -5,19 +5,18 @@
              Padding="30,0" >
 
     <Grid RowDefinitions="Auto,*,Auto" >
-        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" >
-            <Label Grid.Column="0" 
-                   Text="{Binding PlayerInfo}"
+        <VerticalStackLayout Padding="0,0,0,10">
+            <Label Text="{Binding PlayerInfo}"
                    Style="{StaticResource InfoLine}" />
-        </Grid>
+        </VerticalStackLayout>
 
         <ScrollView Grid.Row="1">
             <ListView ItemsSource="{Binding FilteredActiveUsers}" ItemTapped="ListView_ItemTapped" SelectionMode="None" >
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
-                            <VerticalStackLayout Padding="0,5,0,5">
-                                <Grid ColumnDefinitions="*,Auto,Auto,*">
+                            <VerticalStackLayout>
+                                <Grid ColumnDefinitions="*,Auto,Auto">
                                     <Editor Grid.Column="0"
                                         TextColor="{Binding NickColor}"
                                         Text="{Binding Nick}"     
@@ -26,20 +25,47 @@
                                         HorizontalOptions="Fill"                                            
                                         FontAttributes="Bold" />
 
-                                    <Button Grid.Column="1"
-                                            IsVisible="{Binding IsButtonsVisible}"
-                                        Text="+" 
-                                        Command="{Binding CommandUp}"  CommandParameter="{Binding Self}" />
-
-                                    <Button Grid.Column="2"
-                                            IsVisible="{Binding IsButtonsVisible}"
-                                        Text="-" 
-                                        Command="{Binding CommandDown}" CommandParameter="{Binding Self}" />
-
-                                    <CheckBox Grid.Column="3"
+                                    <HorizontalStackLayout Grid.Column="1" 
+                                                           Spacing="25"
+                                                           Padding="25,0,0,0"
+                                                           IsVisible="{Binding IsButtonsVisible}">
+                                        <Button 
+                                            ScaleX="0.8"
+                                            ScaleY="0.73"
+                                            IsEnabled="{Binding IsUpEnabled}"
+                                            BackgroundColor="Black"
+                                            BorderColor="Black"
+                                            BorderWidth="2"
+                                            FontAttributes="Bold"
+                                            FontSize="20"
+                                            CornerRadius="50"
+                                            Text="⇧"                         
                                             VerticalOptions="Center"
-                                            IsChecked="{Binding IsSelected}"                                           
-                                            HorizontalOptions="End" />
+                                            Command="{Binding CommandUp}"  
+                                            CommandParameter="{Binding Self}" />
+
+                                        <Button
+                                            ScaleX="0.8"
+                                            ScaleY="0.73"
+                                            IsEnabled="{Binding IsDownEnabled}"
+                                            BackgroundColor="Black"
+                                            BorderColor="Black"
+                                            BorderWidth="2"
+                                            FontSize="20"
+                                            CornerRadius="50"
+                                            Text="⇩" 
+                                            FontAttributes="Bold"
+                                            VerticalOptions="Center"
+                                            Command="{Binding CommandDown}" 
+                                            CommandParameter="{Binding Self}" />
+                                    </HorizontalStackLayout>
+
+                                    <HorizontalStackLayout Grid.Column="2"                                                            
+                                                           Padding="25,0,0,0">
+                                        <CheckBox 
+                                            IsChecked="{Binding IsSelected}"
+                                            VerticalOptions="Center" />
+                                    </HorizontalStackLayout>
                                 </Grid>
                             </VerticalStackLayout>
                         </ViewCell>
@@ -48,7 +74,7 @@
             </ListView>
         </ScrollView>
 
-        <VerticalStackLayout Grid.Row="2" Padding="0,0,0,25">
+        <VerticalStackLayout Grid.Row="2" Padding="0,25,0,25">
             <Grid ColumnDefinitions="Auto,*,Auto">
                 <HorizontalStackLayout Grid.Column="0" Padding="0,0,25,0" IsVisible="{Binding IsAddUserButtonVisible}" >
                     <Button                         
@@ -61,7 +87,7 @@
                 Command="{Binding SelectRolesCommand}"
                 HorizontalOptions="Fill" />
 
-                <HorizontalStackLayout Grid.Column="2" Padding="25,0,0,0">
+                <HorizontalStackLayout Grid.Column="2" Padding="10,0,0,0">
                     <CheckBox
                     IsChecked="{Binding AreSelectedOnly}"
                     HorizontalOptions="End"
