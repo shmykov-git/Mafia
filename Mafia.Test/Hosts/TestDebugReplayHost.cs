@@ -21,8 +21,14 @@ public class TestDebugReplayHost : ReplayHost
         Debug.WriteLine($"===========");
     }
 
-    protected override void Select(Player? who, Player[] whom)
+    public override Task NotifyGameEnd(State state, Group group)
     {
-        Debug.WriteLine($"{(who == null ? "city" : who.ToString())} --> {whom.SJoin(", ")}");
+        Debug.WriteLine($"===========");
+        return base.NotifyGameEnd(state, group);
+    }
+
+    protected override void Select(Player? who, Player[] whom, string operation)
+    {
+        Debug.WriteLine($"{(who == null ? "city" : who.ToString())} {operation} --> {(whom.Length > 0 ? whom.SJoin(", ") : "nobody")}");
     }
 }

@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Mafia.Test.Model;
 using Mafia.Test.Hosts;
+using Mafia.Hosts;
+using Mafia.Services;
 
 namespace Mafia.Test.Base;
 
@@ -28,6 +30,7 @@ public class MafiaTestsBase
         }
 
         services
+            .AddTransient<Referee>()
             .Configure<TestDebugReplayOptions>(Configure)
             .AddMafia(city)
             .AddSingleton<IHost, TestDebugReplayHost>()
@@ -36,7 +39,7 @@ public class MafiaTestsBase
         return services.BuildServiceProvider();
     }
 
-    protected IServiceProvider CreateTestDebug(string mapFileName, Action<TestDebugOptions> configureOptions)
+    protected IServiceProvider CreateDebugTest(string mapFileName, Action<TestDebugOptions> configureOptions)
     {
         var mafiaFileName = $"Maps/{mapFileName}";
 
@@ -46,6 +49,7 @@ public class MafiaTestsBase
         var services = new ServiceCollection();
 
         services
+            .AddTransient<Referee>()
             .Configure<TestDebugOptions>(configureOptions)
             .AddMafia(city)
             .AddSingleton<IHost, TestDebugHost>();

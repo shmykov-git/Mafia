@@ -2,7 +2,9 @@
 
 public class TestDebugOptions
 {
-    public bool Shaffle { get; set; }
+    public bool ShafflePlaces { get; set; }
+    public bool ShaffleRoles { get; set; }
+    public bool ShowRating { get; set; }
     public required bool HostInstructions { get; set; }
     public required bool CitySelections { get; set; }
     public required int Seed { get; set; }

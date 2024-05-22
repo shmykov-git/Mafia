@@ -37,7 +37,7 @@ public class TestDebugHost : IHost
         users = Enumerable.Range(0, n).Select(i => new User { Nick = $"U{(i).ToString().PadLeft(2, '0')}" }).ToArray();
         state.Players0.ForEach((p, i) => p.User = users[i]);
         
-        if (options.Shaffle)
+        if (options.ShafflePlaces)
         {
             var places = state.Players.ToArray();
             places.Shaffle(n + 7, rnd);
@@ -47,7 +47,12 @@ public class TestDebugHost : IHost
 
     public string[] GetGameRoles()
     {
-        return options.RolesPreset.SelectMany(v => Enumerable.Range(0, v.count).Select(_ => v.name)).ToArray();
+        var roles = options.RolesPreset.SelectMany(v => Enumerable.Range(0, v.count).Select(_ => v.name)).ToArray();
+
+        if (options.ShaffleRoles)
+            roles.Shaffle(roles.Length + 7, rnd);
+
+        return roles;
     }
 
     private void TellTheNews(State state)
@@ -145,6 +150,9 @@ public class TestDebugHost : IHost
         if (options.HostInstructions)
             Debug.WriteLine($"City select somebody to kill{(action.IsSkippable() ? " or skip" : "")}");
 
+        if (operation == nameof(CityOperations.CityBan))
+            return [];
+
         if (operation == nameof(CityOperations.CityKill))
         {
             var skip = action.IsSkippable() && rnd.NextDouble() < 0.1;
@@ -234,8 +242,8 @@ public class TestDebugHost : IHost
         var selectionsStr = state.News.Select(NewsItem).Select(v=>$"[{v}]").SJoin(", ");
 
         Debug.WriteLine($"GameEnd, the winner is {winnerGroup.Name}");
-        Debug.WriteLine($"Players: [{playerStr}]");
-        Debug.WriteLine($"Selections: [{selectionsStr}]");
+        Debug.WriteLine($"Players = [{playerStr}],");
+        Debug.WriteLine($"Selections = [{selectionsStr}]");
         Debug.WriteLine($"===== </day {state.DayNumber}> =====");
     }
 

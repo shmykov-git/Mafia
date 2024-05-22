@@ -19,7 +19,8 @@ public class Game
     private City city;
     private IHost host;
     private State state;
-    
+
+    public State State => state;
     public bool IsActive => state?.IsActive ?? false;
 
     public Game(Func<ICity> mapFactory, Func<IHost> hostFactory)

@@ -8,6 +8,7 @@ using Mafia;
 using Mafia.Extensions;
 using Mafia.Libraries;
 using Mafia.Model;
+using Mafia.Services;
 using Microsoft.Extensions.Options;
 
 namespace Host.ViewModel;
@@ -17,7 +18,7 @@ public partial class HostViewModel : NotifyPropertyChanged, ICity
     private const string UsersStoreKey = "Mafia_Host_Users";
     private const string PersistSettingsStoreKey = "Mafia_Host_Settings";
     private const string ReplayStoreKey = "Mafia_Host_Replays";
-
+    private readonly Referee referee;
     private readonly PermissionFather panhandler;
     private City city;
     private HostOptions options;
@@ -30,9 +31,10 @@ public partial class HostViewModel : NotifyPropertyChanged, ICity
     public Dictionary<KnownRoleKey, string> KnownRoles { get; }
     public Dictionary<string, string> Messages { get; private set; }
 
-    public HostViewModel(Game game, IOptions<HostOptions> options, PermissionFather panhandler)
+    public HostViewModel(Game game, Referee referee, IOptions<HostOptions> options, PermissionFather panhandler)
     {
         this.game = game;
+        this.referee = referee;
         this.panhandler = panhandler;
         this.options = options.Value;
         OperationColors = this.options.Theme.OperationColors.ToDictionary(c => c.Operation, c => c.Color);
@@ -75,6 +77,26 @@ public partial class HostViewModel : NotifyPropertyChanged, ICity
         replays.Add(state.Replay);
         await WriteReplace(replays);
         Debug.WriteLine($"[{state.Replay}]");
+    }
+
+    private async Task ApplyRatings(State state)
+    {
+        var ratings = await referee.GetRatings(state.Replay, state.City);
+        
+        ratings
+            .Select(r => (r.rating, user: state.Users0.Single(u => u.Nick == r.nick)))
+            .ForEach(v =>
+            {
+                if (!v.user.Ratings.TryGetValue(state.City.Name, out var ratings))
+                {
+                    ratings = new();
+                    v.user.Ratings.Add(state.City.Name, ratings);
+                }
+
+                ratings[state.Replay.Id] = v.rating;
+            });
+
+        await WriteUsers();
     }
 
     private Task<List<Replay>> ReadReplays() => Stores.GetDataByKey<List<Replay>>(ReplayStoreKey);

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Mafia.Model;
+using Mafia.Services;
 
 namespace Mafia;
 
@@ -16,6 +17,7 @@ public static class DependencyExtensions
             services.AddTransient<ICity, DefaultCityFactory>(p => new DefaultCityFactory(city));
 
         return services
+            .AddTransient<Referee>()
             .AddTransient<Func<ICity>>(p => () => p.GetRequiredService<ICity>())
             .AddTransient<Func<IHost>>(p => () => p.GetRequiredService<IHost>())
             .AddTransient<Game>();

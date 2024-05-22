@@ -52,6 +52,7 @@ public partial class HostViewModel : IHost
     public async Task NotifyGameEnd(State state, Group winnerGroup)
     {
         await SaveGameReplay(state);
+        await ApplyRatings(state);
 
         ActivePlayerFilter.Killed = true;
 

@@ -7,8 +7,7 @@ namespace Mafia.Hosts;
 
 public abstract class ReplayHost : IHost
 {
-    private readonly Replay replay;
-    //private (int who, int[] whom)[] selections;
+    protected readonly Replay replay;
     protected User[] users;
     private int nNews = 0;
     private int nSelect = 0;
@@ -19,10 +18,10 @@ public abstract class ReplayHost : IHost
         users = replay.Players.Select(p => new User { Nick = p.nick }).ToArray();
     }
 
-    protected virtual void Select(Player? who, Player[] whom) { }
+    protected virtual void Select(Player? who, Player[] whom, string operation) { }
     protected virtual void NotifyDailyNews(State state) { }
 
-    private User[] DoSelect(State state, Player? player)
+    private User[] DoSelect(State state, Player? player, string operation)
     {
         if (nNews != state.News.Count)
         {
@@ -38,14 +37,14 @@ public abstract class ReplayHost : IHost
         if (player != who)
             throw new InvalidReplayException();
 
-        Select(who, whom);
+        Select(who, whom, operation);
 
         return selection.whom.Select(j => users[j]).ToArray();
     }
 
-    public virtual async Task<User[]> AskCityToSelect(State state, CityAction action, string operation) => DoSelect(state, null);
-    public virtual async Task<User[]> AskToSelect(State state, Player player, Action action, string operation) => DoSelect(state, player);
-    public virtual async Task<User[]> GetNeighbors(State state, Player player, Action action, string operation) => DoSelect(state, player);
+    public virtual async Task<User[]> AskCityToSelect(State state, CityAction action, string operation) => DoSelect(state, null, operation);
+    public virtual async Task<User[]> AskToSelect(State state, Player player, Action action, string operation) => DoSelect(state, player, operation);
+    public virtual async Task<User[]> GetNeighbors(State state, Player player, Action action, string operation) => DoSelect(state, player, operation);
 
     public virtual string[] GetGameRoles() => replay.Players.Select(p => p.role).ToArray();
     public virtual User[] GetGameUsers() => users;
