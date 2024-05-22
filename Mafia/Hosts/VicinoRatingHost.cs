@@ -1,79 +1,109 @@
-﻿using Mafia.Extensions;
+﻿using System.Numerics;
+using Mafia.Extensions;
 using Mafia.Model;
 
 namespace Mafia.Hosts;
 
 public class VicinoRatingHost : ReplayHost, IRating
 {
-    private Dictionary<string, int> ratings = new();
+    protected Dictionary<string, List<RatingCase>> ratings = new();
 
-    private const int winnerBonus = 3;
-    private const int aliveWinnerBonus = 2;
-    private const int deathBonus = 1;
+    protected virtual int GetBonus(RatingCase ratingCase) => ratingCase switch
+    {
+        RatingCase.Winner => 3,
+        RatingCase.Loser => 1,
+        RatingCase.Alive => 2,
+        RatingCase.HealMaster => 3,
+        RatingCase.KillMaster => 3,
+        _ => throw new NotImplementedException()
+    };
 
-    private const int maniacBonus = 3;
-    private const int kamikazeBonus = 3;
-    private const int doctorBonus = 3;
+    protected virtual int ManiacKillsBonusCount => 3;
+    protected virtual int DoctorHealsBonusCount => 3;
 
-    private const int maniacKillsBonusCount = 3;
-    private const int doctorHealsBonusCount = 3;
+    protected virtual string[] GetCivilian() => ["Commissar", "Doctor", "Kamikaze", "Civilian", "Комиссар", "Доктор", "Камикадзе", "Мирный"];
+    protected virtual string[] GetMafia() => ["Don", "Bum", "Mafia", "Дон", "Бомж", "Мафия"];
+    protected virtual string[] GetDoctorGoodHeal() => GetCivilian().Concat(GetManiac()).ToArray();
+    protected virtual string[] GetManiacGoodKill() => GetMafia();
+    protected virtual string[] GetKamikazeGoodKill() => GetMafia();
+    protected virtual string[] GetKamikaze() => ["Kamikaze", "Камикадзе"];
+    protected virtual string[] GetDoctor() => ["Doctor", "Доктор"];
+    protected virtual string[] GetManiac() => ["Maniac", "Маньяк"];
 
-    private readonly string[] goodHeal = [ "Maniac", "Commissar", "Doctor", "Civilian", "Маньяк", "Комиссар", "Доктор", "Мирный" ];
-    private readonly string[] mafia = ["Don", "Bum", "Mafia", "Дон", "Бомж", "Мафия"];
-    private readonly string[] kamikaze = ["Kamikaze", "Камикадзе"];
-    private readonly string[] doctor = ["Doctor", "Доктор"];
-    private readonly string[] maniac = ["Maniac", "Маньяк"];
-
-    public (string, int)[] GetRatings() => ratings.Select(r => (r.Key, r.Value)).ToArray();
+    public (string, int, RatingCase[])[] GetRatings() => ratings.Select(r => (r.Key, r.Value.Select(GetBonus).Sum(), r.Value.ToArray())).ToArray();
 
     public VicinoRatingHost(Replay replay) : base(replay)
     {
     }
 
-
-    public override Task NotifyGameEnd(State state, Group winner)
+    public virtual void AddManiacBonus(State state)
     {
-        bool IsAlive(string nick) => state.Players.Any(p => p.User.Nick == nick);
-        bool IsWinner(string role) => winner.AllDeepRoles().Any(r => r.Name == role);
+        var goodManiacKill = GetManiacGoodKill();
+        var maniac = GetManiac();
 
-        ratings = state.Users0.ToDictionary(u => u.Nick, u => 0);
-
-        // winner
-        winner.AllDeepRoles()
-            .SelectMany(r => replay.Players.Where(p => p.role == r.Name))
-            .ForEach(p => ratings[p.nick] += winnerBonus);
-
-        // alive & death
-        state.Users0
-            .SelectMany(u => replay.Players.Where(p => p.nick == u.Nick))
-            .ForEach(p => ratings[p.nick] += IsAlive(p.nick) && IsWinner(p.role) ? aliveWinnerBonus : deathBonus);
-
-        // maniac
-        state.News.SelectMany(n => n.AllSelects().Select(s => (n, s)))
-            .Where(s => s.s.Who != null && maniac.Contains(s.s.Who.Role.Name))
-            .Select(s => (s.s.Who, count: s.s.Whom.Where(p => s.n.FactKills.Contains(p)).Count()))
+        state.News.SelectMany(n => n.AllSelects().Where(s => s.Who != null).Select(s => (n, s)))
+            .Where(s => maniac.Contains(s.s.Who.Role.Name))
+            .Select(s => (s.s.Who, count: s.s.Whom.Where(p => s.n.FactKills.Contains(p) && goodManiacKill.Contains(p.Role.Name)).Count()))
             .GroupBy(s => s.Who)
-            .Select(gv => (nick: gv.Key.User.Nick, count: gv.Sum(v => v.count)))
-            .Where(v => v.count >= maniacKillsBonusCount)
-            .ForEach(p => ratings[p.nick] += maniacBonus);
+            .Select(gv => (nick: gv.Key.User!.Nick, count: gv.Sum(v => v.count)))
+            .Where(v => v.count >= ManiacKillsBonusCount)
+            .ForEach(p => ratings[p.nick].Add(RatingCase.KillMaster));
+    }
 
-        // doctor
-        state.News.SelectMany(n => n.AllSelects().Select(s => (n, s)))
-            .Where(s => s.s.Who != null && doctor.Contains(s.s.Who.Role.Name))
-            .Select(s => (s.s.Who, count: s.s.Whom.Where(p => s.n.FactHeals.Contains(p) && goodHeal.Contains(p.Role.Name)).Count()))
+    public virtual void AddKamikazeBonus(State state)
+    {
+        var goodKamikazeKill = GetKamikazeGoodKill();
+        var kamikaze = GetKamikaze();
+
+        state.News.SelectMany(n => n.AllSelects().Where(s => s.Who != null).Select(s => (n, s)))
+            .Where(s => kamikaze.Contains(s.s.Who.Role.Name))
+            .Where(s => s.s.Whom.Any(p => s.n.FactKills.Contains(p) && goodKamikazeKill.Contains(p.Role.Name)))
+            .GroupBy(s => s.s.Who)
+            .Select(gv => gv.Key.User!.Nick)
+            .ForEach(nick => ratings[nick].Add(RatingCase.KillMaster));
+    }
+
+    public virtual void AddDoctorBonus(State state)
+    {
+        var goodDoctorHeal = GetDoctorGoodHeal();
+        var doctor = GetDoctor();
+
+        state.News.SelectMany(n => n.AllSelects().Where(s => s.Who != null).Select(s => (n, s)))
+            .Where(s => doctor.Contains(s.s.Who.Role.Name))
+            .Select(s => (s.s.Who, count: s.s.Whom.Where(p => s.n.FactHeals.Contains(p) && goodDoctorHeal.Contains(p.Role.Name)).Count()))
             .GroupBy(s => s.Who)
-            .Select(gv => (nick: gv.Key.User.Nick, count: gv.Sum(v => v.count)))
-            .Where(v => v.count >= doctorHealsBonusCount)
-            .ForEach(p => ratings[p.nick] += doctorBonus);
+            .Select(gv => (nick: gv.Key.User!.Nick, count: gv.Sum(v => v.count)))
+            .Where(v => v.count >= DoctorHealsBonusCount)
+            .ForEach(p => ratings[p.nick].Add(RatingCase.HealMaster));
+    }
 
-        // kamikaze
-        state.News.SelectMany(n => n.AllSelects())
-            .Where(s => s.Who != null && kamikaze.Contains(s.Who.Role.Name))
-            .Where(s => s.Whom.Any(p => mafia.Contains(p.Role.Name)))
-            .GroupBy(s => s.Who)
-            .Select(gv => gv.Key.User.Nick)
-            .ForEach(nick => ratings[nick] += kamikazeBonus);
+    public override async Task NotifyGameEnd(State state, Group winner)
+    {
+        await base.NotifyGameEnd(state, winner);
 
-        return base.NotifyGameEnd(state, winner);
+        bool IsAlive(string nick) => state.Players.Any(p => p.User!.Nick == nick);
+
+        ratings = state.Users0.ToDictionary(u => u.Nick, u => new List<RatingCase>());
+        var winnerRoles = winner.AllDeepRoles().Select(r => r.Name).ToArray();
+
+        // winner (alive), loser
+        replay.Players.ForEach(p =>
+        {
+            if (winnerRoles.Contains(p.role))
+            {
+                ratings[p.nick].Add(RatingCase.Winner);
+
+                if (IsAlive(p.nick))
+                    ratings[p.nick].Add(RatingCase.Alive);
+            }
+            else
+            {
+                ratings[p.nick].Add(RatingCase.Loser);
+            }
+        });
+
+        AddManiacBonus(state);
+        AddDoctorBonus(state);
+        AddKamikazeBonus(state);
     }
 }

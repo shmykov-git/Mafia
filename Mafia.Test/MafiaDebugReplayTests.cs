@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using Mafia.Extensions;
 using Mafia.Model;
 using Mafia.Services;
 using Mafia.Test.Base;
@@ -29,8 +30,9 @@ public class MafiaDebugReplayTests : MafiaTestsBase
         
         foreach (var p in state.Players0)
         {
-            var rating = ratings.Single(r => r.nick == p.User.Nick).rating;
-            Debug.WriteLine($"{p.User.Nick} ({p.Role.Name}): {rating}");
+            var (nick, rating, cases) = ratings.Single(r => r.nick == p.User.Nick);
+
+            Debug.WriteLine($"{nick} ({p.Role.Name}): {rating} [{cases.SJoin(", ")}]");
         }
     }
 

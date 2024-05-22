@@ -2,5 +2,5 @@
 
 public interface IRating
 {
-    (string, int)[] GetRatings();
+    (string nick, int rating, RatingCase[] cases)[] GetRatings();
 }

@@ -40,7 +40,7 @@ public class TestDebugHost : IHost
         if (options.ShafflePlaces)
         {
             var places = state.Players.ToArray();
-            places.Shaffle(n + 7, rnd);
+            places.Shaffle(3*n + 7, rnd);
             state.Players = places.ToList();
         }
     }
@@ -50,13 +50,15 @@ public class TestDebugHost : IHost
         var roles = options.RolesPreset.SelectMany(v => Enumerable.Range(0, v.count).Select(_ => v.name)).ToArray();
 
         if (options.ShaffleRoles)
-            roles.Shaffle(roles.Length + 7, rnd);
+            roles.Shaffle(3*roles.Length + 7, rnd);
 
         return roles;
     }
 
     private void TellTheNews(State state)
     {
+        if (!options.Debug) return;
+
         if (!state.HasNews)
         {
             Debug.WriteLine($"Game players: {state.Players.SJoin(", ")}");
@@ -96,6 +98,8 @@ public class TestDebugHost : IHost
 
     public async Task NotifyDayStart(State state)
     {
+        if (!options.Debug) return;
+
         if (state.DayNumber > 1)
             Debug.WriteLine($"===== </night {state.DayNumber}> =====");
 
@@ -104,6 +108,8 @@ public class TestDebugHost : IHost
 
     public async Task NotifyNightStart(State state)
     {
+        if (!options.Debug) return;
+
         Debug.WriteLine($"===== </day {state.DayNumber}> =====");
         Debug.WriteLine($"===== <night {state.DayNumber}> =====");
     }
@@ -161,7 +167,7 @@ public class TestDebugHost : IHost
                 ? []
                 : [state.Players[rnd.Next(state.Players.Count)]];
 
-            if (options.CitySelections)
+            if (options.Debug)
                 Debug.WriteLine($"City {operation} --> {(selected is [] ? "nobody" : selected.SJoin(", "))}");
 
             return selected.Select(p => p.User).ToArray();
@@ -172,7 +178,7 @@ public class TestDebugHost : IHost
             var k = rnd.Next(3);
             Player[] selected = Enumerable.Range(0, k).Select(_=>state.Players[rnd.Next(state.Players.Count)]).Distinct().ToArray();
 
-            if (options.CitySelections)
+            if (options.Debug)
                 Debug.WriteLine($"City {operation} --> {(selected is [] ? "nobody" : selected.SJoin(", "))}");
 
             return selected.Select(p => p.User).ToArray();
@@ -185,7 +191,7 @@ public class TestDebugHost : IHost
     {
         var selected = state.GetNeighborPlayers(player);
 
-        if (options.CitySelections)
+        if (options.Debug)
             Debug.WriteLine($"{player} {operation} --> {selected.SJoin(", ")}");
 
         return selected.Select(p => p.User).ToArray();
@@ -221,7 +227,7 @@ public class TestDebugHost : IHost
                 : [];
         }
 
-        if (options.CitySelections)
+        if (options.Debug)
             Debug.WriteLine($"{player} {operation} --> {(selected is [] ? "nobody" : selected.SJoin(", "))}");
 
         AskToFallAsleep(state, player);
@@ -231,6 +237,8 @@ public class TestDebugHost : IHost
 
     public async Task NotifyGameEnd(State state, Group winnerGroup)
     {
+        if (!options.Debug) return;
+
         var players = state.Players0.ToList();
         int[] GetWhom(Select s) => s.Whom.Select(p => players.IndexOf(p)).ToArray();
         int GetWho(Select s) => s.IsCity ? -1 : players.IndexOf(s.Who);

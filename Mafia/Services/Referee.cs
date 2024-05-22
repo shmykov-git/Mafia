@@ -7,27 +7,29 @@ namespace Mafia.Services;
 
 public class Referee
 {
-    public async Task<(string nick, int rating)[]> GetRatings(Replay replay, City city)
+    public async Task<(string nick, int rating, RatingCase[] cases)[]> GetRatings(Replay replay, City city)
     {
-        // todo: reload city
-
         var services = new ServiceCollection();
-
-        services
-            .AddMafia(city)
-            .AddTransient(p=>(IRating)p.GetRequiredService<IHost>())
-            .AddTransient(_=>replay)
-            ;
 
         switch (replay.MapName) 
         {
             case "Mafia Vicino":
-                services.AddSingleton<IHost, VicinoRatingHost>(); 
+                services.AddSingleton<IHost, VicinoRatingHost>();
+                break;
+
+            case "Mafia Vicino (maniac party)":
+                services.AddSingleton<IHost, VicinoManiacPartyRatingHost>();
                 break;
 
             default:
                 throw new NotImplementedException(replay.MapName);
         }
+
+        services
+            .AddMafia(city)
+            .AddTransient(p => (IRating)p.GetRequiredService<IHost>())
+            .AddTransient(_ => replay)
+            ;
 
         var provider = services.BuildServiceProvider();
 
