@@ -113,9 +113,33 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiImage Update="Resources\Images\game_icon.png">
+	    <CopyToOutputDirectory></CopyToOutputDirectory>
+	  </MauiImage>
 	  <MauiImage Update="Resources\Images\mafia.jpg">
 	    <Color>#000000</Color>
 	    <BaseSize>807,504</BaseSize>
+	  </MauiImage>
+	  <MauiImage Update="Resources\Images\mafia_drive.jpg">
+	    <CopyToOutputDirectory></CopyToOutputDirectory>
+	  </MauiImage>
+	  <MauiImage Update="Resources\Images\mafia_vicino.jpg">
+	    <CopyToOutputDirectory></CopyToOutputDirectory>
+	  </MauiImage>
+	  <MauiImage Update="Resources\Images\mafia_vicino_maniac_party.jpg">
+	    <CopyToOutputDirectory></CopyToOutputDirectory>
+	  </MauiImage>
+	  <MauiImage Update="Resources\Images\rating_icon.jpg">
+	    <CopyToOutputDirectory></CopyToOutputDirectory>
+	  </MauiImage>
+	  <MauiImage Update="Resources\Images\roles_icon.png">
+	    <CopyToOutputDirectory></CopyToOutputDirectory>
+	  </MauiImage>
+	  <MauiImage Update="Resources\Images\settings_icon.png">
+	    <CopyToOutputDirectory></CopyToOutputDirectory>
+	  </MauiImage>
+	  <MauiImage Update="Resources\Images\users_icon.png">
+	    <CopyToOutputDirectory></CopyToOutputDirectory>
 	  </MauiImage>
 	</ItemGroup>
 
