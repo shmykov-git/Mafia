@@ -26,13 +26,12 @@ public class MafiaDebugReplayTests : MafiaTestsBase
         var state = game.State;
         var city = provider.GetRequiredService<ICity>().City;
         var referee = provider.GetRequiredService<Referee>();
-        var ratings = await referee.GetRatings(replay, city);
-        
-        foreach (var p in state.Players0)
-        {
-            var (nick, rating, cases) = ratings.Single(r => r.nick == p.User.Nick);
+        var rating = await referee.GetRating(replay, city);
 
-            Debug.WriteLine($"{nick} ({p.Role.Name}): {rating} [{cases.SJoin(", ")}]");
+        if (rating.IsSupported)
+        {
+            foreach (var r in rating.PlayerRatings)
+                Debug.WriteLine($"{r.Nick} ({r.Role}): {r.Rating} [{r.Cases.SJoin(", ")}]");
         }
     }
 

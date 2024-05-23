@@ -18,6 +18,8 @@ public abstract class ReplayHost : IHost
         users = replay.Players.Select(p => new User { Nick = p.nick }).ToArray();
     }
 
+    protected string GetRole(string nick) => replay.Players.Single(p => p.nick == nick).role;
+
     protected virtual void Select(Player? who, Player[] whom, string operation) { }
     protected virtual void NotifyDailyNews(State state) { }
 

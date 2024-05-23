@@ -1,22 +1,13 @@
 ﻿using System.Numerics;
 using Mafia.Extensions;
 using Mafia.Model;
+using Mafia.Services;
 
 namespace Mafia.Hosts;
 
 public class VicinoRatingHost : ReplayHost, IRating
 {
     protected Dictionary<string, List<RatingCase>> ratings = new();
-
-    protected virtual int GetBonus(RatingCase ratingCase) => ratingCase switch
-    {
-        RatingCase.Winner => 3,
-        RatingCase.Loser => 1,
-        RatingCase.Alive => 2,
-        RatingCase.HealMaster => 3,
-        RatingCase.KillMaster => 3,
-        _ => throw new NotImplementedException()
-    };
 
     protected virtual int ManiacKillsBonusCount => 3;
     protected virtual int DoctorHealsBonusCount => 3;
@@ -30,7 +21,8 @@ public class VicinoRatingHost : ReplayHost, IRating
     protected virtual string[] GetDoctor() => ["Doctor", "Доктор"];
     protected virtual string[] GetManiac() => ["Maniac", "Маньяк"];
 
-    public (string, int, RatingCase[])[] GetRatings() => ratings.Select(r => (r.Key, r.Value.Select(GetBonus).Sum(), r.Value.ToArray())).ToArray();
+
+    public PlayerRating[] GetRatings() => ratings.Select(r => new PlayerRating() { Nick = r.Key, Role = GetRole(r.Key), Cases = r.Value.ToArray() }).ToArray();
 
     public VicinoRatingHost(Replay replay) : base(replay)
     {

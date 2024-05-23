@@ -81,10 +81,14 @@ public partial class HostViewModel : NotifyPropertyChanged, ICity
 
     private async Task ApplyRatings(State state)
     {
-        var ratings = await referee.GetRatings(state.Replay, state.City);
-        
-        ratings
-            .Select(r => (r.rating, user: state.Users0.Single(u => u.Nick == r.nick)))
+        var rating = await referee.GetRating(state.Replay, state.City);
+
+        if (!rating.IsSupported)
+            return;
+
+        rating
+            .PlayerRatings
+            .Select(r => (r.Rating, user: state.Users0.Single(u => u.Nick == r.Nick)))
             .ForEach(v =>
             {
                 if (!v.user.Ratings.TryGetValue(state.City.Name, out var ratings))
@@ -93,7 +97,7 @@ public partial class HostViewModel : NotifyPropertyChanged, ICity
                     v.user.Ratings.Add(state.City.Name, ratings);
                 }
 
-                ratings[state.Replay.Id] = v.rating;
+                ratings[state.Replay.Id] = v.Rating;
             });
 
         await WriteUsers();

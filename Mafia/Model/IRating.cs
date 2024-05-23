@@ -1,6 +1,8 @@
-﻿namespace Mafia.Model;
+﻿using Mafia.Services;
+
+namespace Mafia.Model;
 
 public interface IRating
 {
-    (string nick, int rating, RatingCase[] cases)[] GetRatings();
+    PlayerRating[] GetRatings();
 }

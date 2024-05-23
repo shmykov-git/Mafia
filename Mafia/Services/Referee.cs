@@ -5,9 +5,33 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Mafia.Services;
 
+public class Rating
+{
+    public bool IsSupported { get; set; }
+    public required PlayerRating[] PlayerRatings { get; set; }
+}
+
+public class PlayerRating
+{
+    public required string Nick { get; set; }
+    public required string Role { get; set; }
+    public required RatingCase[] Cases { get; set; }
+    public int Rating => Cases.Select(GetBonus).Sum();
+
+    private int GetBonus(RatingCase ratingCase) => ratingCase switch
+    {
+        RatingCase.Winner => 3,
+        RatingCase.Loser => 1,
+        RatingCase.Alive => 2,
+        RatingCase.HealMaster => 3,
+        RatingCase.KillMaster => 3,
+        _ => throw new NotImplementedException()
+    };
+}
+
 public class Referee
 {
-    public async Task<(string nick, int rating, RatingCase[] cases)[]> GetRatings(Replay replay, City city)
+    public async Task<Rating> GetRating(Replay replay, City city)
     {
         var services = new ServiceCollection();
 
@@ -22,7 +46,7 @@ public class Referee
                 break;
 
             default:
-                throw new NotImplementedException(replay.MapName);
+                return new Rating { PlayerRatings = [], IsSupported = false };
         }
 
         services
@@ -38,6 +62,6 @@ public class Referee
 
         var rating = provider.GetRequiredService<IRating>();
 
-        return rating.GetRatings();
+        return new Rating { PlayerRatings = rating.GetRatings(), IsSupported = true };
     } 
 }

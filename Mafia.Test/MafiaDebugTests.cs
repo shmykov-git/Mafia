@@ -170,7 +170,7 @@ public class MafiaDebugTests : MafiaTestsBase
         var referee = provider.GetRequiredService<Referee>();
         var options = provider.GetRequiredService<IOptions<TestDebugOptions>>().Value;
 
-        List<(string nick, string role, int rating, RatingCase[] cases)[]> games = new();
+        List<(string nick, string role, int rating, RatingCase[] cases)[]> gameRatings = new();
 
         for (var k = 0; k < n; k++)
         {
@@ -179,40 +179,37 @@ public class MafiaDebugTests : MafiaTestsBase
             host.ChangeSeed(seed);
             await game.Start();
 
-            if (options.ShowRating)
+            var rating = await referee.GetRating(game.State.Replay, city);
+
+            if (rating.IsSupported && options.ShowRating)
             {
-                var ratings = await referee.GetRatings(game.State.Replay, city);
-                games.Add(ratings.Select(r => (r.nick, game.State.Players0.Single(p => p.User.Nick == r.nick).Role.Name, r.rating, r.cases)).ToArray());
+                gameRatings.Add(rating.PlayerRatings.Select(r => (r.Nick, r.Role, r.Rating, r.Cases)).ToArray());
 
-                foreach (var p in game.State.Players0)
-                {
-                    var (nick, rating, cases) = ratings.Single(r => r.nick == p.User.Nick);
-
-                    Debug.WriteLine($"{nick} ({p.Role.Name}): {rating} [{cases.SJoin(", ")}]");
-                }
+                foreach (var r in rating.PlayerRatings)
+                    Debug.WriteLine($"{r.Nick} ({r.Role}): {r.Rating} [{r.Cases.SJoin(", ")}]");
             }
         }
 
-        if (options.ShowRating)
+        if (gameRatings.Any() && options.ShowRating)
         {
             Debug.WriteLine($"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
-            var nicks = games.SelectMany(g => g).Select(g => g.nick).Distinct().ToArray();
-            var roles = games.SelectMany(g => g).Select(g => g.role).Distinct().ToArray();
+            var nicks = gameRatings.SelectMany(g => g).Select(g => g.nick).Distinct().ToArray();
+            var roles = gameRatings.SelectMany(g => g).Select(g => g.role).Distinct().ToArray();
 
             foreach (var nick in nicks)
             {
-                var nGame = games.Where(g=>g.Any(n=>n.nick == nick)).Count();
-                var rating = games.Select(g => g.Single(u => u.nick == nick).rating).Sum();
-                var ratingAvg = games.Select(g => g.Single(u => u.nick == nick).rating).Average();
+                var nGame = gameRatings.Where(g=>g.Any(n=>n.nick == nick)).Count();
+                var rating = gameRatings.Select(g => g.Single(u => u.nick == nick).rating).Sum();
+                var ratingAvg = gameRatings.Select(g => g.Single(u => u.nick == nick).rating).Average();
                 Debug.WriteLine($"{nick} {nGame} {rating,3} {ratingAvg:F2}");
             }
 
-            var rolesRating = roles.Select(role => (role, rating: games.SelectMany(g => g.Where(u => u.role == role).Select(v => v.rating)).Average()))
+            var rolesRating = roles.Select(role => (role, rating: gameRatings.SelectMany(g => g.Where(u => u.role == role).Select(v => v.rating)).Average()))
                 .Select(v => $"{v.role}={v.rating:F2}").SJoin(", ");
 
-            Debug.WriteLine($"games count: {games.Count}");
-            Debug.WriteLine($"average rating: {games.SelectMany(g => g).Select(g => g.rating).Average():F2}");
+            Debug.WriteLine($"games count: {gameRatings.Count}");
+            Debug.WriteLine($"average rating: {gameRatings.SelectMany(g => g).Select(g => g.rating).Average():F2}");
             Debug.WriteLine($"roles rating: {rolesRating}");
         }
     }
