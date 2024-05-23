@@ -6,7 +6,6 @@ using Host.Model;
 using Host.Permission;
 using Mafia;
 using Mafia.Extensions;
-using Mafia.Libraries;
 using Mafia.Model;
 using Mafia.Services;
 using Microsoft.Extensions.Options;
@@ -79,12 +78,9 @@ public partial class HostViewModel : NotifyPropertyChanged, ICity
         Debug.WriteLine($"[{state.Replay}]");
     }
 
-    private async Task ApplyRatings(State state)
+    private async Task ApplyRatings(State state, Rating rating)
     {
-        var rating = await referee.GetRating(state.Replay, state.City);
-
-        if (!rating.IsSupported)
-            return;
+        ActivePlayers.ForEach(a => a.Rating = rating.PlayerRatings.Single(r => r.Nick == a.Nick));
 
         rating
             .PlayerRatings

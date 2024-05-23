@@ -54,6 +54,16 @@
             Route="GameView" />
     </FlyoutItem>
 
+    <FlyoutItem Route="ratings"                
+                Icon="rating_icon.png"
+                Title="{Binding Messages[Rating]}" >
+
+        <ShellContent
+            Title="{Binding Messages[Rating]}"
+            ContentTemplate="{DataTemplate local:RatingView}"
+            Route="RatingView" />
+    </FlyoutItem>
+
     <FlyoutItem Route="settings"    
                  Icon="settings_icon.png"
                 Title="{Binding Messages[Settings]}" >

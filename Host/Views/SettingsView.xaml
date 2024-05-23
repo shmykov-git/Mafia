@@ -60,18 +60,16 @@
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <ViewCell>
-                                <VerticalStackLayout>
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <Label Grid.Column="0" 
-                                               Text="{Binding Description}" 
-                                               Style="{StaticResource SettingLine}" />
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Label Grid.Column="0" 
+                                            Text="{Binding Description}" 
+                                            Style="{StaticResource SettingLine}" />
                                         
-                                        <CheckBox Grid.Column="1" 
-                                                  IsChecked="{Binding IsAccepted}" 
-                                                  VerticalOptions="Center" 
-                                                  HorizontalOptions="End" />
-                                    </Grid>
-                                </VerticalStackLayout>
+                                    <CheckBox Grid.Column="1" 
+                                                IsChecked="{Binding IsAccepted}" 
+                                                VerticalOptions="Center" 
+                                                HorizontalOptions="End" />
+                                </Grid>
                             </ViewCell>
                         </DataTemplate>
                     </ListView.ItemTemplate>

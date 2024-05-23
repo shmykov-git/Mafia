@@ -1,4 +1,6 @@
-﻿using Mafia.Model;
+﻿using Mafia.Extensions;
+using Mafia.Model;
+using Mafia.Services;
 using Microsoft.Maui.Controls;
 
 namespace Host.Model;
@@ -26,6 +28,11 @@ public class ActivePlayer : NotifyPropertyChanged
     public Player? PlayerSilent { get; set; }
     public Player? Player { get => PlayerSilent; set { PlayerSilent = value; Changed(); Changed(nameof(RoleName)); } }
 
+    public PlayerRating RatingSilent { get; set; }
+    public PlayerRating Rating { get => RatingSilent; set { RatingSilent = value; Changed(); Changed(nameof(RatingExplanation)); } }
+    public string RatingExplanation => Rating.Cases.SJoin(", ");
+
+    public string NickAndRole => $"{Nick} {RoleName}";
     public string Nick => User.Nick;
     public string RoleName => Player?.Role.Name ?? messages["Unknown"];
 

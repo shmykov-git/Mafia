@@ -49,10 +49,30 @@ public partial class HostViewModel : IHost
         replays.Add(state.Replay);        
     }
 
+    private async Task ApplyGameReplay(State state)
+    {
+        if (!state.AreAllKnown)
+            return;
+
+        var players = state.Players0.ToList();
+        int[] GetWhom(Select s) => s.Whom.Select(p => players.IndexOf(p)).ToArray();
+        int GetWho(Select s) => s.IsCity ? -1 : players.IndexOf(s.Who);
+
+        state.Replay.Players = state.Players0.Select(p => (p.User.Nick, p.Role.Name)).ToArray();
+        state.Replay.Selections = state.News.Select(n => n.Selects.Select(s => (GetWho(s), GetWhom(s))).ToArray()).ToArray();
+    }
+
     public async Task NotifyGameEnd(State state, Group winnerGroup)
     {
+        await ApplyGameReplay(state);
         await SaveGameReplay(state);
-        await ApplyRatings(state);
+
+        var rating = await referee.GetRating(state.Replay, state.City);
+
+        if (rating.IsSupported)
+        {
+            await ApplyRatings(state, rating);
+        }
 
         ActivePlayerFilter.Killed = true;
 
@@ -63,8 +83,16 @@ public partial class HostViewModel : IHost
             State = state
         });
 
-        if (navigationPath == HostValues.GameView)
-            await Shell.Current.GoToAsync(HostValues.RolesView);
+        if (rating.IsSupported)
+        {
+            if (navigationPath == HostValues.GameView)
+                await Shell.Current.GoToAsync(HostValues.RatingView);
+        }
+        else
+        {
+            if (navigationPath == HostValues.GameView)
+                await Shell.Current.GoToAsync(HostValues.RolesView);
+        }
     }
 
     public async Task NotifyCityAfterNight(State state)

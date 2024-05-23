@@ -24,47 +24,45 @@
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <ViewCell>
-                                <VerticalStackLayout>
-                                    <Grid ColumnDefinitions="*,*,0.5*,Auto">
-                                        <Label Grid.Column="0"                                       
-                                            Text="{Binding Nick}"
-                                            TextColor="{Binding NickColor}"
-                                            FontAttributes="Bold"
-                                            VerticalOptions="Center"
-                                            VerticalTextAlignment="Center"
-                                            HorizontalOptions="Start" />
+                                <Grid ColumnDefinitions="*,*,0.5*,Auto">
+                                    <Label Grid.Column="0"                                       
+                                        Text="{Binding Nick}"
+                                        TextColor="{Binding NickColor}"
+                                        FontAttributes="Bold"
+                                        VerticalOptions="Center"
+                                        VerticalTextAlignment="Center"
+                                        HorizontalOptions="Start" />
 
-                                        <Label Grid.Column="1"                                       
-                                            Text="{Binding RoleName}"
-                                            TextColor="{Binding RoleColor}"
-                                            FontAttributes="Bold"
-                                            VerticalOptions="Center"
-                                            VerticalTextAlignment="Center"
-                                            HorizontalOptions="Start" />
+                                    <Label Grid.Column="1"                                       
+                                        Text="{Binding RoleName}"
+                                        TextColor="{Binding RoleColor}"
+                                        FontAttributes="Bold"
+                                        VerticalOptions="Center"
+                                        VerticalTextAlignment="Center"
+                                        HorizontalOptions="Start" />
 
-                                        <Label Grid.Column="2"
-                                            FontSize="24"
-                                            Text="{Binding Operation}"
-                                            TextColor="{Binding OperationColor}"
-                                            FontAttributes="Bold"
-                                            VerticalOptions="Center"
-                                            VerticalTextAlignment="Center"
-                                            HorizontalOptions="Center" />
+                                    <Label Grid.Column="2"
+                                        FontSize="24"
+                                        Text="{Binding Operation}"
+                                        TextColor="{Binding OperationColor}"
+                                        FontAttributes="Bold"
+                                        VerticalOptions="Center"
+                                        VerticalTextAlignment="Center"
+                                        HorizontalOptions="Center" />
 
-                                        <CheckBox Grid.Column="3"
-                                            IsEnabled="{Binding IsEnabled}"                                               
-                                            IsChecked="{Binding IsSelected}"                                           
-                                            Color="{Binding CheckboxColor}"
-                                            VerticalOptions="Center"
-                                            HorizontalOptions="End" >
-                                            <CheckBox.Triggers>
-                                                <Trigger TargetType="CheckBox" Property="IsEnabled" Value="False">
-                                                    <Setter Property="Color" Value="{Binding CheckboxColor}"/>
-                                                </Trigger>
-                                            </CheckBox.Triggers>
-                                        </CheckBox>
-                                    </Grid>
-                                </VerticalStackLayout>
+                                    <CheckBox Grid.Column="3"
+                                        IsEnabled="{Binding IsEnabled}"                                               
+                                        IsChecked="{Binding IsSelected}"                                           
+                                        Color="{Binding CheckboxColor}"
+                                        VerticalOptions="Center"
+                                        HorizontalOptions="End" >
+                                        <CheckBox.Triggers>
+                                            <Trigger TargetType="CheckBox" Property="IsEnabled" Value="False">
+                                                <Setter Property="Color" Value="{Binding CheckboxColor}"/>
+                                            </Trigger>
+                                        </CheckBox.Triggers>
+                                    </CheckBox>
+                                </Grid>
                             </ViewCell>
                         </DataTemplate>
                     </ListView.ItemTemplate>
@@ -96,20 +94,18 @@
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <ViewCell>
-                                        <VerticalStackLayout>
-                                            <Grid ColumnDefinitions="*,Auto">
-                                                <Label Grid.Column="0"                                                                      
-                                                    Text="{Binding RoleName}"
-                                                    TextColor="{Binding RoleColor}"
-                                                   Style="{StaticResource InfoLine}" />
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <Label Grid.Column="0"                                                                      
+                                                Text="{Binding RoleName}"
+                                                TextColor="{Binding RoleColor}"
+                                                Style="{StaticResource InfoLine}" />
 
-                                                <CheckBox Grid.Column="1"
-                                                    IsEnabled="{Binding IsEnabled}"
-                                                    IsChecked="{Binding IsSelected}"                                           
-                                                    VerticalOptions="Center"
-                                                    HorizontalOptions="End" />
-                                            </Grid>
-                                        </VerticalStackLayout>
+                                            <CheckBox Grid.Column="1"
+                                                IsEnabled="{Binding IsEnabled}"
+                                                IsChecked="{Binding IsSelected}"                                           
+                                                VerticalOptions="Center"
+                                                HorizontalOptions="End" />
+                                        </Grid>
                                     </ViewCell>
                                 </DataTemplate>
                             </ListView.ItemTemplate>

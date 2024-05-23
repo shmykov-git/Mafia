@@ -25,6 +25,7 @@ public class State
     public bool RollingBack { get; set; }
     public bool IsFirstDay => DayNumber == 1;
     public bool IsNotFirstDay => !IsFirstDay;
+    public bool AreAllKnown => Players0.All(p => p.IsKnown);
 
     public bool IsDay { get; set; }
     public bool IsNight { get => !IsDay; set => IsDay = !value; }

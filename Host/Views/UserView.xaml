@@ -15,44 +15,42 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
-                            <VerticalStackLayout>
-                                <Grid ColumnDefinitions="*,Auto,Auto">
-                                    <Editor Grid.Column="0"
-                                        TextColor="{Binding NickColor}"
-                                        Text="{Binding Nick}"     
-                                        VerticalOptions="Center"
-                                        VerticalTextAlignment="Center"
-                                        HorizontalOptions="Fill"                                            
-                                        FontAttributes="Bold" />
+                            <Grid ColumnDefinitions="*,Auto,Auto">
+                                <Editor Grid.Column="0"
+                                    TextColor="{Binding NickColor}"
+                                    Text="{Binding Nick}"     
+                                    VerticalOptions="Center"
+                                    VerticalTextAlignment="Center"
+                                    HorizontalOptions="Fill"                                            
+                                    FontAttributes="Bold" />
 
-                                    <HorizontalStackLayout Grid.Column="1" 
-                                                           Spacing="25"
-                                                           Padding="25,0,0,0"
-                                                           IsVisible="{Binding IsButtonsVisible}">
-                                        <Button 
-                                            Style="{StaticResource RoundBlackButton}"
-                                            IsEnabled="{Binding IsUpEnabled}"
-                                            Text="⇪"                         
-                                            Command="{Binding CommandUp}"  
-                                            CommandParameter="{Binding Self}" />
+                                <HorizontalStackLayout Grid.Column="1" 
+                                                        Spacing="25"
+                                                        Padding="25,0,0,0"
+                                                        IsVisible="{Binding IsButtonsVisible}">
+                                    <Button 
+                                        Style="{StaticResource RoundBlackButton}"
+                                        IsEnabled="{Binding IsUpEnabled}"
+                                        Text="⇪"                         
+                                        Command="{Binding CommandUp}"  
+                                        CommandParameter="{Binding Self}" />
 
-                                        <Button
-                                            Style="{StaticResource RoundBlackButton}"
-                                            IsEnabled="{Binding IsDownEnabled}"
-                                            Text="⇪" 
-                                            Rotation="180"
-                                            Command="{Binding CommandDown}" 
-                                            CommandParameter="{Binding Self}" />
-                                    </HorizontalStackLayout>
+                                    <Button
+                                        Style="{StaticResource RoundBlackButton}"
+                                        IsEnabled="{Binding IsDownEnabled}"
+                                        Text="⇪" 
+                                        Rotation="180"
+                                        Command="{Binding CommandDown}" 
+                                        CommandParameter="{Binding Self}" />
+                                </HorizontalStackLayout>
 
-                                    <HorizontalStackLayout Grid.Column="2"                                                            
-                                                           Padding="25,0,0,0">
-                                        <CheckBox 
-                                            IsChecked="{Binding IsSelected}"
-                                            VerticalOptions="Center" />
-                                    </HorizontalStackLayout>
-                                </Grid>
-                            </VerticalStackLayout>
+                                <HorizontalStackLayout Grid.Column="2"                                                            
+                                                        Padding="25,0,0,0">
+                                    <CheckBox 
+                                        IsChecked="{Binding IsSelected}"
+                                        VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                            </Grid>
                         </ViewCell>
                     </DataTemplate>
                 </ListView.ItemTemplate>

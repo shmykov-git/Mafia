@@ -95,6 +95,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Views\RatingView.xaml.cs">
+	    <DependentUpon>RatingView.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\GameView.xaml.cs">
 	    <DependentUpon>GameView.xaml</DependentUpon>
 	  </Compile>
@@ -117,6 +120,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="Views\RatingView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\GameView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

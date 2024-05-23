@@ -15,24 +15,22 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
-                            <VerticalStackLayout>
-                                <Grid ColumnDefinitions="*,*">
-                                    <Label Grid.Column="0"
-                                           TextColor="{Binding RoleColor}"
-                                            Text="{Binding RoleName}"
-                                            VerticalOptions="Center"
-                                            VerticalTextAlignment="Center"                                       
-                                            HorizontalOptions="Start"
-                                            FontAttributes="Bold" />
+                            <Grid ColumnDefinitions="*,*">
+                                <Label Grid.Column="0"
+                                        TextColor="{Binding RoleColor}"
+                                        Text="{Binding RoleName}"
+                                        VerticalOptions="Center"
+                                        VerticalTextAlignment="Center"                                       
+                                        HorizontalOptions="Start"
+                                        FontAttributes="Bold" />
 
-                                    <StackLayout Grid.Column="1" Orientation="Horizontal" HorizontalOptions="End">
-                                        <Editor IsVisible="{Binding IsCounter}"
-                                                IsEnabled="{Binding IsSelected}"
-                                                Text="{Binding Count}" />
-                                        <CheckBox IsChecked="{Binding IsSelected}" VerticalOptions="Center" />
-                                    </StackLayout>
-                                </Grid>
-                            </VerticalStackLayout>
+                                <StackLayout Grid.Column="1" Orientation="Horizontal" HorizontalOptions="End">
+                                    <Editor IsVisible="{Binding IsCounter}"
+                                            IsEnabled="{Binding IsSelected}"
+                                            Text="{Binding Count}" />
+                                    <CheckBox IsChecked="{Binding IsSelected}" VerticalOptions="Center" />
+                                </StackLayout>
+                            </Grid>
                         </ViewCell>
                     </DataTemplate>
                 </ListView.ItemTemplate>
