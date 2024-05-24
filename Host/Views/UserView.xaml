@@ -31,14 +31,14 @@
                                     <Button 
                                         Style="{StaticResource RoundBlackButton}"
                                         IsEnabled="{Binding IsUpEnabled}"
-                                        Text="⇪"                         
+                                        Text="▲"  
                                         Command="{Binding CommandUp}"  
                                         CommandParameter="{Binding Self}" />
 
                                     <Button
                                         Style="{StaticResource RoundBlackButton}"
                                         IsEnabled="{Binding IsDownEnabled}"
-                                        Text="⇪" 
+                                        Text="▲" 
                                         Rotation="180"
                                         Command="{Binding CommandDown}" 
                                         CommandParameter="{Binding Self}" />
